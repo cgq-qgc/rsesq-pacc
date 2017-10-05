@@ -7,10 +7,10 @@ Created on Tue Jun 13 14:29:29 2017
 # ---- Imports: standard library
 
 import urllib
-from urllib.request import urlopen
+from urllib.request import urlopen, urlretrieve
 from bs4 import BeautifulSoup, CData
 import re
-
+import os
 
 # ---- Utilities
 
@@ -50,17 +50,17 @@ def get_xml_url():
     return url
 
 
-def read_xml_datatable(url):
+def read_xml_datatable(url=None):
     """
     Read the xml datafile and return a database with the well info
     """
+    url = get_xml_url() if url is None else url
     xml = urlopen(url)
     soup = BeautifulSoup(xml, 'html.parser')
     places = soup.find_all('placemark')
 
     db = {}
     for place in places:
-        print('-'*78)
         desc = place.find('description')
         name = place.find('name').text
         for cd in desc.findAll(text=True):
@@ -77,31 +77,27 @@ def read_xml_datatable(url):
                         'Dernière lecture =(.*?)<br/>', cd)
 
                 s = '<br/><a href="(.*?)">Données'
-                db['url data'] = findUnique(s, cd)
+                db[pid]['url data'] = findUnique(s, cd)
                 s = 'Données</a><br/><a href="(.*?)">Schéma'
-                db['url drilllog'] = findUnique(s, cd)
+                db[pid]['url drilllog'] = findUnique(s, cd)
                 s = 'Schéma</a><br/><a href="(.*?)">Graphique'
-                db['url graph'] = findUnique(s, cd)
-
-                print(name, pid, db[pid]['Latitude'], db[pid]['Longitude'],
-                      db[pid]['Nappe'], db[pid]['Influenced'])
-                print(db['url data'])
-                print(db['url drilllog'])
-                print(db['url graph'])
+                db[pid]['url graph'] = findUnique(s, cd)
 
     return db
 
 
-def getFile_from_url(url, name):
-    # These operations  are required if non_ASCII char are presents in the url
+def get_file_from_url(url, filepath):
+    # Convert non_ASCII char in the url if any.
     url = urllib.parse.urlsplit(url)
     url = list(url)
     url[2] = urllib.parse.quote(url[2])
     url = urllib.parse.urlunsplit(url)
 
+    urlretrieve(url, filepath)
+
 
 if __name__ == "__main__":
+    db = read_xml_datatable()
 
-    url_xml = get_xml_url()
-    print(url_xml)
-    db = read_xml_datatable(url_xml)
+    filepath = os.path.join(os.getcwd(), 'abc.xls')
+    get_file_from_url(db['09000009']['url data'], filepath)
