@@ -214,6 +214,8 @@ class MDDELCC_RSESQ_Reader(object):
                        ['Elevation', station['Elevation']],
                        ['Nappe', station['Nappe']],
                        ['Influenced', station['Influenced']],
+                       [],
+                       ['Source', 'http://www.mddelcc.gouv.qc.ca/eau/piezo/'],
                        []]
 
         filecontent.append(['Time', 'Year', 'Month', 'Day',
