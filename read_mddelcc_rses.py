@@ -195,6 +195,11 @@ class MDDELCC_RSESQ_Reader(object):
         np.save(self.RSESQ_DB_FILE, self._db)
 
     def dwnld_raw_xls_datafile(self, station_id, filepath):
+        # Create the destination directory if it doesn't exist.
+        if not os.path.exists(os.path.dirname(filepath)):
+            os.makedirs(os.path.dirname(filepath))
+
+        # Download the xls file.
         station = self._db[station_id]
         if station['url data'] not in [None, '', b'']:
             urlretrieve(station['url data'], filepath)
@@ -204,9 +209,12 @@ class MDDELCC_RSESQ_Reader(object):
         if station['url data'] in [None, '', b'']:
             return
 
+        # If the data are not already saved in the local database, fetch it
+        # from the mddelcc website.
         if 'Water level' not in list(station.keys()):
             self.fetch_station_wldata(station_id)
 
+        # Generate the file header.
         filecontent = [['Well Name', station['Name']],
                        ['Well ID', station['ID']],
                        ['Latitude', station['Latitude']],
@@ -222,6 +230,7 @@ class MDDELCC_RSESQ_Reader(object):
                             'Water level (masl)',
                             'Water temperature (degC)'])
 
+        # Append the dataset.
         time = station['Time']
         wlvl = station['Water level']
         wtemp = station['Temperature']
@@ -229,6 +238,11 @@ class MDDELCC_RSESQ_Reader(object):
             yy, mm, dd = xlrd.xldate_as_tuple(time[i], 0)[:3]
             filecontent.append([time[i], yy, mm, dd, wlvl[i], wtemp[i]])
 
+        # Create the destination directory if it doesn't exist.
+        if not os.path.exists(os.path.dirname(filepath)):
+            os.makedirs(os.path.dirname(filepath))
+
+        # Save the csv.
         with open(filepath, 'w') as f:
             writer = csv.writer(f, delimiter=',', lineterminator='\n')
             writer.writerows(filecontent)
