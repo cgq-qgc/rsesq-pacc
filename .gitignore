@@ -99,3 +99,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+#my gitignores
+/data_files
