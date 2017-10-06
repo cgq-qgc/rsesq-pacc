@@ -9,7 +9,9 @@ Réseau de Suivi des Eaux Souterraines du Québec
 ```python
 from read_mddelcc_rses import MDDELCC_RSESQ_Reader
 import os
-   
+
+dirname = os.path.join(os.getcwd(), 'water_level')
+
 reader = MDDELCC_RSESQ_Reader()
 for station in reader.stations():
     filename = "%s (%s).csv" % (station['Name'], station['ID'])
