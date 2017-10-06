@@ -5,8 +5,7 @@ Tools developped at [INRS centre Eau-Terre-Environnement](http://www.ete.inrs.ca
 
 ----
 
-## API to download and format groundwater level data
-(http://www.mddelcc.gouv.qc.ca/eau/piezo/)
+## API to download groundwater level data from the [MDDELCC](http://www.mddelcc.gouv.qc.ca/eau/piezo/) website
 
 ```python
 from read_mddelcc_rses import MDDELCC_RSESQ_Reader
