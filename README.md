@@ -14,6 +14,5 @@ dirname = os.path.join(os.getcwd(), 'water_level')
 reader = MDDELCC_RSESQ_Reader()
 for station in reader.stations():
     filename = "%s (%s).csv" % (station['Name'], station['ID'])
-    filepath = os.path.join(dirname, filename)
-    reader.save_station_to_csv(station['ID'], filepath)
+    reader.save_station_to_csv(station['ID'], os.path.join(dirname, filename))
 ```
