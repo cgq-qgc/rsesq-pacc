@@ -1,8 +1,8 @@
 # rsesq-data
 
-Tools developped at [INRS centre Eau-Terre-Environnement](http://www.ete.inrs.ca/) for collecting and formatting groundwater level, hydrometric data, and weather data that are made freely available from various sources by the [Ministry of Sustainable Development, Environment, and Action against Climate Change ](http://www.mddelcc.gouv.qc.ca/) of the Province of Quebec and by [Environment and Climate Change Canada](https://ec.gc.ca/default.asp?lang=en&n=FD9B0E51-1).
+Outils développés à l'[INRS centre Eau-Terre-Environnement](http://www.ete.inrs.ca/) pour récupérer et mettre en forme automatiquement les données temporelles piézométriques, hydrométriques et climatiques qui sont rendues disponibles gratuitement par le [Ministère du Développement Durable, de l'Environnement et de la Lutte contre les Changements Climatiques](http://www.mddelcc.gouv.qc.ca/) du Québec et par [Environnement et Changement climatique Canada](https://www.ec.gc.ca/default.asp?lang=Fr).
 
-## API to download groundwater level data from the [MDDELCC](http://www.mddelcc.gouv.qc.ca/eau/piezo/) website
+## API pour télécharger les données du RSESQ du [MDDELCC](http://www.mddelcc.gouv.qc.ca/eau/piezo/)
 
 ```python
 from read_mddelcc_rses import MDDELCC_RSESQ_Reader
