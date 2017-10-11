@@ -15,3 +15,11 @@ for station in reader.stations():
     filename = "%s (%s).csv" % (station['Name'], station['ID'])
     reader.save_station_to_csv(station['ID'], os.path.join(dirname, filename))
 ```
+
+## API pour télécharger les données climatiques d'[Environnement et Changement climatique Canada](http://climate.weather.gc.ca/historical_data/search_historic_data_e.html)
+
+À venir...
+
+## API pour récupérer les données hydrométriques de la base de données [HYDAT](https://ec.gc.ca/rhc-wsc/default.asp?lang=En&n=9018B5EC-1)
+
+À venir...
