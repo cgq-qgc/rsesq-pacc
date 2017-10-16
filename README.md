@@ -1,10 +1,11 @@
-# 1. Feuilles de routes
-Tous les documents en lien avec la planification et le suivi de l'avancement du projet sont rendu disponibles dans le répertoire [inrs-rsesq/roadmap](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap). Le fichier [gantt_chart_projet_inrs_rsesq.xml] contient la feuille de route complète du projet et peut être consulté à l'aide du logiciel open source [GanttProject](http://www.ganttproject.biz/). Cette feuille de route est mise à jour en continue selon l'évolution du projet. Des rapports de suivi de l'avancement du projet en format pdf sont également produits sur une base hebdomadaires et sont disponibles dans le dossier [progress report](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap/progress%20reports).
+# 1. Feuilles de route
 
-De plus, la majorité des tâches qui apparaissent dans la planification du projet sont également documentées dans les [Issues](https://github.com/jnsebgosselin/inrs-rsesq/issues) de ce projet où il est possible de commenter et proposer de nouvelles idées pour le projet.
+Tous les documents en lien avec la planification et le suivi de l'avancement du projet sont rendu disponibles dans le répertoire [inrs-rsesq/roadmap](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap). Le fichier [gantt_chart_projet_inrs_rsesq.xml](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/roadmap/gantt_chart_projet_inrs_rsesq.xml) contient la feuille de route complète du projet et peut être consulté à l'aide du logiciel open source [GanttProject](http://www.ganttproject.biz/). Cette feuille de route est mise à jour en continue selon l'évolution du projet. Des rapports de suivi de l'avancement du projet en format pdf sont également produits sur une base hebdomadaires et sont disponibles dans le dossier [progress report](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap/progress%20reports).
+
+De plus, la majorité des tâches qui apparaissent dans la planification du projet sont logguées dans les [Issues](https://github.com/jnsebgosselin/inrs-rsesq/issues) de ce répertoire GitHub où il est possible de commenter et proposer de nouvelles idées pour le projet.
 
 ![Gantt diagram screenshot](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/roadmap/gantt_chart_scs.png)
-_Figure: Diagramme de Gantt du projet (produit le 16/10/2017)_
+_Figure: Diagramme de Gantt du projet tel que vu dans [GanttProject](http://www.ganttproject.biz/)(produit le 16/10/2017)_
 
 # 2. rsesq-data: collecte et mise en forme des données
 
