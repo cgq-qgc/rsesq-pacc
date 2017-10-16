@@ -1,4 +1,4 @@
-# 1. Feuilles de route
+# 1. Feuille de route
 
 Tous les documents en lien avec la planification et le suivi de l'avancement du projet sont rendu disponibles dans le répertoire [inrs-rsesq/roadmap](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap). Le fichier [gantt_chart_projet_inrs_rsesq.xml](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/roadmap/gantt_chart_projet_inrs_rsesq.xml) contient la feuille de route complète du projet et peut être consulté à l'aide du logiciel open source [GanttProject](http://www.ganttproject.biz/). Cette feuille de route est mise à jour en continue selon l'évolution du projet. Des rapports de suivi de l'avancement du projet en format pdf sont également produits sur une base hebdomadaires et sont disponibles dans le dossier [progress report](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap/progress%20reports).
 
