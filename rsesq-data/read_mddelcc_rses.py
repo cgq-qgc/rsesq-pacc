@@ -196,6 +196,7 @@ class MDDELCC_RSESQ_Reader(object):
 
     def dwnld_raw_xls_datafile(self, station_id, filepath):
         # Create the destination directory if it doesn't exist.
+        filepath = os.path.abspath(filepath)
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
 
@@ -239,6 +240,7 @@ class MDDELCC_RSESQ_Reader(object):
             filecontent.append([time[i], yy, mm, dd, wlvl[i], wtemp[i]])
 
         # Create the destination directory if it doesn't exist.
+        filepath = os.path.abspath(filepath)
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
 
