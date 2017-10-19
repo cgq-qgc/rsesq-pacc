@@ -20,6 +20,10 @@ import csv
 from bs4 import BeautifulSoup, CData
 import xlrd
 
+# ---- Imports: local
+
+from base import AbstractReader
+
 
 # ---- Utilities
 
@@ -154,12 +158,12 @@ def get_wldata_from_xls(url):
 # ---- API
 
 
-class MDDELCC_RSESQ_Reader(object):
+class MDDELCC_RSESQ_Reader(AbstractReader):
 
-    RSESQ_DB_FILE = 'mddelcc_rsesq_stations.npy'
+    DATABASE_FILEPATH = 'mddelcc_rsesq_stations.npy'
 
     def __init__(self):
-        self.load_database()
+        super(MDDELCC_RSESQ_Reader, self).__init__()
 
     def __getitem__(self, key):
         return self._db[key]
@@ -172,14 +176,14 @@ class MDDELCC_RSESQ_Reader(object):
 
     def load_database(self):
         try:
-            self._db = np.load(self.RSESQ_DB_FILE).item()
+            self._db = np.load(self.DATABASE_FILEPATH).item()
         except FileNotFoundError:
             self.fetch_database_from_mddelcc()
 
     def fetch_database_from_mddelcc(self):
         url = get_xml_url()
         self._db = read_xml_datatable(url)
-        np.save(self.RSESQ_DB_FILE, self._db)
+        np.save(self.DATABASE_FILEPATH, self._db)
 
     def fetch_station_wldata(self, station_id):
         station = self._db[station_id]
@@ -192,10 +196,11 @@ class MDDELCC_RSESQ_Reader(object):
         station['Water level'] = wlvl
         station['Temperature'] = wtemp
 
-        np.save(self.RSESQ_DB_FILE, self._db)
+        np.save(self.DATABASE_FILEPATH, self._db)
 
     def dwnld_raw_xls_datafile(self, station_id, filepath):
         # Create the destination directory if it doesn't exist.
+        filepath = os.path.abspath(filepath)
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
 
@@ -203,6 +208,9 @@ class MDDELCC_RSESQ_Reader(object):
         station = self._db[station_id]
         if station['url data'] not in [None, '', b'']:
             urlretrieve(station['url data'], filepath)
+
+    def save_station_to_hdf5(self, station_id, filepath):
+        pass
 
     def save_station_to_csv(self, station_id, filepath):
         station = self._db[station_id]
@@ -213,6 +221,7 @@ class MDDELCC_RSESQ_Reader(object):
         # from the mddelcc website.
         if 'Water level' not in list(station.keys()):
             self.fetch_station_wldata(station_id)
+            station = self._db[station_id]
 
         # Generate the file header.
         filecontent = [['Well Name', station['Name']],
@@ -239,6 +248,7 @@ class MDDELCC_RSESQ_Reader(object):
             filecontent.append([time[i], yy, mm, dd, wlvl[i], wtemp[i]])
 
         # Create the destination directory if it doesn't exist.
+        filepath = os.path.abspath(filepath)
         if not os.path.exists(os.path.dirname(filepath)):
             os.makedirs(os.path.dirname(filepath))
 

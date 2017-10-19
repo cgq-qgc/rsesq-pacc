@@ -102,3 +102,4 @@ ENV/
 
 #my gitignores
 /data_files
+*.npy
