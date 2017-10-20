@@ -114,10 +114,12 @@ def format_url_to_ascii(url):
 
 # ---- Base functions
 
-def get_data_from_url(tail):
-    root = "http://www.cehq.gouv.qc.ca/depot/historique_donnees/"
+def read_html_from_url(url):
+    """"
+    Get, read and decode html data from a url in the the CEHQ domain.
+    """
     try:
-        html = urlopen(root+tail).read()
+        html = urlopen(url).read()
     except (HTTPError, URLError):
         return None
 
@@ -216,12 +218,13 @@ def scrape_daily_series_from_txt(sid, data):
 
 
 def scrape_data_from_sid(sid):
-    data_Q = get_data_from_url("fichier/%s_Q.txt" % sid)
-    data_N = get_data_from_url("fichier/%s_N.txt" % sid)
     """
     This is a meta function that will read and restructured station info and
     daily streamflow and level data for the station with the specified id.
     """
+    root = "http://www.cehq.gouv.qc.ca/depot/historique_donnees/"
+    data_Q = read_html_from_url(root+"fichier/%s_Q.txt" % sid)
+    data_N = read_html_from_url(root+"fichier/%s_N.txt" % sid)
 
     df_dly_hydat = {}
     if data_N:
