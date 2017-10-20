@@ -69,8 +69,9 @@ def dms2decdeg(coord):
     Convert decimal, minute, second format lat/lon coordinate to
     decimal degree.
     """
-    dd = coord[0] + coord[1]/60 + coord[2]/3600
-    return dd
+    sign = np.sign(coord[0])
+    dd = abs(coord[0]) + coord[1]/60 + coord[2]/3600
+    return sign*dd
 
 
 def findUnique(pattern, string):
