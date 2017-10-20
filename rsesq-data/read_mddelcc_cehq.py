@@ -374,8 +374,4 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
 
 if __name__ == "__main__":
     reader = MDDELCC_CEHQ_Reader()
-    reader.save_station_to_csv('030920', 'test_hyd.csv')
-    
-    
-    # df_dly_hydat = scrape_data_from_sid(sids[0])
-    # df_dly_hydat2 = scrape_data_from_sid('011508')
+    # reader.fetch_database_from_mddelcc()
