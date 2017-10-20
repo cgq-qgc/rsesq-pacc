@@ -144,27 +144,53 @@ def scrape_station_ids():
     return [row.text.strip() for row in options if row.text.strip()]
 
 
-def scrape_station_info(sid, data):
+def scrape_station_datasheet(sid):
     """
-    Read the header of the daily data sheet of a given station to extract
-    information about the station and return a dataframe with the name of the
-    station, a desciption of its location, the watershed drainage area, the
-    stream regime at the station, and the latitude, longitude, and elevation of
-    the station if available.
+    Read the information in the station datasheet.
     """
-    df = {'ID': sid}
+    url = "http://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/"
+    url += "fiche_station.asp?NoStation=%s" % sid
+    html = urlopen(url).read().decode('iso-8859-1')
 
-    # ---- Scrape name and description
+    FIELDS_KEYS = [('Numéro de la station :', 'ID'),
+                   ('Nom de la station :', 'Name'),
+                   ('Description :', 'Description'),
+                   ('État :', 'Status'),
+                   ("Période(s) d'activité :", 'Active period'),
+                   ("Municipalité :", 'Municipality'),
+                   ('Région administrative :', 'Administrative Region'),
+                   ("Lac ou cours d'eau :", 'Stream Name'),
+                   ("Région hydrographique", 'Hydrographic Region'),
+                   ("Bassin versant à la station", 'Drainage Area'),
+                   ("Régime d'écoulement", 'Flow Regime'),
+                   ("Numéro fédéral de la station :", "Federal ID")]
 
-    items = [s.strip() for s in data[2].split("     ") if s][2].split('-')
-    df['Name'] = items[0].strip()
-    df['Description'] = items[1].strip()
+    # BeautifulSoup is not working correctly for this content due to the mixed
+    # up of <a> and <b> fields in the table. So we use a basic crawling of the
+    # content using regexes instead.
 
-    # ---- Scrape watershed area and flow regime
+    data = {}
+    for field, key in FIELDS_KEYS:
+        idx = html.find(field)
+        data[key] = findUnique('<td width="421">(.*?)&nbsp;</td>', html[idx:])
 
-    items = [s.strip() for s in data[3].split() if s]
-    df['Drainage Area'] = float(items[2])
-    df['Regime'] = items[-1]
+    data['Drainage Area'] = data['Drainage Area'].replace(',', '.')
+    data['Drainage Area'] = data['Drainage Area'].replace(' km²', '')
+    data['Drainage Area'] = data['Drainage Area'].replace('\xa0', '')
+    try:
+        data['Drainage Area'] = float(data['Drainage Area'])
+    except ValueError:
+        data['Drainage Area'] = ''
+
+    return data
+
+
+def scrape_station_data_header(data):
+    """
+    Get latitude, longitude, and elevation (if available) from the header of
+    the datafile.
+    """
+    df = {}
 
     # ---- Scrape latitude and longitude
 
@@ -221,17 +247,18 @@ def scrape_data_from_sid(sid):
     This is a meta function that will read and restructured station info and
     daily streamflow and level data for the station with the specified id.
     """
+    df_dly_hydat = {'ID': sid}
+
     root = "http://www.cehq.gouv.qc.ca/depot/historique_donnees/"
     data_Q = read_html_from_url(root+"fichier/%s_Q.txt" % sid)
     data_N = read_html_from_url(root+"fichier/%s_N.txt" % sid)
 
-    df_dly_hydat = {}
     if data_N:
-        df_dly_hydat = scrape_station_info(sid, data_N)
+        df_dly_hydat.update(scrape_station_data_header(data_N))
     elif data_Q:
-        df_dly_hydat = scrape_station_info(sid, data_Q)
+        df_dly_hydat.update(scrape_station_data_header(data_Q))
     else:
-        return df_dly_hydat
+        return {}
 
     df_Q = scrape_daily_series_from_txt(sid, data_Q)
     df_N = scrape_daily_series_from_txt(sid, data_N)
