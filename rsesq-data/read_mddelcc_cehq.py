@@ -16,6 +16,7 @@ import os
 import requests
 import csv
 import datetime
+from multiprocessing import Pool
 
 # ---- Imports: third parties
 
@@ -296,7 +297,15 @@ def scrape_data_from_sid(sid):
     return df_dly_hydat
 
 
+def fetch_station_data(sid):
+    df = {'ID': sid}
+    df.update(scrape_station_datasheet(sid))
+    df.update(scrape_data_from_sid(sid))
+    return df
+
+
 # ---- API
+
 
 class MDDELCC_CEHQ_Reader(AbstractReader):
     DATABASE_FILEPATH = 'mddelcc_cehq_stations.npy'
@@ -319,14 +328,27 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
     def fetch_database_from_mddelcc(self):
         sids = scrape_station_ids()
         self._db = {}
-        for sid in sids:
-            self._db[sid] = {}
+
+        # for i, sid in enumerate(sids):
+        #     print('Data for station %s fetched: %d of %d' %
+        #           (sid, i+1, len(sids)))
+        #     self._db[sid] = fetch_station_data(sid)
+        # np.save(self.DATABASE_FILEPATH, self._db)
+
+        p = Pool(10)
+        itr = 0
+        for result in p.imap(fetch_station_data, sids):
+            itr += 1
+            print('Data for station %s fetched: %d of %d' %
+                  (result['ID'], itr, len(sids)))
+            self._db[result['ID']] = result
+        p.close()
+        p.join()
         np.save(self.DATABASE_FILEPATH, self._db)
 
     def fetch_station_data(self, sid):
-        self._db[sid] = scrape_data_from_sid(sid)
+        self._db[sid] = fetch_station_data(sid)
         np.save(self.DATABASE_FILEPATH, self._db)
-
         return self._db[sid]
 
     def save_station_to_hdf5(self):
