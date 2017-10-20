@@ -116,9 +116,7 @@ def format_url_to_ascii(url):
 # ---- Base functions
 
 def read_html_from_url(url):
-    """"
-    Get, read and decode html data from a url in the the CEHQ domain.
-    """
+    """"Get, read and decode html data from a url in the the CEHQ domain."""
     try:
         html = urlopen(url).read()
     except (HTTPError, URLError):
