@@ -129,7 +129,10 @@ def get_data_from_url(tail):
 
 
 def scrape_station_ids():
-    """Get a list of all station ID on the CEHQ website"""
+    """
+    Get a list of the IDs of all the stations for which data are available
+    on the CEHQ website
+    """
     url = ("http://www.cehq.gouv.qc.ca/hydrometrie/"
            "historique_donnees/default.asp")
 
@@ -141,6 +144,13 @@ def scrape_station_ids():
 
 
 def scrape_station_info(sid, data):
+    """
+    Read the header of the daily data sheet of a given station to extract
+    information about the station and return a dataframe with the name of the
+    station, a desciption of its location, the watershed drainage area, the
+    stream regime at the station, and the latitude, longitude, and elevation of
+    the station if available.
+    """
     df = {'ID': sid}
 
     # ---- Scrape name and description
@@ -173,6 +183,10 @@ def scrape_station_info(sid, data):
 
 
 def scrape_daily_series_from_txt(sid, data):
+    """
+    Structured the daily streamflow and level that were downloaded on the CEHQ
+    website into structured arrays and store them in a dataframe.
+    """
     df = {'Time': [], 'Year': [], 'Month': [], 'Day': [],
           'Daily values': [], 'Note': []}
 
@@ -204,6 +218,10 @@ def scrape_daily_series_from_txt(sid, data):
 def scrape_data_from_sid(sid):
     data_Q = get_data_from_url("fichier/%s_Q.txt" % sid)
     data_N = get_data_from_url("fichier/%s_N.txt" % sid)
+    """
+    This is a meta function that will read and restructured station info and
+    daily streamflow and level data for the station with the specified id.
+    """
 
     df_dly_hydat = {}
     if data_N:
