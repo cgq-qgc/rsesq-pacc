@@ -322,13 +322,14 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
     def fetch_database_from_mddelcc(self):
         sids = scrape_station_ids()
         self._db = {}
-        p = Pool(10)
+        p = Pool(5)
         itr = 0
         for result in p.imap(fetch_station_data, sids):
             itr += 1
-            print('Data for station %s fetched: %d of %d' %
-                  (result['ID'], itr, len(sids)))
+            args = (result['ID'], itr, len(sids))
+            print('Data for station %s fetched: %d of %d' % args, end="\r")
             self._db[result['ID']] = result
+        print()
         p.close()
         p.join()
         np.save(self.DATABASE_FILEPATH, self._db)
@@ -391,4 +392,4 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
 
 if __name__ == "__main__":
     reader = MDDELCC_CEHQ_Reader()
-    # reader.fetch_database_from_mddelcc()
+    reader.fetch_database_from_mddelcc()
