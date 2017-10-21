@@ -29,6 +29,34 @@ for station in reader.stations():
 
 À venir...
 
-## 2.3. API pour récupérer les données hydrométriques de la base de données [HYDAT](https://ec.gc.ca/rhc-wsc/default.asp?lang=En&n=9018B5EC-1)
+## 2.3. API pour récupérer les données hydrométriques du [CEHQ](https://www.cehq.gouv.qc.ca/)
+https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 
-À venir d'ici le 19/10/2017...
+```python
+import os
+from numpy import min, max
+from read_mddelcc_cehq import MDDELCC_CEHQ_Reader
+
+dirname = os.path.join(os.getcwd(), 'data_files', 'streamflow_and_level')
+
+reader = MDDELCC_CEHQ_Reader()
+for i, sid in enumerate(reader.station_ids()):
+    args = (sid, i+1, len(reader.station_ids()))
+    print('Saving data for station %s: %d of %d' % args, end='\r')
+    
+    data = reader._db[sid]
+    filename = "%s_%d-%d.csv" % (sid, min(data['Year']), max(data['Year']))
+    filepath = os.path.join(dirname, filename)
+    reader.save_station_to_csv(sid, filepath)
+```
+
+La première fois que `MDDELCC_CEHQ_Reader` est initialisé, la base de données hydrométriques complète sera téléchargée du site web du CEHQ et sera sauvegardée sur le disque en format binaire dans le fichier `mddelcc_cehq_stations.npy`. Les initialisations subséquentes de `MDDELCC_CEHQ_Reader` accéderont les données à partir de ce fichier.
+
+Pour mettre à jour la base de données locale à partir de celle du CEHQ, simplement lancer:
+
+```python
+from read_mddelcc_cehq import MDDELCC_CEHQ_Reader
+
+reader = MDDELCC_CEHQ_Reader()
+reader.fetch_database_from_mddelcc()
+```
