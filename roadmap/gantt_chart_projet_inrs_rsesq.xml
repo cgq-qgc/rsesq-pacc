@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="INRS-ETE" webLink="https://github.com/RSESQ" view-date="2017-10-01" view-index="0" gantt-divider-location="456" resource-divider-location="300" version="2.8.5" locale="en">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="INRS-ETE" webLink="https://github.com/RSESQ" view-date="2017-10-08" view-index="0" gantt-divider-location="395" resource-divider-location="300" version="2.8.5" locale="en">
     <description/>
     <view zooming-state="default:4" id="gantt-chart">
-        <field id="tpd3" name="Name" width="289" order="0"/>
-        <field id="tpd4" name="Begin date" width="59" order="1"/>
-        <field id="tpd5" name="End date" width="88" order="2"/>
+        <field id="tpd3" name="Name" width="246" order="0"/>
+        <field id="tpd4" name="Begin date" width="52" order="1"/>
+        <field id="tpd5" name="End date" width="77" order="2"/>
         <option id="taskLabelUp" value=""/>
         <option id="taskLabelLeft" value="name"/>
         <option id="taskLabelRight" value=""/>
         <timeline><![CDATA[145]]></timeline>
-        <option id="color.recent"><![CDATA[#ffff00 #cccccc #999999 #333333 #000000 #00ff66 #f0f0f0]]></option>
+        <option id="color.recent"><![CDATA[#00ff66 #ffff00 #cccccc #999999 #333333 #000000 #f0f0f0]]></option>
     </view>
     <view id="resource-table">
         <field id="0" name="Name" width="211" order="0"/>
@@ -47,7 +47,7 @@
             <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
             <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
         </taskproperties>
-        <task id="0" name="Volet: opération" color="#333333" meeting="false" start="2017-09-18" duration="80" complete="28" expand="true">
+        <task id="0" name="Volet: opération" color="#333333" meeting="false" start="2017-09-18" duration="80" complete="31" expand="true">
             <task id="246" name="Version 1.0 des outils pour la collecte et mise à jour des données complétés" color="#8cb6ce" meeting="true" start="2017-11-15" duration="0" complete="0" expand="true"/>
             <task id="2" name="Données climatiques" color="#999999" meeting="false" start="2017-09-18" duration="67" complete="8" expand="true">
                 <task id="240" name="Production d'une première version des données traitées" color="#8cb6ce" meeting="false" start="2017-09-18" duration="4" complete="100" expand="true">
@@ -101,27 +101,32 @@ Pour ce faire, il est proposé de rédiger le tout à l'aide de Read the Doc: ht
                 </task>
                 <task id="197" name="Mettre à jour la doc. de GWHAT" color="#ffff00" meeting="false" start="2018-01-09" duration="2" complete="0" expand="true"/>
             </task>
-            <task id="4" name="Données hydrométriques" color="#999999" meeting="false" start="2017-10-16" duration="5" complete="0" expand="true">
-                <task id="120" name="Tutoriel SQLite pour Python" color="#00ff66" meeting="false" start="2017-10-16" duration="2" complete="0" expand="true">
-                    <notes><![CDATA[L'objectif est d'acquérir les connaissances nécessaires pour être en mesure de lire et récupérer les données de la base de données SQLite HYDAT
+            <task id="4" name="Données hydrométriques" color="#999999" meeting="false" start="2017-10-16" duration="5" complete="83" expand="true">
+                <task id="120" name="Tutoriel SQLite pour Python" color="#00ff66" meeting="false" start="2017-10-16" duration="1" complete="100" expand="true">
+                    <notes><![CDATA[L'objectif est d'acquérir les connaissances nécessaires pour mener à bien l'Issue #1.
 
-Base de données HYDAT:
-https://ec.gc.ca/rhc-wsc/default.asp?lang=En&n=9018B5EC-1
+Documentation de Python:
+- [x] https://docs.python.org/2/library/sqlite3.html
 
-Documentation python:
-https://docs.python.org/2/library/sqlite3.html
+Documentation de SQLite:
+- [x] https://www.tutorialspoint.com/sqlite/sqlite_python.htm
 
-Tutoriels:
-http://pythoncentral.io/introduction-to-sqlite-in-python/
-https://www.tutorialspoint.com/sqlite/sqlite_python.htm
-http://zetcode.com/db/sqlitepythontutorial/]]></notes>
+Tutoriel de ZetCode:
+- [x] http://zetcode.com/db/sqlitepythontutorial/
+
+Pandas:
+- [x] http://pandas.pydata.org/pandas-docs/version/0.15.0/generated/pandas.read_sql.html
+- [x] https://www.dataquest.io/blog/python-pandas-databases/]]></notes>
                     <depend id="25" type="2" difference="0" hardness="Strong"/>
                 </task>
-                <task id="25" name="Créer une API pour lire HYDAT" color="#8cb6ce" meeting="false" start="2017-10-18" duration="2" complete="0" expand="true">
+                <task id="25" name="Créer une API pour lire HYDAT" color="#8cb6ce" meeting="false" start="2017-10-17" duration="2" complete="100" expand="true">
                     <notes><![CDATA[Créer une API qui permettra de lire et récupérer les données de la base de données HYDAT dans le but de pouvoir mettre à jour les données hydrométriques utilisées pour le projet sur une base bi-annuelle.]]></notes>
                     <depend id="26" type="2" difference="0" hardness="Strong"/>
                 </task>
-                <task id="26" name="Récupérer les données" color="#8cb6ce" meeting="false" start="2017-10-20" duration="1" complete="0" expand="true">
+                <task id="249" name="Créer une API pour lire CEHQ" color="#8cb6ce" meeting="false" start="2017-10-19" duration="1" complete="100" expand="true">
+                    <depend id="26" type="2" difference="0" hardness="Strong"/>
+                </task>
+                <task id="26" name="Récupérer les données" color="#8cb6ce" meeting="false" start="2017-10-20" duration="1" complete="100" expand="true">
                     <notes><![CDATA[Créer un script dans un IPython notebook faisant appel à l'API développée plus tôt pour récupérer automatiquement les données d'intérêts dans la base de données HYDAT.]]></notes>
                 </task>
                 <task id="212" name="Outils pour récupérer les données hydrométriques complétés" color="#8cb6ce" meeting="true" start="2017-10-20" duration="0" complete="0" expand="true">
@@ -166,8 +171,12 @@ https://github.com/jnsebgosselin/inrs-rsesq/issues/6]]></notes>
             <task id="163" name="Graph: hydrogramme et météo" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
             <task id="162" name="Rapport: fin de projet" color="#8cb6ce" meeting="true" start="2019-12-31" duration="0" complete="0" expand="true"/>
         </task>
-        <task id="17" name="Formation continue" color="#00ff66" meeting="false" start="2017-10-23" duration="5" complete="0" expand="true">
+        <task id="17" name="Formation continue" color="#00ff66" meeting="false" start="2017-10-02" duration="19" complete="0" expand="true">
             <task id="21" name="Lecture Klove et al. (2014)" color="#00ff66" meeting="false" start="2017-10-23" duration="5" complete="0" expand="true"/>
+            <task id="247" name="Lire le contenu du CEHQ" color="#00ff66" meeting="false" start="2017-10-02" duration="1" complete="0" expand="true">
+                <notes><![CDATA[Survoler et lire tout ce qui est disponible sur:
+https://www.cehq.gouv.qc.ca/hydrometrie/]]></notes>
+            </task>
         </task>
     </tasks>
     <resources/>
