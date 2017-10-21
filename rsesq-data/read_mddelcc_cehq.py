@@ -181,7 +181,7 @@ def scrape_station_datasheet(sid):
     try:
         data['Drainage Area'] = float(data['Drainage Area'])
     except ValueError:
-        data['Drainage Area'] = ''
+        data['Drainage Area'] = 'Non disponible'
 
     return data
 
@@ -205,7 +205,7 @@ def scrape_station_data_header(data):
     try:
         df['Elevation'] = float(items[2])
     except (IndexError, ValueError):
-        df['Elevation'] = ''
+        df['Elevation'] = 'Non disponible'
 
     return df
 
