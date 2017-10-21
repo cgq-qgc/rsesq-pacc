@@ -70,6 +70,7 @@ reader.fetch_database_from_mddelcc()
 # 3 License
 
 Copyright 2017 Jean-Sébastien Gosselin. All Rights Reserved.
+
 email: jean-sebastien.gosselin@ete.inrs.ca
 
 This is free software: you can redistribute it and/or modify
