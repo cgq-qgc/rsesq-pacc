@@ -17,7 +17,7 @@ Outils développés à l'[INRS centre Eau-Terre-Environnement](http://www.ete.in
 from read_mddelcc_rses import MDDELCC_RSESQ_Reader
 import os
 
-dirname = os.path.join(os.getcwd(), 'water_level')
+dirname = os.path.join(os.getcwd(), 'data_files', 'water_level')
 
 reader = MDDELCC_RSESQ_Reader()
 for station in reader.stations():
