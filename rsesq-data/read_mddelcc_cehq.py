@@ -328,13 +328,6 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
     def fetch_database_from_mddelcc(self):
         sids = scrape_station_ids()
         self._db = {}
-
-        # for i, sid in enumerate(sids):
-        #     print('Data for station %s fetched: %d of %d' %
-        #           (sid, i+1, len(sids)))
-        #     self._db[sid] = fetch_station_data(sid)
-        # np.save(self.DATABASE_FILEPATH, self._db)
-
         p = Pool(10)
         itr = 0
         for result in p.imap(fetch_station_data, sids):
@@ -355,8 +348,10 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
         pass
 
     def save_station_to_csv(self, sid, filepath):
-        # If the data are not already saved in the local database, fetch it
-        # from the mddelcc website.
+        """
+        Save data from local database to csv. If the data are not already
+        saved in the local database, it is fetched from the mddelcc website.
+        """
         if len(self._db[sid]) == 0:
             self.fetch_station_data(sid)
         station = self._db[sid]
@@ -366,14 +361,20 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
               ['Station Name', station['Name']],
               ['Description', station['Description']],
               ['Status', station['Status']],
+              ['Active period', station['Active period']],
               ['Province', 'Qc'],
+              ['Municipality', station['Municipality']],
+              ['Administrative Region', station['Administrative Region']],
+              ['Stream Name', station['Stream Name']],
+              ['Hydrographic Region', station['Hydrographic Region']],
               ['Latitude (dd)', station['Latitude']],
               ['Longitude (dd)', station['Longitude']],
               ['Elevation (m)', station['Elevation']],
               ['Drainage Area (km2)', station['Drainage Area']],
-              ['Regime', station['Regime']],
+              ['Flow Regime', station['Flow Regime']],
               [],
               ['Source', 'https://www.cehq.gouv.qc.ca'],
+              ['Federal ID', station["Federal ID"]],
               [],
               ['Time', 'Year', 'Month', 'Day', 'Level (m)', 'Flow (m3/s)']]
 
