@@ -103,3 +103,6 @@ ENV/
 #my gitignores
 /data_files
 *.npy
+*/data_files/*
+Hydat.sqlite3
+demande_UQAM_meteo_debit.xlsx
