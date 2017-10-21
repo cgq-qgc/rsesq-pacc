@@ -286,14 +286,6 @@ def scrape_data_from_sid(sid):
         df_dly_hydat[key][indexes] = df_N[key]
     df_dly_hydat['Level'][indexes] = df_N['Daily values']
 
-    # ---- Determine status
-
-    now = datetime.datetime.now()
-    if np.max(df_dly_hydat['Year']) == now.year:
-        df_dly_hydat['Status'] = 'Open'
-    else:
-        df_dly_hydat['Status'] = 'Closed'
-
     return df_dly_hydat
 
 
