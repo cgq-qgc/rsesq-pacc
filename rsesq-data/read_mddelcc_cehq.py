@@ -175,6 +175,8 @@ def scrape_station_datasheet(sid):
         idx = html.find(field)
         data[key] = findUnique('<td width="421">(.*?)&nbsp;</td>', html[idx:])
 
+    data['Active period'] = data['Active period'].replace('<br>', ' ; ')
+
     data['Drainage Area'] = data['Drainage Area'].replace(',', '.')
     data['Drainage Area'] = data['Drainage Area'].replace(' km²', '')
     data['Drainage Area'] = data['Drainage Area'].replace('\xa0', '')
