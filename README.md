@@ -61,10 +61,14 @@ La première fois que `MDDELCC_CEHQ_Reader` est initialisé, la base de données
 Pour mettre à jour la base de données locale à partir de celle du CEHQ, simplement lancer:
 
 ```python
-from read_mddelcc_cehq import MDDELCC_CEHQ_Reader
-
 reader = MDDELCC_CEHQ_Reader()
 reader.fetch_database_from_mddelcc()
+```
+
+Pour mettre à jour les données d'une station en particulier, par exemple la station '022513':
+```python
+reader = MDDELCC_CEHQ_Reader()
+reader.fetch_station_data('022513')
 ```
 
 # 3 License
