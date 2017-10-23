@@ -6,11 +6,9 @@ Created on Tue Jun 13 14:29:29 2017
 
 # ---- Imports: standard library
 
-import urllib
 from urllib.request import urlopen, urlretrieve
 from io import BytesIO
 import numpy as np
-import re
 import os
 import requests
 import csv
@@ -23,49 +21,7 @@ import xlrd
 # ---- Imports: local
 
 from base import AbstractReader
-
-
-# ---- Utilities
-
-
-def findUnique(pattern, string):
-    """
-    Return the first result found for the regex search or return None if
-    nothing is found.
-    """
-    result = re.findall(pattern, string)
-    if len(result) > 0:
-        return result[0].strip()
-    else:
-        return None
-
-
-def find_float_from_str(string, sep):
-    """
-    Search a string to find a float number if any.
-    """
-    float_ = ''
-    digit_sep_found = False
-    for char in string:
-        if char.isdigit():
-            float_ += char
-        else:
-            if char == sep and not digit_sep_found:
-                digit_sep_found = True
-                float_ += '.'
-    return float(float_)
-
-
-def format_url_to_ascii(url):
-    """
-    Convert non_ASCII char in the url if any.
-    """
-    url = urllib.parse.urlsplit(url)
-    url = list(url)
-    url[2] = urllib.parse.quote(url[2])
-    url = urllib.parse.urlunsplit(url)
-    return url
-
+from utils import findUnique, find_float_from_str, format_url_to_ascii
 
 # ---- Base functions
 

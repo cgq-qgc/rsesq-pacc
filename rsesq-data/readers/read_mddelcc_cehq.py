@@ -6,16 +6,11 @@ Created on Tue Jun 13 14:29:29 2017
 
 # ---- Imports: standard library
 
-import urllib
-from urllib.request import urlopen, urlretrieve
+from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
-from io import BytesIO
 import numpy as np
-import re
 import os
-import requests
 import csv
-import datetime
 from multiprocessing import Pool
 
 # ---- Imports: third parties
@@ -26,95 +21,11 @@ from xlrd.xldate import xldate_from_date_tuple
 # ---- Imports: local
 
 from base import AbstractReader
-
-
-# ---- Utilities
-
-ACTIVE_STATION_LIST = [
-        '010802', '010902', '011003', '011204', '011508', '011509', '011707',
-        '020404', '020602', '021407', '021601', '021605', '021702', '021916',
-        '022003', '022301', '022501', '022505', '022507', '022513', '022601',
-        '022704', '023002', '023004', '023106', '023303', '023401', '023402',
-        '023409', '023422', '023427', '023429', '023432', '023446', '023702',
-        '024003', '024014', '024015', '024016', '030101', '030103', '030106',
-        '030118', '030201', '030202', '030208', '030215', '030220', '030225',
-        '030234', '030241', '030247', '030268', '030278', '030282', '030283',
-        '030284', '030289', '030296', '030297', '030298', '030299', '030302',
-        '030304', '030309', '030314', '030316', '030326', '030332', '030340',
-        '030342', '030343', '030345', '030348', '030350', '030353', '030415',
-        '030421', '030423', '030424', '030425', '030426', '030429', '030430',
-        '030905', '030907', '030919', '030920', '030921', '040101', '040102',
-        '040103', '040104', '040105', '040106', '040107', '040108', '040109',
-        '040110', '040122', '040129', '040132', '040204', '040212', '040238',
-        '040239', '040406', '040409', '040602', '040605', '040608', '040609',
-        '040619', '040624', '040627', '040629', '040829', '040830', '040840',
-        '040841', '041902', '042609', '042610', '042611', '043003', '043004',
-        '043005', '043012', '043030', '043031', '043108', '043205', '043206',
-        '043208', '043301', '046709', '048603', '050119', '050135', '050144',
-        '050147', '050304', '050408', '050409', '050501', '050702', '050801',
-        '050805', '050807', '050812', '050813', '050904', '050915', '050916',
-        '051001', '051002', '051003', '051004', '051005', '051007', '051502',
-        '052212', '052219', '052228', '052233', '052235', '052401', '052601',
-        '052603', '052604', '052606', '052805', '054001', '060102', '060704',
-        '060901', '061001', '061002', '061004', '061020', '061022', '061024',
-        '061028', '061029', '061307', '061502', '061601', '061602', '061801',
-        '061901', '061909', '062002', '062102', '062114', '062701', '062803',
-        '062914', '064101', '070204', '071203', '071401', '071801', '072301',
-        '073503', '074903', '075705', '076601', '080101', '080106', '080707',
-        '080718', '080809', '081101', '089902', '089903', '089907', '093801',
-        '095003', '102706', '103605', '103702', '104001', '104803', '120201']
-
-
-def dms2decdeg(coord):
-    """
-    Convert decimal, minute, second format lat/lon coordinate to
-    decimal degree.
-    """
-    sign = np.sign(coord[0])
-    dd = abs(coord[0]) + coord[1]/60 + coord[2]/3600
-    return sign*dd
-
-
-def findUnique(pattern, string):
-    """
-    Return the first result found for the regex search or return None if
-    nothing is found.
-    """
-    result = re.findall(pattern, string)
-    if len(result) > 0:
-        return result[0].strip()
-    else:
-        return None
-
-
-def find_float_from_str(string, sep):
-    """
-    Search a string to find a float number if any.
-    """
-    float_ = ''
-    digit_sep_found = False
-    for char in string:
-        if char.isdigit():
-            float_ += char
-        else:
-            if char == sep and not digit_sep_found:
-                digit_sep_found = True
-                float_ += '.'
-    return float(float_)
-
-
-def format_url_to_ascii(url):
-    """
-    Convert non_ASCII char in the url if any.
-    """
-    url = urllib.parse.urlsplit(url)
-    url = list(url)
-    url[2] = urllib.parse.quote(url[2])
-    url = urllib.parse.urlunsplit(url)
-    return url
+from utils import findUnique, dms2decdeg
 
 
 # ---- Base functions
+
 
 def read_html_from_url(url):
     """"Get, read and decode html data from a url in the the CEHQ domain."""
