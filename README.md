@@ -41,35 +41,38 @@ for station in reader.stations():
 ## 2.3 API pour récupérer les données hydrométriques du [CEHQ](https://www.cehq.gouv.qc.ca/)
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 
+Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations hydrométriques actives dans un fichier csv.
+
 ```python
 import os
-from numpy import min, max
 from readers import MDDELCC_CEHQ_Reader
 
 dirname = os.path.join(os.getcwd(), 'data_files', 'streamflow_and_level')
 
 reader = MDDELCC_CEHQ_Reader()
-for sid in reader.station_ids():
-    data = reader._db[sid]
-    filename = "%s_%d-%d.csv" % (sid, min(data['Year']), max(data['Year']))
-    filepath = os.path.join(dirname, filename)
-    reader.save_station_to_csv(sid, filepath)
+for i, stn in enumerate(reader.stations()):
+    filepath = os.path.join(dirname, "%s (%s).csv" % (stn['Name'], stn['ID']))
+    reader.save_station_to_csv(stn['ID'], filepath)
 ```
 
-La première fois que `MDDELCC_CEHQ_Reader` est initialisé, la base de données hydrométriques complète sera téléchargée du site web du CEHQ et sera sauvegardée sur le disque en format binaire dans le fichier `mddelcc_cehq_stations.npy`. Les initialisations subséquentes de `MDDELCC_CEHQ_Reader` accéderont les données à partir de ce fichier.
+La première fois que `MDDELCC_CEHQ_Reader` est initialisé, les infos pour l'ensemble des stations hydrométriques seront téléchargées du site web du CEHQ et seront sauvegardées sur le disque en format binaire dans le fichier `mddelcc_cehq_stations.npy`. Les initialisations subséquentes de `MDDELCC_CEHQ_Reader` accéderont les infos directement à partir de ce fichier. Toutefois, seul les infos relatives aux stations sont téléchargées lors de cette opération et non les données journalières de débits et niveaux d'eau. Si les données journalières n'existent pas dans la base de données locale pour une station donnée lorsque l'on appelle `save_station_to_csv(<station_id>, <filepath>)`, ces dernières sont alors automatiquement téléchargées du site web du CEHQ.
 
-Pour mettre à jour la base de données locale à partir de celle du CEHQ, simplement lancer:
+Il est également possible de sauvegarder les données dans la base de données locale sans les sauvegarder dans un csv en faisant:
+
+```python
+reader = MDDELCC_CEHQ_Reader()
+reader.fetch_station_data(<station_id>)
+```
+
+Pour mettre à jour la base de données locale à partir de celle du CEHQ, il suffit de lancer:
 
 ```python
 reader = MDDELCC_CEHQ_Reader()
 reader.fetch_database_from_mddelcc()
 ```
 
-Pour mettre à jour les données d'une station en particulier, par exemple la station '022513':
-```python
-reader = MDDELCC_CEHQ_Reader()
-reader.fetch_station_data('022513')
-```
+Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
+
 
 # 3 License
 
