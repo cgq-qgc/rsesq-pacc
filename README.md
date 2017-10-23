@@ -1,7 +1,10 @@
 # Table des Matières
 
 1. [Feuille de route](#1-feuille-de-route)
-2. [Collecte et mise en forme des données](#2-collecte-et-mise-en-forme-des-données)
+2. [Collecte et mise en forme des données](#2-collecte-et-mise-en-forme-des-données)<br />
+    2.1. API pour télécharger les données du RSESQ du MDDELCC<br />
+    2.2. API pour télécharger les données climatiques d'Environnement et Changement climatique Canada<br />
+    2.3 API pour récupérer les données hydrométriques du CEHQ<br />
 3. [License](#3-license)
 
 # 1 Feuille de route
@@ -20,7 +23,7 @@ Outils développés à l'[INRS centre Eau-Terre-Environnement](http://www.ete.in
 ## 2.1 API pour télécharger les données du [RSESQ du MDDELCC](http://www.mddelcc.gouv.qc.ca/eau/piezo/)
 
 ```python
-from read_mddelcc_rses import MDDELCC_RSESQ_Reader
+from readers import MDDELCC_RSESQ_Reader
 import os
 
 dirname = os.path.join(os.getcwd(), 'data_files', 'water_level')
@@ -41,15 +44,12 @@ https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 ```python
 import os
 from numpy import min, max
-from read_mddelcc_cehq import MDDELCC_CEHQ_Reader
+from readers import MDDELCC_CEHQ_Reader
 
 dirname = os.path.join(os.getcwd(), 'data_files', 'streamflow_and_level')
 
 reader = MDDELCC_CEHQ_Reader()
-for i, sid in enumerate(reader.station_ids()):
-    args = (sid, i+1, len(reader.station_ids()))
-    print('Saving data for station %s: %d of %d' % args, end='\r')
-    
+for sid in reader.station_ids():
     data = reader._db[sid]
     filename = "%s_%d-%d.csv" % (sid, min(data['Year']), max(data['Year']))
     filepath = os.path.join(dirname, filename)

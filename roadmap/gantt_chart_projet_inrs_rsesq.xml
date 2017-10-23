@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="INRS-ETE" webLink="https://github.com/RSESQ" view-date="2017-10-08" view-index="0" gantt-divider-location="395" resource-divider-location="300" version="2.8.5" locale="en">
     <description/>
     <view zooming-state="default:4" id="gantt-chart">
-        <field id="tpd3" name="Name" width="246" order="0"/>
-        <field id="tpd4" name="Begin date" width="52" order="1"/>
-        <field id="tpd5" name="End date" width="77" order="2"/>
+        <field id="tpd3" name="Name" width="252" order="0"/>
+        <field id="tpd4" name="Begin date" width="58" order="1"/>
+        <field id="tpd5" name="End date" width="82" order="2"/>
         <option id="taskLabelUp" value=""/>
         <option id="taskLabelLeft" value="name"/>
         <option id="taskLabelRight" value=""/>
@@ -47,9 +47,10 @@
             <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
             <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
         </taskproperties>
-        <task id="0" name="Volet: opération" color="#333333" meeting="false" start="2017-09-18" duration="80" complete="31" expand="true">
+        <task id="0" name="Volet: opération" color="#333333" meeting="false" start="2017-09-18" duration="80" complete="32" expand="true">
+            <task id="250" name="Réorganisation du répertoire rsesq-data" color="#8cb6ce" meeting="false" start="2017-10-23" duration="1" complete="100" expand="true"/>
             <task id="246" name="Version 1.0 des outils pour la collecte et mise à jour des données complétés" color="#8cb6ce" meeting="true" start="2017-11-15" duration="0" complete="0" expand="true"/>
-            <task id="2" name="Données climatiques" color="#999999" meeting="false" start="2017-09-18" duration="67" complete="8" expand="true">
+            <task id="2" name="Données climatiques" color="#999999" meeting="false" start="2017-09-18" duration="67" complete="8" expand="false">
                 <task id="240" name="Production d'une première version des données traitées" color="#8cb6ce" meeting="false" start="2017-09-18" duration="4" complete="100" expand="true">
                     <task id="103" name="Télécharger les donnnées" color="#8cb6ce" meeting="false" start="2017-09-18" duration="1" complete="100" expand="true">
                         <notes><![CDATA[Télécharger les données des stations qui ont été ciblées par l'UQAM. 
@@ -87,7 +88,7 @@ Pour ce faire, il est proposé de rédiger le tout à l'aide de Read the Doc: ht
                 <task id="122" name="Article: première version" color="#8cb6ce" meeting="true" start="2017-12-01" duration="0" complete="0" expand="true"/>
                 <task id="124" name="Article: soumission revue" color="#8cb6ce" meeting="true" start="2017-12-21" duration="0" complete="0" expand="true"/>
             </task>
-            <task id="1" name="Données piézométriques" color="#999999" meeting="false" start="2017-09-25" duration="75" complete="50" expand="true">
+            <task id="1" name="Données piézométriques" color="#999999" meeting="false" start="2017-09-25" duration="75" complete="50" expand="false">
                 <task id="13" name="Créer une API" color="#8cb6ce" meeting="false" start="2017-09-25" duration="3" complete="100" expand="true">
                     <notes><![CDATA[Créer une API permettant de lire la liste des stations piézométriques existantes sur le site du RSESQ du MDDELCC et de télécharger, formatter et sauvegarder les données dans un format csv.]]></notes>
                     <depend id="54" type="2" difference="0" hardness="Strong"/>
@@ -101,7 +102,7 @@ Pour ce faire, il est proposé de rédiger le tout à l'aide de Read the Doc: ht
                 </task>
                 <task id="197" name="Mettre à jour la doc. de GWHAT" color="#ffff00" meeting="false" start="2018-01-09" duration="2" complete="0" expand="true"/>
             </task>
-            <task id="4" name="Données hydrométriques" color="#999999" meeting="false" start="2017-10-16" duration="5" complete="83" expand="true">
+            <task id="4" name="Données hydrométriques" color="#999999" meeting="false" start="2017-10-16" duration="5" complete="83" expand="false">
                 <task id="120" name="Tutoriel SQLite pour Python" color="#00ff66" meeting="false" start="2017-10-16" duration="1" complete="100" expand="true">
                     <notes><![CDATA[L'objectif est d'acquérir les connaissances nécessaires pour mener à bien l'Issue #1.
 
@@ -136,7 +137,7 @@ Partage des données journalières hydrométriques avec les projet de l'UQAM et 
                 </task>
             </task>
         </task>
-        <task id="88" name="Volet: caractérisation" color="#000000" meeting="false" start="2017-07-04" duration="122" complete="0" expand="true">
+        <task id="88" name="Volet: caractérisation" color="#000000" meeting="false" start="2017-07-04" duration="122" complete="0" expand="false">
             <task id="173" name="Lecture circulaire 1217 de l'USGS" color="#00ff66" meeting="false" start="2017-10-16" duration="50" complete="0" expand="true"/>
             <task id="90" name="Fonction de réponse barométrique" color="#8cb6ce" meeting="false" start="2017-12-04" duration="5" complete="0" expand="true">
                 <notes><![CDATA[Utiliser le logiciel KGS-BRF à partir de l'interface de GWHAT pour caractériser la fonction de réponse barométrique des puits à l'aide de données de niveau d'eau acquises aux 15 minutes.
@@ -147,7 +148,7 @@ https://github.com/jnsebgosselin/inrs-rsesq/issues/8]]></notes>
             <task id="168" name="Classement des puits et leurs fonctions" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
             <task id="188" name="Livrable: grille de classement des puits" color="#8cb6ce" meeting="true" start="2017-07-04" duration="0" complete="0" expand="true"/>
         </task>
-        <task id="145" name="Volet: exploitation" color="#333333" meeting="false" start="2017-08-28" duration="10" complete="0" expand="true">
+        <task id="145" name="Volet: exploitation" color="#333333" meeting="false" start="2017-08-28" duration="10" complete="0" expand="false">
             <task id="147" name="Estimation de la recharge" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
             <task id="152" name="Détection des changements dans les tendances" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
             <task id="149" name="Prévision des niveau d'eau" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
@@ -171,7 +172,7 @@ https://github.com/jnsebgosselin/inrs-rsesq/issues/6]]></notes>
             <task id="163" name="Graph: hydrogramme et météo" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
             <task id="162" name="Rapport: fin de projet" color="#8cb6ce" meeting="true" start="2019-12-31" duration="0" complete="0" expand="true"/>
         </task>
-        <task id="17" name="Formation continue" color="#00ff66" meeting="false" start="2017-10-02" duration="19" complete="0" expand="true">
+        <task id="17" name="Formation continue" color="#00ff66" meeting="false" start="2017-10-02" duration="19" complete="0" expand="false">
             <task id="21" name="Lecture Klove et al. (2014)" color="#00ff66" meeting="false" start="2017-10-23" duration="5" complete="0" expand="true"/>
             <task id="247" name="Lire le contenu du CEHQ" color="#00ff66" meeting="false" start="2017-10-02" duration="1" complete="0" expand="true">
                 <notes><![CDATA[Survoler et lire tout ce qui est disponible sur:
