@@ -69,7 +69,7 @@ Pour mettre à jour la base de données locale à partir de celle du CEHQ, il su
 
 ```python
 reader = MDDELCC_CEHQ_Reader()
-reader.fetch_database_from_mddelcc()
+reader.fetch_database()
 ```
 
 Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
