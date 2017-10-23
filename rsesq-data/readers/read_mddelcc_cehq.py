@@ -81,7 +81,7 @@ def scrape_station_datasheet(sid):
     # up of <a> and <b> fields in the table. So we use a basic crawling of the
     # content using regexes instead.
 
-    data = {}
+    data = {'ID': sid}
     for field, key in FIELDS_KEYS:
         idx = html.find(field)
         data[key] = findUnique('<td width="421">(.*?)&nbsp;</td>', html[idx:])
@@ -202,13 +202,6 @@ def scrape_data_from_sid(sid):
     return df_dly_hydat
 
 
-def fetch_station_data(sid):
-    df = {'ID': sid}
-    df.update(scrape_station_datasheet(sid))
-    df.update(scrape_data_from_sid(sid))
-    return df
-
-
 # ---- API
 
 
@@ -231,24 +224,35 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             self.fetch_database_from_mddelcc()
 
     def fetch_database_from_mddelcc(self):
+        """
+        Clear the local database and fetch the datasheets for all available
+        station on the CEHQ website. The daily streamflow and level data are
+        not downloaded during this operation.
+        """
         sids = scrape_station_ids()
         self._db = {}
         p = Pool(5)
         itr = 0
-        for result in p.imap(fetch_station_data, sids):
+        print("Fetching station datasheets from the CEHQ website...")
+        for result in p.imap(scrape_station_datasheet, sids):
             itr += 1
-            args = (result['ID'], itr, len(sids))
-            print('Data for station %s fetched: %d of %d' % args, end="\r")
             self._db[result['ID']] = result
-        print()
+            print("\r", "%d of %d" % (itr, len(sids)), end="")
+        print("\nDatasheet fetched for all stations.")
         p.close()
         p.join()
         np.save(self.DATABASE_FILEPATH, self._db)
 
-    def fetch_station_data(self, sid):
-        self._db[sid] = fetch_station_data(sid)
+    def fetch_station_dlydata(self, sid):
+        """
+        Download the daily streamflow and level for the station corresponding
+        to the provided id and save the results in the local database.
+        """
+        self._db[sid].update(scrape_data_from_sid(sid))
         np.save(self.DATABASE_FILEPATH, self._db)
         return self._db[sid]
+
+    # def fetch_all_station_dlydata(self, sid):
 
     def save_station_to_hdf5(self):
         pass
@@ -258,8 +262,8 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
         Save data from local database to csv. If the data are not already
         saved in the local database, it is fetched from the mddelcc website.
         """
-        if len(self._db[sid]) == 0:
-            self.fetch_station_data(sid)
+        if 'Level' not in list(self._db[sid].keys()):
+            self.fetch_station_dlydata(sid)
         station = self._db[sid]
 
         # Generate the file header.
@@ -303,4 +307,5 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
 
 if __name__ == "__main__":
     reader = MDDELCC_CEHQ_Reader()
-    reader.fetch_database_from_mddelcc()
+    # reader.fetch_database_from_mddelcc()
+    reader.save_station_to_csv('022704', 'test.csv')
