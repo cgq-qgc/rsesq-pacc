@@ -20,8 +20,8 @@ from xlrd.xldate import xldate_from_date_tuple
 
 # ---- Imports: local
 
-from base import AbstractReader
-from utils import findUnique, dms2decdeg
+from readers.base import AbstractReader
+from readers.utils import findUnique, dms2decdeg
 
 
 # ---- Base functions

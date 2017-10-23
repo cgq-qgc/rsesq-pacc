@@ -20,8 +20,8 @@ import xlrd
 
 # ---- Imports: local
 
-from base import AbstractReader
-from utils import findUnique, find_float_from_str, format_url_to_ascii
+from readers.base import AbstractReader
+from readers.utils import findUnique, find_float_from_str, format_url_to_ascii
 
 # ---- Base functions
 
