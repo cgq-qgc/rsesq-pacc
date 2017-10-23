@@ -227,9 +227,9 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
         try:
             self._db = np.load(self.DATABASE_FILEPATH).item()
         except FileNotFoundError:
-            self.fetch_database_from_mddelcc()
+            self.fetch_database()
 
-    def fetch_database_from_mddelcc(self):
+    def fetch_database(self):
         """
         Clear the local database and fetch the datasheets for all available
         station on the CEHQ website. The daily streamflow and level data are
@@ -313,5 +313,5 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
 
 if __name__ == "__main__":
     reader = MDDELCC_CEHQ_Reader()
-    # reader.fetch_database_from_mddelcc()
+    # reader.fetch_database()
     reader.save_station_to_csv('022704', 'test.csv')

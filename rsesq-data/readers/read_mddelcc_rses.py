@@ -134,9 +134,9 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         try:
             self._db = np.load(self.DATABASE_FILEPATH).item()
         except FileNotFoundError:
-            self.fetch_database_from_mddelcc()
+            self.fetch_database()
 
-    def fetch_database_from_mddelcc(self):
+    def fetch_database(self):
         url = get_xml_url()
         self._db = read_xml_datatable(url)
         np.save(self.DATABASE_FILEPATH, self._db)
