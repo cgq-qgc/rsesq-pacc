@@ -211,8 +211,14 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
     def __init__(self):
         super(MDDELCC_CEHQ_Reader, self).__init__()
 
-    def stations(self):
-        return self._db.values()
+    def stations(self, active=None):
+        stns = self._db.values()
+        if active is True:
+            stns = [stn for stn in stns if stn['Status'] == 'Station ouverte']
+        elif active is False:
+            stns = [stn for stn in stns if stn['Status'] == 'Station fermée']
+
+        return stns
 
     def station_ids(self):
         return list(self._db.keys())
