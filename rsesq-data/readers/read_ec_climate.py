@@ -36,8 +36,35 @@ def get_climate_stations_from_tor():
     except (UnicodeDecodeError, UnicodeError):
         return None
 
+# ---- API
+
+
+class EC_Climate_Reader(AbstractReader):
+
+    DATABASE_FILEPATH = 'ec_climate_database.npy'
+
+    def __init__(self):
+        super(EC_Climate_Reader, self).__init__()
+
+    def load_database(self):
+        pass
+
+    def stations(self):
+        pass
+
+    def station_ids(self):
+        pass
+
+    def save_station_to_hdf5(self, station_id, filepath):
+        pass
+
+    def save_station_to_csv(self, station_id, filepath):
+        pass
+
+
 if __name__ == "__main__":
     data = get_climate_stations_from_tor()
     
     # reader = EC_Climate_Reader()
     # reader.save_station_to_csv('01160002', 'test.csv')
+    
