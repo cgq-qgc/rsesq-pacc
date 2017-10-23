@@ -116,7 +116,7 @@ def get_wldata_from_xls(url):
 
 class MDDELCC_RSESQ_Reader(AbstractReader):
 
-    DATABASE_FILEPATH = 'mddelcc_rsesq_stations.npy'
+    DATABASE_FILEPATH = 'mddelcc_rsesq_database.npy'
 
     def __init__(self):
         super(MDDELCC_RSESQ_Reader, self).__init__()

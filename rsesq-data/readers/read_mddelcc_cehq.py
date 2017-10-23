@@ -206,7 +206,7 @@ def scrape_data_from_sid(sid):
 
 
 class MDDELCC_CEHQ_Reader(AbstractReader):
-    DATABASE_FILEPATH = 'mddelcc_cehq_stations.npy'
+    DATABASE_FILEPATH = 'mddelcc_cehq_database.npy'
 
     def __init__(self):
         super(MDDELCC_CEHQ_Reader, self).__init__()
