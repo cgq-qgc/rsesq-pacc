@@ -4,7 +4,7 @@
 2. [Collecte et mise en forme des données](#2-collecte-et-mise-en-forme-des-données)<br />
     2.1. API pour télécharger les données du RSESQ du MDDELCC<br />
     2.2. API pour télécharger les données climatiques d'Environnement et Changement climatique Canada<br />
-    2.3 API pour récupérer les données hydrométriques du CEHQ<br />
+    2.3. API pour récupérer les données hydrométriques du CEHQ<br />
 3. [License](#3-license)
 
 # 1 Feuille de route
@@ -20,8 +20,8 @@ _Figure: Diagramme de Gantt du projet tel que vu dans [GanttProject](http://www.
 
 Outils développés à l'[INRS centre Eau-Terre-Environnement](http://www.ete.inrs.ca/) pour récupérer et mettre en forme automatiquement les données temporelles piézométriques, hydrométriques et climatiques qui sont rendues disponibles gratuitement par le [Ministère du Développement Durable, de l'Environnement et de la Lutte contre les Changements Climatiques](http://www.mddelcc.gouv.qc.ca/) du Québec et par [Environnement et Changement climatique Canada](https://www.ec.gc.ca/default.asp?lang=Fr).
 
-## 2.1 API pour télécharger les données du [RSESQ du MDDELCC](http://www.mddelcc.gouv.qc.ca/eau/piezo/)
-
+## 2.1 API pour télécharger les données du RSESQ du MDDELCC
+http://www.mddelcc.gouv.qc.ca/eau/piezo/
 ```python
 from readers import MDDELCC_RSESQ_Reader
 import os
@@ -34,11 +34,12 @@ for stn in reader.stations():
     reader.save_station_to_csv(stn['ID'], os.path.join(dirname, filename))
 ```
 
-## 2.2 API pour télécharger les données climatiques d'[Environnement et Changement climatique Canada](http://climate.weather.gc.ca/historical_data/search_historic_data_e.html)
+## 2.2 API pour télécharger les données climatiques d'Environnement et Changement climatique Canada
+http://climate.weather.gc.ca/historical_data/search_historic_data_e.html
 
 À venir...
 
-## 2.3 API pour récupérer les données hydrométriques du [CEHQ](https://www.cehq.gouv.qc.ca/)
+## 2.3 API pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 
 Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations hydrométriques actives dans un fichier csv.
