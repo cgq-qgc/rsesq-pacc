@@ -29,9 +29,9 @@ import os
 dirname = os.path.join(os.getcwd(), 'data_files', 'water_level')
 
 reader = MDDELCC_RSESQ_Reader()
-for station in reader.stations():
-    filename = "%s (%s).csv" % (station['Name'], station['ID'])
-    reader.save_station_to_csv(station['ID'], os.path.join(dirname, filename))
+for stn in reader.stations():
+    filename = "%s (%s).csv" % (stn['Name'], stn['ID'])
+    reader.save_station_to_csv(stn['ID'], os.path.join(dirname, filename))
 ```
 
 ## 2.2 API pour télécharger les données climatiques d'[Environnement et Changement climatique Canada](http://climate.weather.gc.ca/historical_data/search_historic_data_e.html)
