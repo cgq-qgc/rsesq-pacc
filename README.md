@@ -2,9 +2,9 @@
 
 1. [Feuille de route](#1-feuille-de-route)
 2. [Collecte et mise en forme des données](#2-collecte-et-mise-en-forme-des-données)<br />
-    2.1. API pour télécharger les données du RSESQ du MDDELCC<br />
-    2.2. API pour télécharger les données climatiques d'Environnement et Changement climatique Canada<br />
-    2.3. API pour récupérer les données hydrométriques du CEHQ<br />
+    2.1. [API pour télécharger les données du RSESQ du MDDELCC](#21-api-pour-télécharger-les-données-du-rsesq-du-mddelcc)<br />
+    2.2. [API pour télécharger les données climatiques d'Environnement et Changement climatique Canada](#22-api-pour-télécharger-les-données-climatiques-denvironnement-et-changement-climatique-canada)<br />
+    2.3. [API pour récupérer les données hydrométriques du CEHQ](#23-api-pour-récupérer-les-données-hydrométriques-du-cehq)<br />
 3. [License](#3-license)
 
 # 1 Feuille de route
