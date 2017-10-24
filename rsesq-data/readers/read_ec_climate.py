@@ -21,6 +21,8 @@ import numpy as np
 # ---- Imports: local
 
 from readers.base import AbstractReader
+from WHAT.meteo.dwnld_weather_data import (RawDataDownloader,
+                                           ConcatenatedDataFrame)
 
 
 # ---- Base functions
@@ -115,6 +117,7 @@ class EC_Climate_Reader(AbstractReader):
 
     def __init__(self):
         super(EC_Climate_Reader, self).__init__()
+        self.raw_data_dir = "raw_datafiles"
 
     def load_database(self):
         try:
@@ -204,8 +207,16 @@ class EC_Climate_Reader(AbstractReader):
     def save_station_to_hdf5(self, station_id, filepath):
         pass
 
-    def save_station_to_csv(self, station_id, filepath):
-        pass
+    def save_station_to_csv(self, sid, filepath):
+        if self.station_has_dly_data(sid) is False:
+            print("No daily data is available for station %s." % sid)
+            return
+
+        if sid not in list(self._db['Data Table'].keys()):
+            self.dwnld_station_dly_data(sid, self.raw_data_dir)
+
+        cdf = self._db['Data Table'][sid]
+        cdf.save_to_csv(filepath)
 
 
 if __name__ == "__main__":
