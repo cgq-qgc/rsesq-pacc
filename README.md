@@ -37,7 +37,7 @@ for stn in reader.stations():
 ## 2.2 API pour télécharger les données climatiques d'Environnement et Changement climatique Canada
 http://climate.weather.gc.ca/historical_data/search_historic_data_e.html
 
-À venir...
+À venir... voir [PR #19](https://github.com/jnsebgosselin/inrs-rsesq/pull/19) pour suivre l'avancement.
 
 ## 2.3 API pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
