@@ -130,6 +130,16 @@ class EC_Climate_Reader(AbstractReader):
         np.save(self.DATABASE_FILEPATH, self._db)
         print("Station list fetched sucessfully.")
 
+    def fetch_station_data(self, sid):
+        """
+        Download the daily climate data for the station corresponding
+        to the provided id and save the results in the local database.
+        """
+        self._db['Data Table'][sid] = self.station_info(sid)
+
+        np.save(self.DATABASE_FILEPATH, self._db)
+        return self._db[sid]
+
     def stations(self, active=None, prov=None):
         stations = []
         for sid in self.station_ids():
