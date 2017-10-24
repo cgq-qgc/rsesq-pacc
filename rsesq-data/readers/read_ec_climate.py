@@ -204,6 +204,18 @@ class EC_Climate_Reader(AbstractReader):
         self._db['Data Table'][sid] = cdf
         np.save(self.DATABASE_FILEPATH, self._db)
 
+    def save_station_table_to_csv(self, filepath, active=None, prov=None):
+        keys = ['Name', 'Province', 'ID', 'Station ID',
+                'Latitude', 'Longitude', 'Elevation',
+                'DLY First Year', 'DLY Last Year', 'Status']
+        fcontent = [keys]
+        for stn in self.stations(active, prov):
+            fcontent.append([stn[key] for key in keys])
+
+        with open(filepath, 'w', encoding='utf-8') as f:
+            writer = csv.writer(f, delimiter=',', lineterminator='\n')
+            writer.writerows(fcontent)
+
     def save_station_to_hdf5(self, station_id, filepath):
         pass
 
@@ -227,3 +239,6 @@ if __name__ == "__main__":
     dly_data_first = station_table['DLY First Year']
     dly_data_last = station_table['DLY Last Year']
     active_qc_stns = reader.stations(active=True, prov='QC')
+
+    filename = "Active_Climate_Stations_QC.csv"
+    reader.save_station_table_to_csv(filename, active=True, prov='QC')
