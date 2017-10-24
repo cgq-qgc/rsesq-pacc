@@ -85,6 +85,23 @@ def read_stationlist_from_tor():
     dly_last_year = np.array(df['DLY Last Year']).astype(int)
     df['Status'] = dly_last_year >= 2017
 
+    # Format province value.
+    NAME_ABB = [('ALBERTA', 'AB'),
+                ('BRITISH COLUMBIA', 'BC'),
+                ('MANITOBA', 'MB'),
+                ('NEW BRUNSWICK', 'NB'),
+                ('NEWFOUNDLAND', 'NL'),
+                ('NORTHWEST TERRITORIES', 'NT'),
+                ('NOVA SCOTIA', 'NS'),
+                ('NUNAVUT', 'NU'),
+                ('ONTARIO', 'ON'),
+                ('PRINCE EDWARD ISLAND', 'PE'),
+                ('QUEBEC', 'QC'),
+                ('SASKATCHEWAN', 'SK'),
+                ('YUKON TERRITORY', 'YT')]
+
+    for name, abb in NAME_ABB:
+        df['Province'] = [p.replace(name, abb) for p in df['Province']]
 
     return df
 
