@@ -120,11 +120,15 @@ class EC_Climate_Reader(AbstractReader):
         try:
             self._db = np.load(self.DATABASE_FILEPATH).item()
         except FileNotFoundError:
-            self.fetch_database_from_mddelcc()
+            self.fetch_database()
 
     def fetch_database(self):
-        self._db = read_stationlist_from_tor()
+        print("Fetching station list from EC Tor ftp server...")
+        self._db = {}
+        self._db['Station Table'] = read_stationlist_from_tor()
+        self._db['Data Table'] = {}
         np.save(self.DATABASE_FILEPATH, self._db)
+        print("Station list fetched sucessfully.")
 
     def stations(self):
         pass
