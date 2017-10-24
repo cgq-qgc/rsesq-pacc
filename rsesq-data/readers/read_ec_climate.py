@@ -130,11 +130,27 @@ class EC_Climate_Reader(AbstractReader):
         np.save(self.DATABASE_FILEPATH, self._db)
         print("Station list fetched sucessfully.")
 
-    def stations(self):
-        pass
+    def stations(self, active=None, prov=None):
+        stations = []
+        for sid in self.station_ids():
+            stn_info = self.station_info(sid)
+            if prov is None or prov == stn_info['Province']:
+                if active is None or active == stn_info['Status']:
+                    stations.append(stn_info)
+        return stations
 
     def station_ids(self):
-        pass
+        return self._db['Station Table']['ID']
+
+    def station_info(self, sid):
+        idx = self._db['Station Table']['ID'].index(sid)
+        keys = ['Name', 'Province', 'ID', 'Station ID',
+                'Latitude', 'Longitude', 'Elevation',
+                'DLY First Year', 'DLY Last Year', 'Status']
+        df = {}
+        for key in keys:
+            df[key] = self._db['Station Table'][key][idx]
+        return df
 
     def save_station_to_hdf5(self, station_id, filepath):
         pass
