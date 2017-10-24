@@ -166,6 +166,41 @@ class EC_Climate_Reader(AbstractReader):
         """Check whether station have daily data or not"""
         return self.station_info(sid)['DLY First Year'] != 'NA'
 
+    def dwnld_station_dly_data(self, sid, dirname):
+        """
+        Download raw data files on a yearly basis from yr_start to yr_end and
+        save the files in dirname.
+        """
+        if self.station_has_dly_data(sid) is False:
+            print("No daily data is available for station %s." % sid)
+            return
+
+        # Download raw datafiles from EC website.
+
+        dwnld_worker = RawDataDownloader()
+
+        dwnld_worker.climateID = sid
+        dwnld_worker.dirname = dirname
+
+        station_info = self.station_info(sid)
+        dwnld_worker.stationID = station_info['Station ID']
+        dwnld_worker.StaName = station_info['Name']
+
+        dwnld_worker.yr_start = max(int(station_info['DLY First Year']), 1980)
+        dwnld_worker.yr_end = int(station_info['DLY Last Year'])
+
+        # min_year = station_info[DLY First Year'']
+
+        downloaded_raw_datafiles = dwnld_worker.download_data()
+
+        # Concatenate and save data to the local database.
+
+        cdf = ConcatenatedDataFrame()
+        cdf.concatenate_rawdata(downloaded_raw_datafiles)
+
+        self._db['Data Table'][sid] = cdf
+        np.save(self.DATABASE_FILEPATH, self._db)
+
     def save_station_to_hdf5(self, station_id, filepath):
         pass
 
