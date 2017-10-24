@@ -81,6 +81,10 @@ def read_stationlist_from_tor():
     # Sanitarize station name.
     df['Name'] = [n.replace('\\', ' ').replace('/', ' ') for n in df['Name']]
 
+    # Determine station status.
+    dly_last_year = np.array(df['DLY Last Year']).astype(int)
+    df['Status'] = dly_last_year >= 2017
+
 
     return df
 
