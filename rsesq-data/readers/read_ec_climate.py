@@ -24,54 +24,58 @@ from readers.base import AbstractReader
 def read_stationlist_from_tor():
     """"Read and format the `Station Inventory En.csv` file from Tor ftp."""
 
-    url = "ftp://client_climate@ftp.tor.ec.gc.ca"
-    url += "/Pub/Get_More_Data_Plus_de_donnees/Station%20Inventory%20EN.csv"
-
+    url = "ftp://client_climate@ftp.tor.ec.gc.ca/"
+    url += "Pub/Get_More_Data_Plus_de_donnees/Station%20Inventory%20EN.csv"
     try:
-        html = urlopen(url).read()
+        data = urlopen(url).read()
     except (HTTPError, URLError):
         return None
-
     try:
-        data = html.decode('utf-8-sig').split('\n')
+        data = data.decode('utf-8-sig').splitlines()
     except (UnicodeDecodeError, UnicodeError):
         return None
+    data = list(csv.reader(data, delimiter=','))
 
     FIELDS_KEYS_STR = [('Name', 'Name'),
                        ('Province', 'Province'),
                        ('Climate ID', 'ID'),
-                       ('Station ID', 'Station ID')]
+                       ('Station ID', 'Station ID'),
+                       ('DLY First Year', 'DLY First Year'),
+                       ('DLY Last Year', 'DLY Last Year')]
+
     FIELDS_KEYS_FLOAT = [('Latitude (Decimal Degrees)', 'Latitude'),
                          ('Longitude (Decimal Degrees)', 'Longitude'),
                          ('Elevation (m)', 'Elevation')]
-    FIELDS_KEYS_INT = [('HLY First Year', 'HLY First Year'),
-                       ('HLY Last Year', 'HLY Last Year'),
-                       ('DLY First Year', 'DLY First Year'),
-                       ('DLY Last Year', 'DLY Last Year'),
-                       ('MLY First Year', 'MLY First Year'),
-                       ('MLY Last Year', 'MLY Last Year')]
 
     df = {}
     columns = None
-    for row in data:
+    for i, row in enumerate(data):
+        if len(row) == 0:
+            continue
         if row[0] == 'Name':
             columns = row
+            data = np.array(data[i+1:])
 
-        if columns:
-            sid = row[columns.index('Climate ID')]
-            for field, key in FIELDS_KEYS_STR:
-                df[sid][key] = row[columns.index(field)]
-            for field, key in FIELDS_KEYS_FLOAT:
-                try:
-                    df[sid][key] = float(row[columns.index(field)])
-                except ValueError:
-                    df[sid][key] = 'NA'
-            for field, key in FIELDS_KEYS_INT:
-                try:
-                    df[sid][key] = int(row[columns.index(field)])
-                except ValueError:
-                    df[sid][key] = 'NA'
+            # Remove stations with no daily data
+            hly_first_year = data[:, columns.index('DLY First Year')]
+            data = data[~(hly_first_year == ''), :]
+
+            break
+    else:
+        return None
+
+    for field, key in FIELDS_KEYS_STR:
+        arr = data[:, columns.index(field)]
+        arr[arr == ''] = 'NA'
+        df[key] = arr.tolist()
+    for field, key in FIELDS_KEYS_FLOAT:
+        arr = data[:, columns.index(field)]
+        arr[arr == ''] = np.nan
+        df[key] = arr.tolist()
+
+
     return df
+
 
 # ---- API
 
