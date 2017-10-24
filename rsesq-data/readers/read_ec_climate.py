@@ -8,6 +8,11 @@ Created on Mon Oct 23 15:28:06 2017
 
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
+import numpy as np
+import os
+import csv
+from time import gmtime
+import copy
 
 # ---- Imports: third parties
 
@@ -72,6 +77,9 @@ def read_stationlist_from_tor():
         arr = data[:, columns.index(field)]
         arr[arr == ''] = np.nan
         df[key] = arr.tolist()
+
+    # Sanitarize station name.
+    df['Name'] = [n.replace('\\', ' ').replace('/', ' ') for n in df['Name']]
 
 
     return df
