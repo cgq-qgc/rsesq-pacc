@@ -220,8 +220,10 @@ class EC_Climate_Reader(AbstractReader):
 
 
 if __name__ == "__main__":
-    data = read_stationlist_from_tor()
-    
-    # reader = EC_Climate_Reader()
-    # reader.save_station_to_csv('01160002', 'test.csv')
-    
+    reader = EC_Climate_Reader()
+    # reader.fetch_database()
+
+    station_table = reader._db['Station Table']
+    dly_data_first = station_table['DLY First Year']
+    dly_data_last = station_table['DLY Last Year']
+    active_qc_stns = reader.stations(active=True, prov='QC')
