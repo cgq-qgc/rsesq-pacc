@@ -22,6 +22,9 @@ Outils développés à l'[INRS centre Eau-Terre-Environnement](http://www.ete.in
 
 ## 2.1 API pour télécharger les données du RSESQ du MDDELCC
 http://www.mddelcc.gouv.qc.ca/eau/piezo/
+
+Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations piézométriques du MDDELCC dans un fichier csv.
+
 ```python
 from readers import MDDELCC_RSESQ_Reader
 import os
@@ -42,7 +45,7 @@ http://climate.weather.gc.ca/historical_data/search_historic_data_e.html
 ## 2.3 API pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 
-Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations hydrométriques actives dans un fichier csv.
+Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations hydrométriques actives du CEHQ dans un fichier csv.
 
 ```python
 import os
