@@ -152,6 +152,10 @@ class EC_Climate_Reader(AbstractReader):
             df[key] = self._db['Station Table'][key][idx]
         return df
 
+    def station_has_dly_data(self, sid):
+        """Check whether station have daily data or not"""
+        return self.station_info(sid)['DLY First Year'] != 'NA'
+
     def save_station_to_hdf5(self, station_id, filepath):
         pass
 
