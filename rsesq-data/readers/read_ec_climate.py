@@ -119,6 +119,8 @@ class EC_Climate_Reader(AbstractReader):
         super(EC_Climate_Reader, self).__init__()
         self.raw_data_dir = "raw_datafiles"
 
+    # ---- Load and fetch database
+
     def load_database(self):
         try:
             self._db = np.load(self.DATABASE_FILEPATH).item()
@@ -133,6 +135,7 @@ class EC_Climate_Reader(AbstractReader):
         np.save(self.DATABASE_FILEPATH, self._db)
         print("Station list fetched sucessfully.")
 
+    # ---- Utility functions
 
     def stations(self, active=None, prov=None):
         stations = []
@@ -159,6 +162,8 @@ class EC_Climate_Reader(AbstractReader):
     def station_has_dly_data(self, sid):
         """Check whether station have daily data or not"""
         return self.station_info(sid)['DLY First Year'] != 'NA'
+
+    # ---- Fetch data
 
     def fetch_station_data(self, sid, dirname):
         """
@@ -194,6 +199,8 @@ class EC_Climate_Reader(AbstractReader):
 
         self._db['Data Table'][sid] = cdf
         np.save(self.DATABASE_FILEPATH, self._db)
+
+    # ---- Save to file
 
     def save_station_table_to_csv(self, filepath, active=None, prov=None):
         keys = ['Name', 'Province', 'ID', 'Station ID',

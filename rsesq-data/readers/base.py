@@ -17,13 +17,17 @@ class AbstractReader(ABC):
         super().__init__()
         self.load_database()
 
+    # ---- Load and fetch database
+
     @abstractmethod
     def load_database(self):
         pass
-    
+
     @abstractmethod
     def fetch_database(self):
         pass
+
+    # ---- Utility functions
 
     @abstractmethod
     def stations(self):
@@ -32,6 +36,8 @@ class AbstractReader(ABC):
     @abstractmethod
     def station_ids(self):
         pass
+
+    # ---- Save to file
 
     @abstractmethod
     def save_station_to_hdf5(self, station_id, filepath):
