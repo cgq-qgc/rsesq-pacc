@@ -152,19 +152,16 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         self._db = read_xml_datatable(url)
         np.save(self.DATABASE_FILEPATH, self._db)
 
-    def fetch_station_wldata(self, station_id):
-        station = self._db[station_id]
-        if station['url data'] in [None, '', b'']:
-            return
-
-        elevation, time, wlvl, wtemp = get_wldata_from_xls(station['url data'])
-        station['Elevation'] = elevation
-        station['Time'] = time
-        station['Water level'] = wlvl
-        station['Temperature'] = wtemp
     # ---- Fetch data
 
-        np.save(self.DATABASE_FILEPATH, self._db)
+    def fetch_station_wldata(self, sid):
+        url = self._db[sid]['url data']
+        if url in [None, '', b'']:
+            return
+        else:
+            self._db[sid].update(get_wldata_from_xls(url))
+            np.save(self.DATABASE_FILEPATH, self._db)
+            return self._db[sid]
 
     def dwnld_raw_xls_datafile(self, station_id, filepath):
         # Create the destination directory if it doesn't exist.
