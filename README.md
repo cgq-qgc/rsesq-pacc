@@ -3,7 +3,8 @@
 1. [Feuille de route](#1-feuille-de-route)
 2. [Collecte et mise en forme des données](#2-collecte-et-mise-en-forme-des-données)<br />
     2.1. [API pour télécharger les données du RSESQ du MDDELCC](#21-api-pour-télécharger-les-données-du-rsesq-du-mddelcc)<br />
-    2.2. [API pour télécharger les données climatiques d'Environnement et Changement climatique Canada](#22-api-pour-télécharger-les-données-climatiques-denvironnement-et-changement-climatique-canada)<br />
+    2.2a. [API pour télécharger les données climatiques d'Environnement et Changement climatique Canada](#22a-api-pour-télécharger-les-données-climatiques-denvironnement-et-changement-climatique-canada)<br />
+    2.2b. [Logiciel pour télécharger les données climatiques d'Environnement et Changement climatique Canada](#22b-logiciel-pour-télécharger-les-données-climatiques-denvironnement-et-changement-climatique-canada)<br />
     2.3. [API pour récupérer les données hydrométriques du CEHQ](#23-api-pour-récupérer-les-données-hydrométriques-du-cehq)<br />
 3. [License](#3-license)
 
@@ -37,7 +38,7 @@ for stn in reader.stations():
     reader.save_station_to_csv(stn['ID'], os.path.join(dirname, filename))
 ```
 
-## 2.2 API pour télécharger les données climatiques d'Environnement et Changement climatique Canada
+## 2.2a API pour télécharger les données climatiques d'Environnement et Changement climatique Canada
 http://climate.weather.gc.ca/historical_data/search_historic_data_e.html
 
 Le script ci-dessous montre comment il est possible d'utiliser l'API pour télécharger, formatter et sauvegarder dans un fichier csv les données climatiques journalières de toutes les stations climatiques actives d'Environnement Canada localisées au Québec.
@@ -74,7 +75,12 @@ reader.fetch_database()
 
 Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
 
+## 2.2b Logiciel pour télécharger les données climatiques d'Environnement et Changement climatique Canada
+
 Le logiciel [WHAT](https://github.com/jnsebgosselin/what), qui est développé dans le cadre de ce projet, permet également de télécharger les données climatiques et de combler les données manquantes à partir d'une interface graphique.
+
+![Prise d'écran de l'interface de WHAT pour télécharger les données climatiques](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/img_src/what_telecharger_donnees_climatiques.png)
+_Figure: Caputre d'écran de l'interface du logiciel [WHAT](https://github.com/jnsebgosselin/what) pour le téléchargement et la mise en forme des données climatique d'[Environnement et Changement climatique Canada](http://climat.meteo.gc.ca/historical_data/search_historic_data_f.html)_
 
 ## 2.3 API pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
