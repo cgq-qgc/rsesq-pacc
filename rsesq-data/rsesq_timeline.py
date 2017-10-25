@@ -12,6 +12,7 @@ from readers import MDDELCC_RSESQ_Reader
 # ---- Produce the bins
 
 def compute_nbr_stn_bins(bstep, reader):
+    """Compute the number of active stations for periods of bstep years."""
     bins = {}
     for stn in reader.stations():
         if 'Year' not in list(stn.keys()):
@@ -37,6 +38,7 @@ def compute_nbr_stn_bins(bstep, reader):
 
 
 def compute_nbr_year_bins(bins, reader):
+    "Compute the number of stations with data for at "
     values = [0] * len(bins)
     for stn in reader.stations():
         if 'Year' not in list(stn.keys()):
