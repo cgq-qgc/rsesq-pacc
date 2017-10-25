@@ -40,7 +40,39 @@ for stn in reader.stations():
 ## 2.2 API pour télécharger les données climatiques d'Environnement et Changement climatique Canada
 http://climate.weather.gc.ca/historical_data/search_historic_data_e.html
 
-À venir... voir [PR #19](https://github.com/jnsebgosselin/inrs-rsesq/pull/19) pour suivre l'avancement.
+Le script ci-dessous montre comment il est possible d'utiliser l'API pour télécharger, formatter et sauvegarder dans un fichier csv les données climatiques journalières de toutes les stations climatiques actives d'Environnement Canada localisées au Québec.
+
+
+```python
+import os
+from readers import EC_Climate_Reader
+
+dirname = os.path.join(os.getcwd(), 'data_files', 'climate')
+
+reader = EC_Climate_Reader()
+reader.raw_data_dir = os.path.join(dirname, 'raw_datafiles')
+stationlist = reader.stations(active=True, prov='QC')
+for i, stn in enumerate(stationlist):
+    filepath = os.path.join(dirname, "%s (%s).csv" % (stn['Name'], stn['ID']))
+    reader.save_station_to_csv(stn['ID'], filepath)
+```
+
+La première fois que `EC_Climate_Reader` est initialisé, les infos pour l'ensemble des stations climatiques canadiennes avec des données journalières disponibles sont téléchargées du site web d'Environnement Canada et sont sauvegardées sur le disque en format binaire dans le fichier `ec_climate_database.npy`. Les initialisations subséquentes de `EC_Climate_Reader` accéderont les infos des stations directement à partir de ce fichier. Toutefois, seul les infos relatives aux stations sont téléchargées lors de cette opération et non les données climatiques journalières. Si les données journalières n'existent pas dans la base de données locale pour une station donnée lorsque l'on appelle `save_station_to_csv(<station_id>, <filepath>)`, ces dernières sont alors automatiquement téléchargées du site web d'Environnement Canada.
+
+Il est également possible de sauvegarder les données dans la base de données locale sans les sauvegarder dans un csv en faisant:
+
+```python
+reader = EC_Climate_Reader()
+reader.fetch_station_data(<station_id>)
+```
+Pour mettre à jour la base de données locale à partir de celle d'Environnement Canada, il suffit de lancer:
+
+```python
+reader = EC_Climate_Reader()
+reader.fetch_database()
+```
+
+Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
 
 ## 2.3 API pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
@@ -59,7 +91,7 @@ for i, stn in enumerate(reader.stations()):
     reader.save_station_to_csv(stn['ID'], filepath)
 ```
 
-La première fois que `MDDELCC_CEHQ_Reader` est initialisé, les infos pour l'ensemble des stations hydrométriques seront téléchargées du site web du CEHQ et seront sauvegardées sur le disque en format binaire dans le fichier `mddelcc_cehq_stations.npy`. Les initialisations subséquentes de `MDDELCC_CEHQ_Reader` accéderont les infos directement à partir de ce fichier. Toutefois, seul les infos relatives aux stations sont téléchargées lors de cette opération et non les données journalières de débits et niveaux d'eau. Si les données journalières n'existent pas dans la base de données locale pour une station donnée lorsque l'on appelle `save_station_to_csv(<station_id>, <filepath>)`, ces dernières sont alors automatiquement téléchargées du site web du CEHQ.
+La première fois que `MDDELCC_CEHQ_Reader` est initialisé, les infos pour l'ensemble des stations hydrométriques sont téléchargées du site web du CEHQ et sont sauvegardées sur le disque en format binaire dans le fichier `mddelcc_cehq_stations.npy`. Les initialisations subséquentes de `MDDELCC_CEHQ_Reader` accéderont les infos directement à partir de ce fichier. Toutefois, seul les infos relatives aux stations sont téléchargées lors de cette opération et non les données journalières de débits et niveaux d'eau. Si les données journalières n'existent pas dans la base de données locale pour une station donnée lorsque l'on appelle `save_station_to_csv(<station_id>, <filepath>)`, ces dernières sont alors automatiquement téléchargées du site web du CEHQ.
 
 Il est également possible de sauvegarder les données dans la base de données locale sans les sauvegarder dans un csv en faisant:
 
