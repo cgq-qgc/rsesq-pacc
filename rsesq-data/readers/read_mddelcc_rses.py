@@ -228,3 +228,4 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 if __name__ == "__main__":
     reader = MDDELCC_RSESQ_Reader()
     reader.save_station_to_csv('01160002', 'test.csv')
+    data = reader.fetch_station_wldata('02257001')
