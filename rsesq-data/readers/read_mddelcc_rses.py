@@ -131,11 +131,15 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     def __getitem__(self, key):
         return self._db[key]
 
+    # ---- Utility functions
+
     def stations(self):
         return self._db.values()
 
     def station_ids(self):
         return list(self._db.keys())
+
+    # ---- Load and fetch database
 
     def load_database(self):
         try:
@@ -158,6 +162,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         station['Time'] = time
         station['Water level'] = wlvl
         station['Temperature'] = wtemp
+    # ---- Fetch data
 
         np.save(self.DATABASE_FILEPATH, self._db)
 
@@ -171,6 +176,8 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         station = self._db[station_id]
         if station['url data'] not in [None, '', b'']:
             urlretrieve(station['url data'], filepath)
+
+    # ---- Save to file
 
     def save_station_to_hdf5(self, station_id, filepath):
         pass
