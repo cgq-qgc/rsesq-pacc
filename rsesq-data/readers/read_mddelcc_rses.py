@@ -106,9 +106,24 @@ def get_wldata_from_xls(url):
         wlvl = np.array(ws.col_values(1, start_rowx=row_idx)).astype(float)
         wtemp = np.array(ws.col_values(2, start_rowx=row_idx)).astype(float)
 
-        elevation = find_float_from_str(ws.cell_value(2, 2), ',')
+    # Remove duplicates in time series and save in a dataframe
+    indexes = np.digitize(np.unique(time), time, right=True)
 
-        return (elevation, time, wlvl, wtemp)
+    df = {}
+    df['Elevation'] = find_float_from_str(ws.cell_value(2, 2), ',')
+    df['Time'] = time[indexes]
+    df['Water Level'] = wlvl[indexes]
+    df['Temperature'] = wtemp[indexes]
+
+    # Produce year, month and data time series.
+    df['Year'] = np.zeros(np.shape(df['Time'])).astype(int)
+    df['Month'] = np.zeros(np.shape(df['Time'])).astype(int)
+    df['Day'] = np.zeros(np.shape(df['Time'])).astype(int)
+    for i, t in enumerate(df['Time']):
+        date = xlrd.xldate_as_tuple(t, 0)[:3]
+        df['Year'][i], df['Month'][i], df['Day'][i] = date
+
+    return df
 
 
 # ---- API
@@ -124,11 +139,15 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     def __getitem__(self, key):
         return self._db[key]
 
+    # ---- Utility functions
+
     def stations(self):
         return self._db.values()
 
     def station_ids(self):
         return list(self._db.keys())
+
+    # ---- Load and fetch database
 
     def load_database(self):
         try:
@@ -141,18 +160,16 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         self._db = read_xml_datatable(url)
         np.save(self.DATABASE_FILEPATH, self._db)
 
-    def fetch_station_wldata(self, station_id):
-        station = self._db[station_id]
-        if station['url data'] in [None, '', b'']:
+    # ---- Fetch data
+
+    def fetch_station_wldata(self, sid):
+        url = self._db[sid]['url data']
+        if url in [None, '', b'']:
             return
-
-        elevation, time, wlvl, wtemp = get_wldata_from_xls(station['url data'])
-        station['Elevation'] = elevation
-        station['Time'] = time
-        station['Water level'] = wlvl
-        station['Temperature'] = wtemp
-
-        np.save(self.DATABASE_FILEPATH, self._db)
+        else:
+            self._db[sid].update(get_wldata_from_xls(url))
+            np.save(self.DATABASE_FILEPATH, self._db)
+            return self._db[sid]
 
     def dwnld_raw_xls_datafile(self, station_id, filepath):
         # Create the destination directory if it doesn't exist.
@@ -165,43 +182,40 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         if station['url data'] not in [None, '', b'']:
             urlretrieve(station['url data'], filepath)
 
+    # ---- Save to file
+
     def save_station_to_hdf5(self, station_id, filepath):
         pass
 
-    def save_station_to_csv(self, station_id, filepath):
-        station = self._db[station_id]
-        if station['url data'] in [None, '', b'']:
+    def save_station_to_csv(self, sid, filepath):
+        if self._db[sid]['url data'] in [None, '', b'']:
             return
 
         # If the data are not already saved in the local database, fetch it
         # from the mddelcc website.
-        if 'Water level' not in list(station.keys()):
-            self.fetch_station_wldata(station_id)
-            station = self._db[station_id]
+        if 'Water Level' not in list(self._db[sid].keys()):
+            self.fetch_station_wldata(sid)
 
+        stn = self._db[sid]
         # Generate the file header.
-        filecontent = [['Well Name', station['Name']],
-                       ['Well ID', station['ID']],
-                       ['Latitude', station['Latitude']],
-                       ['Longitude', station['Longitude']],
-                       ['Elevation', station['Elevation']],
-                       ['Nappe', station['Nappe']],
-                       ['Influenced', station['Influenced']],
-                       [],
-                       ['Source', 'http://www.mddelcc.gouv.qc.ca/eau/piezo/'],
-                       []]
-
-        filecontent.append(['Time', 'Year', 'Month', 'Day',
-                            'Water level (masl)',
-                            'Water temperature (degC)'])
+        fc = [['Well Name', stn['Name']],
+              ['Well ID', stn['ID']],
+              ['Latitude', stn['Latitude']],
+              ['Longitude', stn['Longitude']],
+              ['Elevation', stn['Elevation']],
+              ['Nappe', stn['Nappe']],
+              ['Influenced', stn['Influenced']],
+              [],
+              ['Source', 'http://www.mddelcc.gouv.qc.ca/eau/piezo/'],
+              [],
+              ['Time', 'Year', 'Month', 'Day', 'Water level (masl)',
+               'Water temperature (degC)']]
 
         # Append the dataset.
-        time = station['Time']
-        wlvl = station['Water level']
-        wtemp = station['Temperature']
-        for i in range(len(wlvl)):
-            yy, mm, dd = xlrd.xldate_as_tuple(time[i], 0)[:3]
-            filecontent.append([time[i], yy, mm, dd, wlvl[i], wtemp[i]])
+        data = np.vstack([stn['Time'], stn['Year'], stn['Month'],
+                          stn['Day'], stn['Water Level'], stn['Temperature']]
+                         ).transpose().tolist()
+        fc.extend(data)
 
         # Create the destination directory if it doesn't exist.
         filepath = os.path.abspath(filepath)
@@ -211,9 +225,12 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         # Save the csv.
         with open(filepath, 'w') as f:
             writer = csv.writer(f, delimiter=',', lineterminator='\n')
-            writer.writerows(filecontent)
+            writer.writerows(fc)
 
 
 if __name__ == "__main__":
     reader = MDDELCC_RSESQ_Reader()
-    reader.save_station_to_csv('01160002', 'test.csv')
+    # reader.save_station_to_csv('01160002', 'test.csv')
+
+    data = reader.fetch_station_wldata('02257001')
+    reader.save_station_to_csv('02257001', 'stantonin_doublon.csv')
