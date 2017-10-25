@@ -106,9 +106,16 @@ def get_wldata_from_xls(url):
         wlvl = np.array(ws.col_values(1, start_rowx=row_idx)).astype(float)
         wtemp = np.array(ws.col_values(2, start_rowx=row_idx)).astype(float)
 
-        elevation = find_float_from_str(ws.cell_value(2, 2), ',')
+    # Remove duplicates in time series and save in a dataframe
+    indexes = np.digitize(np.unique(time), time, right=True)
 
-        return (elevation, time, wlvl, wtemp)
+    df = {}
+    df['Elevation'] = find_float_from_str(ws.cell_value(2, 2), ',')
+    df['Time'] = time[indexes]
+    df['Water Level'] = wlvl[indexes]
+    df['Temperature'] = wtemp[indexes]
+
+    return df
 
 
 # ---- API
