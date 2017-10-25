@@ -74,6 +74,8 @@ reader.fetch_database()
 
 Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
 
+Le logiciel [WHAT](https://github.com/jnsebgosselin/what), qui est développé dans le cadre de ce projet, permet également de télécharger les données climatiques et de combler les données manquantes à partir d'une interface graphique.
+
 ## 2.3 API pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 
