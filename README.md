@@ -6,7 +6,8 @@
     2.2a. [API pour télécharger les données climatiques d'ECCC](#22a-api-pour-télécharger-les-données-climatiques-deccc)<br />
     2.2b. [Logiciel pour télécharger les données climatiques d'ECCC](#22b-logiciel-avec-interface-graphique-pour-télécharger-les-données-climatiques-deccc)<br />
     2.3. [API pour récupérer les données hydrométriques du CEHQ](#23-api-pour-récupérer-les-données-hydrométriques-du-cehq)<br />
-3. [License](#3-license)
+3. [Caractérisation du Réseau](#3-caractérisation-du-réseau)
+4. [License](#4-license)
 
 # 1 Feuille de route
 
@@ -118,8 +119,11 @@ reader.fetch_database()
 
 Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
 
+# 3 Caractérisation du Réseau
+![Nombre de stations piézo en fonction des années](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/nbr_stns_actives_vs_temps.png)
+_Figure: Nombre de stations piézométriques actives du RSESQ selon les années._
 
-# 3 License
+# 4 License
 
 Copyright 2017 Jean-Sébastien Gosselin. All Rights Reserved.
 
