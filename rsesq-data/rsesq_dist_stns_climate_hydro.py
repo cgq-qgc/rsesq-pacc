@@ -7,13 +7,14 @@ Created on Thu Oct 26 08:21:32 2017
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
-from readers import (MDDELCC_RSESQ_Reader, MDDELCC_CEHQ_Reader,
+from readers import (MDDELCC_RSESQ_Reader,
+                     MDDELCC_CEHQ_Reader,
                      EC_Climate_Reader)
 
 
 def find_closest_location(lat1, lon1, lat2, lon2):
     """
-    Compute the minimum horizontal distances between a location in radians and
+    Compute the minimum horizontal distance between a location in radians and
     a set of locations also in radians.
     """
     r = 6373  # r is the Earth radius in km
@@ -29,8 +30,8 @@ def find_closest_location(lat1, lon1, lat2, lon2):
 
 def calc_rsesq_dist_to_climate_and_hydro():
     """
-    Compute the distance between the closest climatic and hydrometric station
-    of each piezometric station of the RSESQ.
+    Compute the distance between each piezometric station of the RSESQ
+    and the nearest climatic and hydrometric station.
     """
     reader_eccc = EC_Climate_Reader()
     climstns = reader_eccc.stations(active=True, prov='QC')
@@ -60,6 +61,11 @@ def calc_rsesq_dist_to_climate_and_hydro():
 
 
 def plot_bar_diagram(dist1, dist2):
+    """
+    Plot a bar diagram that shows the number of piezometric stations of the
+    RSESQ classied according to the distance to the neares climatic
+    station (above in blue) and hydrometric station (below in organge).
+    """
     # Produce the figure.
 
     fig, ax = plt.subplots(figsize=(8, 5.5))
@@ -120,7 +126,7 @@ def plot_bar_diagram(dist1, dist2):
                 transform=ax.transData+offset)
 
         offset = transforms.ScaledTranslation(0, -2/72, fig.dpi_scale_trans)
-        text = "%d\n(%d%%)" % (-value2, -value2/len(dist2)*100)
+        text = "%d\n(%d%%)" % (abs(value2), abs(value2)/len(dist2)*100)
         ax2.text(x, value2, text, ha='center', va='top',
                  transform=ax.transData+offset)
 
