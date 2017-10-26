@@ -6,7 +6,7 @@ Created on Thu Oct 26 08:21:32 2017
 
 import numpy as np
 import matplotlib.pyplot as plt
-from multiprocessing import Pool
+import matplotlib.transforms as transforms
 from readers import (MDDELCC_RSESQ_Reader, MDDELCC_CEHQ_Reader,
                      EC_Climate_Reader)
 
@@ -55,11 +55,11 @@ def calc_rsesq_dist_to_climate_and_hydro():
 def plot_bar_diagram(dist1, dist2):
     # Produce the figure.
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(8, 5.5))
     ax2 = ax.twiny()
 
     ax.set_facecolor('0.85')
-    ax.grid(color='white', linestyle='-', linewidth=1)
+    ax.grid(axis='both', color='white', linestyle='-', linewidth=1)
     ax.set_axisbelow(True)
     for loc in ax.spines:
         ax.spines[loc].set_visible(False)
@@ -105,10 +105,17 @@ def plot_bar_diagram(dist1, dist2):
     ax2.set_xticklabels(["\u2264"+str(v) for v in bins])
 
     # Plot text values over the barplot.
-
+    
     for x, value, value2 in zip(xpos, values, values2):
-        ax.text(x, value+1, str(value), ha='center', va='bottom')
-        ax2.text(x, value2-5, str(abs(value2)), ha='center', va='top')
+        offset = transforms.ScaledTranslation(0, 2/72, fig.dpi_scale_trans)
+        text = "%d\n(%d%%)" % (value, value/len(dist1)*100)
+        ax.text(x, value, text, ha='center', va='bottom', 
+                transform=ax.transData+offset)
+         
+        offset = transforms.ScaledTranslation(0, -2/72, fig.dpi_scale_trans)
+        text = "%d\n(%d%%)" % (-value2, -value2/len(dist2)*100)
+        ax2.text(x, value2, text, ha='center', va='top',
+                 transform=ax.transData+offset)
 
     # Show and save figure.
 
