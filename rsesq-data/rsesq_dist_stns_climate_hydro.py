@@ -89,12 +89,17 @@ def plot_bar_diagram(dist1, dist2):
     ax2.set_xlabel("Distance à la station hydrométrique la plus proche (km)",
                    fontsize=16, labelpad=10)
 
+    # Define the axe ticks and labels.
+
+    ax.axis(ymin=-300, ymax=300)
+    ypos = np.arange(-300, 301, 100)
+    ax.set_yticks(ypos)
+    ax.set_yticklabels(np.abs(ypos))
+
     ax.set_xticks(xpos)
     ax.set_xticklabels(["\u2264"+str(v) for v in bins])
     ax2.set_xticks(xpos)
     ax2.set_xticklabels(["\u2264"+str(v) for v in bins])
-
-    ax.axis(ymin=-300, ymax=300)
 
     # Plot text values over the barplot.
 
