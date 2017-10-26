@@ -121,12 +121,17 @@ Cela effacera toutefois toutes les données journalières de la base de données
 
 # 3 Caractérisation du Réseau
 ![Nombre de stations piézo en fonction des années](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/nbr_stns_actives_vs_temps.png)
-_Figure: Nombre de stations piézométriques actives du RSESQ par tranches de 5 ans (diagramme à bandes bleues) et pour chaque année (ligne pointillée rouge)._<br />
-_Code source: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
+_**Figure**: Nombre de stations piézométriques actives du RSESQ par tranches de 5 ans (diagramme à bandes bleues) et pour chaque année (ligne pointillée rouge)._<br />
+_**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
 
 ![Nombre de stations piézo en fonction du nbr d'années](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/stns_nbr_vs_year_nbr.png)
-_Figure: Diagramme à bandes du nombre de stations piézométriques du RSESQ selon le nombre d'années avec des données disponibles à chacune des stations._<br />
-_Code source: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
+_**Figure**: Diagramme à bandes du nombre de stations piézométriques du RSESQ selon le nombre d'années avec des données disponibles à chacune des stations._<br />
+_**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
+
+![Dist. piézo vs climat et hydro](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_dist_stns_climate_hydro.png)
+_**Figure**: Diagramme à bandes de la distribution du nbr. de stations piézo en fonction de la distance min. aux stations climatiques et hydrométriques._<br />
+_**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_dist_stns_climate_hydro.py_
+
 
 # 4 License
 
