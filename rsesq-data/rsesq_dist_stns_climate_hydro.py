@@ -65,7 +65,10 @@ def plot_bar_diagram(dist1, dist2):
         ax.spines[loc].set_visible(False)
         ax2.spines[loc].set_visible(False)
     ax.tick_params(axis='both', which='both', length=0)
+    ax.xaxis.set_label_position('top')
+
     ax2.tick_params(axis='both', which='both', length=0)
+    ax2.xaxis.set_label_position('bottom')
 
     # Generate the bins.
 
@@ -83,11 +86,11 @@ def plot_bar_diagram(dist1, dist2):
     ax2.bar(xpos, values2, 0.75, color='orange')
 
     ax.set_ylabel("Nombre de stations piézométriqes",
-                  fontsize=16, labelpad=10)
+                  fontsize=16, labelpad=20)
     ax.set_xlabel("Distance à la station climatique la plus proche (km)",
-                  fontsize=16, labelpad=10)
+                  fontsize=16, labelpad=25)
     ax2.set_xlabel("Distance à la station hydrométrique la plus proche (km)",
-                   fontsize=16, labelpad=10)
+                   fontsize=16, labelpad=25)
 
     # Define the axe ticks and labels.
 
