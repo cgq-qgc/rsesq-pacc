@@ -129,7 +129,7 @@ _**Figure**: Diagramme à bandes du nombre de stations piézométriques du RSESQ
 _**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
 
 ![Dist. piézo vs climat et hydro](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_dist_stns_climate_hydro.png)
-_**Figure**: Diagramme à bandes de la distribution du nbr. de stations piézo en fonction de la distance min. aux stations climatiques et hydrométriques._<br />
+_**Figure**: Diagramme à bandes de la distribution du nbr. de stations piézo actives en fonction de la distance min. aux stations climatiques et hydrométriques._<br />
 _**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_dist_stns_climate_hydro.py_
 
 
