@@ -12,7 +12,10 @@ from readers import (MDDELCC_RSESQ_Reader, MDDELCC_CEHQ_Reader,
 
 
 def find_closest_location(lat1, lon1, lat2, lon2):
-    """"Compute the horizontal distance between the two points in km."""
+    """
+    Compute the minimum horizontal distances between a location in radians and
+    a set of locations also in radians.
+    """
     r = 6373  # r is the Earth radius in km
 
     dlon = lon2 - lon1
@@ -25,6 +28,10 @@ def find_closest_location(lat1, lon1, lat2, lon2):
 
 
 def calc_rsesq_dist_to_climate_and_hydro():
+    """
+    Compute the distance between the closest climatic and hydrometric station
+    of each piezometric station of the RSESQ.
+    """
     reader_eccc = EC_Climate_Reader()
     climstns = reader_eccc.stations(active=True, prov='QC')
     lat2 = np.radians([float(stn['Latitude']) for stn in climstns])
@@ -105,13 +112,13 @@ def plot_bar_diagram(dist1, dist2):
     ax2.set_xticklabels(["\u2264"+str(v) for v in bins])
 
     # Plot text values over the barplot.
-    
+
     for x, value, value2 in zip(xpos, values, values2):
         offset = transforms.ScaledTranslation(0, 2/72, fig.dpi_scale_trans)
         text = "%d\n(%d%%)" % (value, value/len(dist1)*100)
-        ax.text(x, value, text, ha='center', va='bottom', 
+        ax.text(x, value, text, ha='center', va='bottom',
                 transform=ax.transData+offset)
-         
+
         offset = transforms.ScaledTranslation(0, -2/72, fig.dpi_scale_trans)
         text = "%d\n(%d%%)" % (-value2, -value2/len(dist2)*100)
         ax2.text(x, value2, text, ha='center', va='top',
