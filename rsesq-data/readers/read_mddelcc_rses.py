@@ -142,7 +142,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     # ---- Utility functions
 
     def stations(self):
-        return self._db.values()
+        return list(self._db.values())
 
     def station_ids(self):
         return list(self._db.keys())
