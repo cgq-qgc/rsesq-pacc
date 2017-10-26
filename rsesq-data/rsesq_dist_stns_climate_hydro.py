@@ -125,12 +125,7 @@ def plot_bar_diagram(dist1, dist2):
 
 
 if __name__ == "__main__":
-    # results = calc_rsesq_dist_to_climate_and_hydro()
-    # rsesq_stns, dist_to_climstn, dist_to_hydstn = results
+    results = calc_rsesq_dist_to_climate_and_hydro()
+    rsesq_stns, dist_to_climstn, dist_to_hydstn = results
     plt.close('all')
     plot_bar_diagram(dist_to_climstn, dist_to_hydstn)
-
-
-    # plt.close('all')
-    # plt.plot(dist_to_climstn, dist_to_hydstn, '.', alpha=0.85)
-    # plt.show()
