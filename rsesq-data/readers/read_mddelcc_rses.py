@@ -131,8 +131,6 @@ def get_wldata_from_xls(url):
 
 class MDDELCC_RSESQ_Reader(AbstractReader):
 
-    DATABASE_FILEPATH = 'mddelcc_rsesq_database.npy'
-
     def __init__(self):
         super(MDDELCC_RSESQ_Reader, self).__init__()
 
@@ -159,6 +157,10 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         url = get_xml_url()
         self._db = read_xml_datatable(url)
         np.save(self.DATABASE_FILEPATH, self._db)
+
+    def set_local_database_dir(self, dirname):
+        self.DATABASE_FILEPATH = os.path.join(
+                dirname, 'mddelcc_rsesq_database.npy')
 
     # ---- Fetch data
 

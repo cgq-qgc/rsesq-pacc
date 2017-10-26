@@ -113,8 +113,6 @@ def read_stationlist_from_tor():
 
 class EC_Climate_Reader(AbstractReader):
 
-    DATABASE_FILEPATH = 'ec_climate_database.npy'
-
     def __init__(self):
         super(EC_Climate_Reader, self).__init__()
         self.raw_data_dir = "raw_datafiles"
@@ -134,6 +132,10 @@ class EC_Climate_Reader(AbstractReader):
         self._db['Data Table'] = {}
         np.save(self.DATABASE_FILEPATH, self._db)
         print("Station list fetched sucessfully.")
+
+    def set_local_database_dir(self, dirname):
+        self.DATABASE_FILEPATH = os.path.join(
+                dirname, 'ec_climate_database.npy')
 
     # ---- Utility functions
 

@@ -7,6 +7,7 @@ Created on Tue Oct 17 10:38:02 2017
 # ---- Imports: standard library
 
 from abc import ABC, abstractmethod
+import os
 
 
 class AbstractReader(ABC):
@@ -15,6 +16,8 @@ class AbstractReader(ABC):
 
     def __init__(self):
         super().__init__()
+        self.set_local_database_dir(os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), 'databases'))
         self.load_database()
 
     # ---- Load and fetch database
@@ -25,6 +28,10 @@ class AbstractReader(ABC):
 
     @abstractmethod
     def fetch_database(self):
+        pass
+
+    @abstractmethod
+    def set_local_database_dir(dirname):
         pass
 
     # ---- Utility functions
