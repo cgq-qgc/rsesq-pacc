@@ -28,7 +28,7 @@ def compute_monthly_statistics_table(years, months, values, q):
     return np.array(percentiles), np.array(nyear)
 
 
-def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
+def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
     reader = MDDELCC_RSESQ_Reader()
     stn_data = reader._db[sid]
 
@@ -141,10 +141,9 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
 
     # Plot and save the figure.
     plt.show(block=False)
-
-    return percentiles
+    if filename:
+        fig.savefig(filename)
 
 
 if __name__ == "__main__":
     plt.close('all')
-    percentiles = plot_10yrs_annual_statistical_hydrograph('03090006', 2016)
