@@ -7,6 +7,7 @@ Created on Wed Oct 25 20:24:09 2017
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import matplotlib.transforms as transforms
 from readers import MDDELCC_RSESQ_Reader
 
@@ -40,9 +41,9 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
                                                           level, q)
 
     # Produce the figure.
-    fw, fh = 8, 5
+    fw, fh = 8, 6
     fig = plt.figure(figsize=(fw, fh))
-    lm, rm, bm, tm = 0.75/fw, 0.1/fw, 0.45/fh, 0.3/fh
+    lm, rm, bm, tm = 0.75/fw, 0.1/fw, 1.25/fh, 0.3/fh
 
     # Produce the axe.
     ax = fig.add_axes([lm, bm, 1-lm-rm, 1-bm-tm], zorder=1)
@@ -101,7 +102,44 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
     ax.text(0, 1, title, weight='normal', fontsize=12,
             transform=ax.transAxes+offset)
 
-    # Plot and save figure.
+    # Create a custom Legend.
+    ax_pos = ax.get_position()
+    ax_pos.y0 = 0
+    ax_pos.y1 = 1
+    ax2 = fig.add_axes(ax_pos, facecolor=None)
+    ax2.axis('off')
+
+    labels = ['<10', '10-24', '25-75', '76-90', '>90', 'Médiane',
+              'Mesures\nde %d' % cur_year]
+
+    x = [0, 0.075, 0.15, 0.225, 0.3, 0.45, 0.6]
+    x = [val+0.2 for val in x]
+
+    # Add the pathes to the legend
+    rw = 0.3/fw*1
+    rh = 0.15/fh*1
+    mpad = mpl.transforms.ScaledTranslation(0, 30/72, fig.dpi_scale_trans)
+    lpad = mpl.transforms.ScaledTranslation(0, 25/72, fig.dpi_scale_trans)
+    for i in range(5):
+        ax2.add_patch(
+                mpl.patches.Rectangle((x[i], 0), rw, rh, fc=rbg[i],
+                                      ec='black', linewidth=0.5,
+                                      transform=ax2.transAxes+mpad))
+        ax2.text(x[i]+rw/2, 0, labels[i], ha='center', va='top', fontsize=10,
+                 transform=ax2.transAxes+lpad)
+
+    mpad = mpl.transforms.ScaledTranslation(0, 35/72, fig.dpi_scale_trans)  
+    ax2.plot([x[i+1]], [0], marker='^', color='black', ms=10, ls='',
+             transform=ax2.transAxes+mpad)
+    ax2.text(x[i+1], 0, labels[i+1], ha='center', va='top', fontsize=10,
+                 transform=ax2.transAxes+lpad)
+    
+    ax2.plot([x[i+2]], [0], marker='.', color='red', ms=10, ls='',
+             transform=ax2.transAxes+mpad)
+    ax2.text(x[i+2], 0, labels[i+2], ha='center', va='top', fontsize=10,
+             transform=ax2.transAxes+lpad)
+
+    # Plot and save the figure.
     plt.show(block=False)
 
     return percentiles
