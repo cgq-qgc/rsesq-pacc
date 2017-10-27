@@ -19,10 +19,12 @@ rbg = [[152/255, 100/255, 38/255],
 
 def compute_monthly_statistics_table(years, months, values, q):
     percentiles = []
+    nyear = []
     for m in range(1, 13):
         ixs = np.where(months == m)[0]
         percentiles.append(np.percentile(values[ixs], q))
-    return np.array(percentiles)
+        nyear.append(len(np.unique(years[ixs])))
+    return np.array(percentiles), np.array(nyear)
 
 
 def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
@@ -34,19 +36,19 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
     month = stn_data['Month']
     level = stn_data['Elevation'] - stn_data['Water Level']
     q = [100, 90, 75, 50, 25, 10, 0]
-    percentiles = compute_monthly_statistics_table(year, month, level, q)
+    percentiles, nyear = compute_monthly_statistics_table(year, month,
+                                                          level, q)
 
     # Produce the figure.
     fw, fh = 8, 5
     fig = plt.figure(figsize=(fw, fh))
-    lm, rm, bm, tm = 0.75/fw, 0.1/fw, 0.35/fh, 0.3/fh
-        
+    lm, rm, bm, tm = 0.75/fw, 0.1/fw, 0.45/fh, 0.3/fh
+
     # Produce the axe.
     ax = fig.add_axes([lm, bm, 1-lm-rm, 1-bm-tm], zorder=1)
     ax.set_facecolor('0.85')
     ax.grid(axis='both', color='white', linestyle='-', linewidth=1)
     ax.set_axisbelow(True)
-    ax.invert_yaxis()
     for loc in ax.spines:
         ax.spines[loc].set_visible(False)
     ax.tick_params(axis='both', which='both', length=0)
@@ -79,12 +81,19 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
 
     # Set ticks and ticklabels.
     ax.set_xticks(np.arange(-0.5, 11.51))
-    ax.set_xticks(np.arange(12), minor=True)
+    ax.set_xticklabels([])
 
+    xlabelspos = np.arange(12)
     months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jui', 'Aoû', 'Sep',
               'Oct', 'Nov', 'Déc']
-    ax.set_xticklabels([])
-    ax.set_xticklabels(months, minor=True, fontsize=12)
+    y = ymax+yoffset
+    for m, n, x in zip(months, nyear, xlabelspos):
+        offset = transforms.ScaledTranslation(0, -3/72, fig.dpi_scale_trans)
+        ax.text(x, y, m, ha='center', va='top', fontsize=12,
+                transform=ax.transData+offset)
+        offset = transforms.ScaledTranslation(0, -18/72, fig.dpi_scale_trans)
+        ax.text(x, y, '(%d)' % n, ha='center', va='top', fontsize=9,
+                transform=ax.transData+offset)
 
     # Add a Title.
     offset = transforms.ScaledTranslation(0, 3/72, fig.dpi_scale_trans)
