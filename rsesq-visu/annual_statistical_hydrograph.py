@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms as transforms
 from readers import MDDELCC_RSESQ_Reader
 
-rbg = [[57/255, 82/255, 164/255],
-       [110/255, 205/255, 222/255],
-       [105/255, 189/255, 69/255],
+rbg = [[152/255, 100/255, 38/255],
        [248/255, 151/255, 29/255],
-       [152/255, 100/255, 38/255]]
+       [105/255, 189/255, 69/255],
+       [110/255, 205/255, 222/255],
+       [57/255, 82/255, 164/255]]
 
 
 def compute_monthly_statistics_table(years, months, values, q):
