@@ -47,19 +47,22 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
 
     # Produce the axe.
     ax = fig.add_axes([lm, bm, 1-lm-rm, 1-bm-tm], zorder=1)
-    ax.set_facecolor('0.85')
-    ax.grid(axis='both', color='white', linestyle='-', linewidth=1)
+    ax.set_facecolor('1')
+    ax.grid(axis='y', color='0.65', linestyle='-', linewidth=0.5,
+            dashes=[10, 3])
     ax.set_axisbelow(True)
-    for loc in ax.spines:
-        ax.spines[loc].set_visible(False)
-    ax.tick_params(axis='both', which='both', length=0)
+    # for loc in ax.spines:
+    #     ax.spines[loc].set_visible(False)
+    ax.tick_params(axis='x', which='both', length=3)
+    ax.tick_params(axis='y', which='both', length=0)
 
     # Plot the percentiles.
-    xpos = range(12)
+    xpos = np.arange(12)
     idx = [0, 1, 2, 4, 5, 6]
     for i in range(len(idx)-1):
-        ax.bar(xpos, percentiles[:, idx[i]]-percentiles[:, idx[i+1]], 0.95,
-               percentiles[:, idx[i+1]], color=rbg[i])
+        ax.bar(xpos, percentiles[:, idx[i]]-percentiles[:, idx[i+1]],
+               width=0.9, bottom=percentiles[:, idx[i+1]], color=rbg[i],
+               edgecolor='black', linewidth=0.5)
     ax.plot(xpos, percentiles[:, 3], '^k')
 
     # Plot daily series.
@@ -73,7 +76,7 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
     ymin = min(np.min(percentiles), np.min(level))
     yrange = ymax - ymin
     yoffset = 0.1/fh*yrange
-    ax.axis([-1, 12, ymin-yoffset, ymax+yoffset])
+    ax.axis([-0.75, 11.75, ymin-yoffset, ymax+yoffset])
     ax.invert_yaxis()
 
     # Set axis labels.
@@ -98,7 +101,7 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
 
     # Add a Title.
     offset = transforms.ScaledTranslation(0, 3/72, fig.dpi_scale_trans)
-    title = "Puits %s (%s)" % (stn_data['Name'], sid)
+    title = "Piézomètre %s (%s)" % (stn_data['Name'], sid)
     ax.text(0, 1, title, weight='normal', fontsize=12,
             transform=ax.transAxes+offset)
 
@@ -147,3 +150,5 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
 
 if __name__ == "__main__":
     plt.close('all')
+    filename = '03090006 - hydrogramme_statistique_annnuel_2016.pdf'
+    plot_10yrs_annual_statistical_hydrograph('03090006', 2016, filename)
