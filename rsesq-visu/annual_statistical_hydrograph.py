@@ -131,12 +131,12 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
         ax2.text(x[i]+rw/2, 0, labels[i], ha='center', va='top', fontsize=10,
                  transform=ax2.transAxes+lpad)
 
-    mpad = mpl.transforms.ScaledTranslation(0, 35/72, fig.dpi_scale_trans)  
+    mpad = mpl.transforms.ScaledTranslation(0, 35/72, fig.dpi_scale_trans)
     ax2.plot([x[i+1]], [0], marker='^', color='black', ms=10, ls='',
              transform=ax2.transAxes+mpad)
     ax2.text(x[i+1], 0, labels[i+1], ha='center', va='top', fontsize=10,
-                 transform=ax2.transAxes+lpad)
-    
+             transform=ax2.transAxes+lpad)
+
     ax2.plot([x[i+2]], [0], marker='.', color='red', ms=10, ls='',
              transform=ax2.transAxes+mpad)
     ax2.text(x[i+2], 0, labels[i+2], ha='center', va='top', fontsize=10,
