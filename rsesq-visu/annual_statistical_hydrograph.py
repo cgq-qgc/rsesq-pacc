@@ -37,7 +37,12 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
     percentiles = compute_monthly_statistics_table(year, month, level, q)
 
     # Produce the figure.
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fw, fh = 8, 5
+    fig = plt.figure(figsize=(fw, fh))
+    lm, rm, bm, tm = 0.75/fw, 0.1/fw, 0.35/fh, 0.3/fh
+        
+    # Produce the axe.
+    ax = fig.add_axes([lm, bm, 1-lm-rm, 1-bm-tm], zorder=1)
     ax.set_facecolor('0.85')
     ax.grid(axis='both', color='white', linestyle='-', linewidth=1)
     ax.set_axisbelow(True)
@@ -76,11 +81,10 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
     # Add a Title.
     offset = transforms.ScaledTranslation(0, 3/72, fig.dpi_scale_trans)
     title = "Puits %s (%s)" % (stn_data['Name'], sid)
-    ax.text(0, 1, title, weight='bold', fontsize=12,
+    ax.text(0, 1, title, weight='normal', fontsize=12,
             transform=ax.transAxes+offset)
 
     # Plot and save figure.
-    plt.tight_layout()
     plt.show(block=False)
 
     return percentiles
