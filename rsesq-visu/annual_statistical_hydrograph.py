@@ -65,6 +65,14 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year):
     level = stn_data['Elevation'] - stn_data['Water Level'][year == cur_year]
     ax.plot((time-time[0])/365*12-0.5, level, '.', color='red')
 
+    # Axe limits.
+    ymax = max(np.max(percentiles), np.max(level))
+    ymin = min(np.min(percentiles), np.min(level))
+    yrange = ymax - ymin
+    yoffset = 0.1/fh*yrange
+    ax.axis([-1, 12, ymin-yoffset, ymax+yoffset])
+    ax.invert_yaxis()
+
     # Set axis labels.
     ax.set_ylabel("Niveau d'eau en m sous la surface", fontsize=16,
                   labelpad=10)
