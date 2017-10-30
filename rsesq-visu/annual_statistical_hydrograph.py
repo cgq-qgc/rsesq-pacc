@@ -76,7 +76,7 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     # Produce the figure.
     fw, fh = 8, 6
     fig = plt.figure(figsize=(fw, fh))
-    lm, rm, bm, tm = 0.75/fw, 0.1/fw, 0.8/fh, 0.5/fh
+    lm, rm, bm, tm = 0.85/fw, 0.1/fw, 0.8/fh, 0.5/fh
 
     # Produce the axe.
     ax = fig.add_axes([lm, bm, 1-lm-rm, 1-bm-tm], zorder=1)
