@@ -37,7 +37,8 @@ def compute_monthly_statistics_table(years, months, values, q):
     return np.array(percentiles), np.array(nyear)
 
 
-def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
+def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
+                                             filename=None):
     reader = MDDELCC_RSESQ_Reader()
     stn_data = reader._db[sid]
 
@@ -45,17 +46,17 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
     year = stn_data['Year']
     month = stn_data['Month']
     time = stn_data['Time']
-    ndata_in_curyear = len(year[year == cur_year])
-    last_day_of_curyear = xldate_from_date_tuple((cur_year, 12, 31), 0)
-    if ndata_in_curyear == 0 or last_day_of_curyear < time[-1]:
+
+    if last_month == 12:
         year_lbl = "Année %d" % cur_year
         mth_idx = np.arange(12)
         tstart = xldate_from_date_tuple((cur_year, 1, 1), 0)
         tend = xldate_from_date_tuple((cur_year, 12, 31), 0)
     else:
         year_lbl = "Années %d-%d" % (cur_year-1, cur_year)
-        mth_idx = np.arange(month[-1], 12)
+        mth_idx = np.arange(last_month, 12)
         mth_idx = np.hstack((mth_idx, np.arange(12-len(mth_idx))))
+
         tstart = xldate_from_date_tuple((cur_year-1, mth_idx[0]+1, 1), 0)
         nday_in_mth = monthrange(cur_year, mth_idx[-1]+1)[-1]
         tend = xldate_from_date_tuple(
@@ -173,7 +174,6 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, filename=None):
              transform=ax2.transAxes+mpad)
 
     # Plot and save the figure.
-    plt.show(block=False)
     if filename:
         fig.savefig(filename)
     return fig
