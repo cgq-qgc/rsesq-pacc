@@ -10,12 +10,19 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.transforms as transforms
 from readers import MDDELCC_RSESQ_Reader
+import colorsys
 
-rbg = [[152/255, 100/255, 38/255],
-       [248/255, 151/255, 29/255],
-       [105/255, 189/255, 69/255],
-       [110/255, 205/255, 222/255],
-       [57/255, 82/255, 164/255]]
+# lightnes = 150
+# hls = [[23/255, lightnes/255, 153/255],
+#         [24/255, lightnes/255, 240/255],
+#         [72/255, lightnes/255, 121/255],
+#         [134/255, lightnes/255, 160/255],
+#         [160/255, lightnes/255, 123/255]]
+# RGB = [colorsys.hls_to_rgb(col[0], col[1], col[2]) for col in hls]
+
+RGB = ["#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe"]
+MONTHS = np.array(['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+                   'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'])
 
 
 def compute_monthly_statistics_table(years, months, values, q):

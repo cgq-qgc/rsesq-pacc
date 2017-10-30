@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="INRS-ETE" webLink="https://github.com/RSESQ" view-date="2017-09-24" view-index="0" gantt-divider-location="1" resource-divider-location="300" version="2.8.5" locale="en">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="INRS-ETE" webLink="https://github.com/RSESQ" view-date="2017-10-08" view-index="0" gantt-divider-location="408" resource-divider-location="300" version="2.8.5" locale="en">
     <description/>
     <view zooming-state="default:5" id="gantt-chart">
-        <field id="tpd3" name="Name" width="15" order="0"/>
-        <field id="tpd4" name="Begin date" width="15" order="1"/>
-        <field id="tpd5" name="End date" width="15" order="2"/>
+        <field id="tpd3" name="Name" width="244" order="0"/>
+        <field id="tpd4" name="Begin date" width="61" order="1"/>
+        <field id="tpd5" name="End date" width="83" order="2"/>
         <option id="taskLabelUp" value=""/>
         <option id="taskLabelLeft" value="name"/>
         <option id="taskLabelRight" value=""/>
@@ -112,8 +112,8 @@ https://github.com/jnsebgosselin/inrs-rsesq/pull/19]]></notes>
                 <notes><![CDATA[Ajout de la documentatation dans le README.md du répertoire GitHub.]]></notes>
             </task>
         </task>
-        <task id="287" name="Affichage GIS des données et évaluation du réseau" color="#000000" meeting="false" start="2017-10-25" duration="8" complete="0" expand="true">
-            <task id="288" name="Graph: nbr. de stations versus le temps" color="#8cb6ce" meeting="false" start="2017-10-25" duration="1" complete="0" expand="true">
+        <task id="287" name="Affichage GIS des données et évaluation du réseau" color="#000000" meeting="false" start="2017-10-25" duration="8" complete="6" expand="true">
+            <task id="288" name="Graph: nbr. de stations versus le temps" color="#8cb6ce" meeting="false" start="2017-10-25" duration="1" complete="100" expand="true">
                 <notes><![CDATA[Produire un graphique mettant en relation le nombre de stations piézométriques pour lesquelles des données sont disponibles au Québec en fonction du temps. 
 
 https://github.com/jnsebgosselin/inrs-rsesq/issues/6]]></notes>
