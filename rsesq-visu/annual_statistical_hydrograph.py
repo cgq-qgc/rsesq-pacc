@@ -179,6 +179,36 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     return fig
 
 
+def produce_tex_table(sid, cur_year, last_month=12, filename=None):
+    pass
+
+
+def plot_and_save_all(year, dirname=None):
+    reader = MDDELCC_RSESQ_Reader()
+    for stn in reader.stations():
+        if 'Year' not in list(stn.keys()):
+            continue
+
+        years = np.unique(stn['Year'])
+        if len(years) < 10:
+            continue
+
+        yr_to_plot = years[-1] if year == 'last' else year
+        if yr_to_plot not in years:
+            continue
+
+        filename = ('%s - hydrogramme_statistique_annnuel_%d.png' %
+                    (stn['ID'], yr_to_plot))
+        if dirname:
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            filename = os.path.join(dirname, filename)
+
+        last_month = stn['Month'][stn['Year'] == yr_to_plot][-1]
+        plot_10yrs_annual_statistical_hydrograph(
+                stn['ID'], yr_to_plot, last_month, filename)
+        plt.close('all')
+
 
 if __name__ == "__main__":
     plt.close('all')
