@@ -27,18 +27,30 @@ MONTHS = np.array(['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
                    'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'])
 
 
-def compute_monthly_statistics_table(years, months, values, q):
+def compute_monthly_statistics(years, months, values, q, pool='all'):
     percentiles = []
     nyear = []
     for m in range(1, 13):
-        ixs = np.where(months == m)[0]
-        percentiles.append(np.percentile(values[ixs], q))
-        nyear.append(len(np.unique(years[ixs])))
+        if pool == 'all':
+            ixs = np.where(months == m)[0]
+            mly_values = values[ixs]
+            nyear.append(len(np.unique(years[ixs])))
+        else:
+            mly_values = []
+            for yr in np.unique(years):
+                ixs = np.where((months == m) & (years == yr))[0]
+                if pool == 'median' and len(ixs) > 0:
+                    mly_values.append(np.median(values[ixs]))
+                elif pool == 'mean' and len(ixs) > 0:
+                    mly_values.append(np.mean(values[ixs]))
+            nyear.append(len(mly_values))
+        percentiles.append(np.percentile(mly_values, q))
+
     return np.array(percentiles), np.array(nyear)
 
 
 def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
-                                             filename=None):
+                                             filename=None, pool='all'):
     reader = MDDELCC_RSESQ_Reader()
     stn_data = reader._db[sid]
 
@@ -70,8 +82,8 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     # Generate the percentiles.
     level = stn_data['Elevation'] - stn_data['Water Level']
     q = [100, 90, 75, 50, 25, 10, 0]
-    percentiles, nyear = compute_monthly_statistics_table(year, month,
-                                                          level, q)
+    percentiles, nyear = compute_monthly_statistics(year, month, level,
+                                                    q, pool)
 
     # Produce the figure.
     fw, fh = 8, 6
@@ -183,7 +195,10 @@ def produce_tex_table(sid, cur_year, last_month=12, filename=None):
     pass
 
 
-def plot_and_save_all(year, dirname=None):
+# ---- Helper functions
+
+
+def plot_and_save_all(year, dirname, pool='all'):
     reader = MDDELCC_RSESQ_Reader()
     for stn in reader.stations():
         if 'Year' not in list(stn.keys()):
@@ -206,7 +221,7 @@ def plot_and_save_all(year, dirname=None):
 
         last_month = stn['Month'][stn['Year'] == yr_to_plot][-1]
         plot_10yrs_annual_statistical_hydrograph(
-                stn['ID'], yr_to_plot, last_month, filename)
+                stn['ID'], yr_to_plot, last_month, filename, pool)
         plt.close('all')
 
 
