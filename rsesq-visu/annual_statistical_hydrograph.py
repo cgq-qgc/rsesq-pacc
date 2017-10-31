@@ -225,6 +225,23 @@ def plot_and_save_all(year, dirname, pool='all'):
         plt.close('all')
 
 
+def plot_all_year_from_sid(sid):
+    reader = MDDELCC_RSESQ_Reader()
+    stn_data = reader._db[sid]
+
+    dirname = os.path.join('Hydrogrammes statistiques annnuels',
+                           '%s (%s)' % (stn_data['Name'], stn_data['ID']))
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+
+    years = np.unique(stn_data['Year'])
+    for yr in years:
+        filename = ('%s - hydrogramme_statistique_annnuel_%d.png' %
+                    (stn_data['ID'], yr))
+        plot_10yrs_annual_statistical_hydrograph(
+                sid, yr, filename=os.path.join(dirname, filename))
+
+
 if __name__ == "__main__":
     plt.close('all')
     filename = '03090006 - hydrogramme_statistique_annnuel_2016.pdf'
