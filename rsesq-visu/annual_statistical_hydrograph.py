@@ -212,12 +212,10 @@ def plot_and_save_all(year, dirname, pool='all'):
         if yr_to_plot not in years:
             continue
 
-        filename = ('%s - hydrogramme_statistique_annnuel_%d.png' %
-                    (stn['ID'], yr_to_plot))
-        if dirname:
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-            filename = os.path.join(dirname, filename)
+        filename = ('%s (%s) - %d.png' % (stn['Name'], stn['ID'], yr_to_plot))
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        filename = os.path.join(dirname, filename)
 
         last_month = stn['Month'][stn['Year'] == yr_to_plot][-1]
         plot_10yrs_annual_statistical_hydrograph(
