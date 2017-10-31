@@ -13,6 +13,7 @@ from readers import MDDELCC_RSESQ_Reader
 import colorsys
 from xlrd.xldate import xldate_from_date_tuple
 from calendar import monthrange
+import datetime
 
 # lightnes = 150
 # hls = [[23/255, lightnes/255, 153/255],
@@ -58,6 +59,30 @@ def compute_monthly_statistics(years, months, values, q, pool='all'):
         percentiles.append(np.percentile(mly_values, q))
 
     return np.array(percentiles), np.array(nyear)
+
+
+def compute_dly_statistics_table(years, months, days, values, q):
+    days365 = convert_date_to_day_format(years, months, days)
+    percentiles = []
+    ww = 15
+    for day in range(1, 366):
+        day3 = np.tile(np.arange(1, 366), 3)
+        idx = np.where(day3 == day)[0][1]
+
+        day_lb = day3[idx-ww//2]
+        day_rb = day3[idx+ww//2]
+        if day_lb > day_rb:
+            ixs_lb = np.where(days365 >= day_lb)[0]
+            ixs_rb = np.where(days365 <= day_rb)[0]
+            ixs = np.hstack((ixs_lb, ixs_rb))
+        else:
+            ixs = np.where((days365 >= day_lb) & (days365 <= day_rb))[0]
+        percentiles.append(np.percentile(values[ixs], q))
+
+    return np.array(percentiles), None
+
+
+# ---- Plotting functions
 
 
 def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
