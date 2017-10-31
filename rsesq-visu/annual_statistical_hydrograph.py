@@ -27,6 +27,17 @@ MONTHS = np.array(['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
                    'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'])
 
 
+# ---- Utility functions
+
+
+def convert_date_to_day_format(years, months, days):
+    day365 = []
+    for y, m, d in zip(years, months, days):
+        date = datetime.date(y, m, d)
+        day365.append(int(date.timetuple().tm_yday))
+    return np.array(day365)
+
+
 def compute_monthly_statistics(years, months, values, q, pool='all'):
     percentiles = []
     nyear = []
