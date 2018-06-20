@@ -291,8 +291,12 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
               ['Time', 'Year', 'Month', 'Day', 'Level (m)', 'Flow (m3/s)']]
 
         # Append the dataset.
-        data = np.vstack([station['Time'], station['Year'], station['Month'],
-                          station['Day'], station['Level'], station['Flow']]
+        data = np.vstack([station['Time'].astype(str),
+                          station['Year'].astype(str),
+                          station['Month'].astype(str),
+                          station['Day'].astype(str),
+                          station['Level'].astype(str),
+                          station['Flow'].astype(str)]
                          ).transpose().tolist()
         fc.extend(data)
 
