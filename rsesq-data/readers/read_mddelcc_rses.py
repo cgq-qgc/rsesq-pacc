@@ -213,8 +213,10 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
                'Water temperature (degC)']]
 
         # Append the dataset.
-        data = np.vstack([stn['Time'], stn['Year'], stn['Month'],
-                          stn['Day'], stn['Water Level'], stn['Temperature']]
+        data = np.vstack([stn['Time'].astype(str), stn['Year'].astype(str),
+                          stn['Month'].astype(str), stn['Day'].astype(str),
+                          stn['Water Level'].astype(str),
+                          stn['Temperature'].astype(str)]
                          ).transpose().tolist()
         fc.extend(data)
 
