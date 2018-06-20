@@ -10,8 +10,6 @@ from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 import numpy as np
 import os
-import csv
-from multiprocessing import Pool
 
 # ---- Imports: third parties
 
@@ -237,16 +235,12 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
         """
         sids = scrape_station_ids()
         self._db = {}
-        p = Pool(5)
-        itr = 0
         print("Fetching station datasheets from the CEHQ website...")
-        for result in p.imap(scrape_station_datasheet, sids):
-            itr += 1
+        for i, sid in enumerate(sids):
+            result = scrape_station_datasheet(sid)
             self._db[result['ID']] = result
-            print("\r", "%d of %d" % (itr, len(sids)), end="")
+            print("\r%d of %d" % (i, len(sids)), end="          ")
         print("\nDatasheet fetched for all stations.")
-        p.close()
-        p.join()
         np.save(self.DATABASE_FILEPATH, self._db)
 
     def fetch_station_dlydata(self, sid):
