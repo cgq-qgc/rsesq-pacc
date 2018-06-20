@@ -10,8 +10,6 @@ from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 import numpy as np
 import os
-import csv
-from multiprocessing import Pool
 
 # ---- Imports: third parties
 
@@ -21,7 +19,7 @@ from xlrd.xldate import xldate_from_date_tuple
 # ---- Imports: local
 
 from readers.base import AbstractReader
-from readers.utils import findUnique, dms2decdeg
+from readers.utils import findUnique, dms2decdeg, save_content_to_csv
 
 
 # ---- Base functions
@@ -217,6 +215,8 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             stns = [stn for stn in stns if stn['Status'] == 'Station ouverte']
         elif active is False:
             stns = [stn for stn in stns if stn['Status'] == 'Station fermée']
+        elif active is None:
+            stns = [stn for stn in stns]
 
         return stns
 
@@ -237,16 +237,12 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
         """
         sids = scrape_station_ids()
         self._db = {}
-        p = Pool(5)
-        itr = 0
         print("Fetching station datasheets from the CEHQ website...")
-        for result in p.imap(scrape_station_datasheet, sids):
-            itr += 1
+        for i, sid in enumerate(sids):
+            result = scrape_station_datasheet(sid)
             self._db[result['ID']] = result
-            print("\r", "%d of %d" % (itr, len(sids)), end="")
+            print("\r%d of %d" % (i, len(sids)), end="          ")
         print("\nDatasheet fetched for all stations.")
-        p.close()
-        p.join()
         np.save(self.DATABASE_FILEPATH, self._db)
 
     def fetch_station_dlydata(self, sid):
@@ -272,6 +268,9 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             self.fetch_station_dlydata(sid)
         station = self._db[sid]
 
+        federal_id = (
+            '' if station["Federal ID"] == '\x97' else station["Federal ID"])
+
         # Generate the file header.
         fc = [['Station ID', station['ID']],
               ['Station Name', station['Name']],
@@ -290,13 +289,17 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
               ['Flow Regime', station['Flow Regime']],
               [],
               ['Source', 'https://www.cehq.gouv.qc.ca'],
-              ['Federal ID', station["Federal ID"]],
+              ['Federal ID', federal_id],
               [],
               ['Time', 'Year', 'Month', 'Day', 'Level (m)', 'Flow (m3/s)']]
 
         # Append the dataset.
-        data = np.vstack([station['Time'], station['Year'], station['Month'],
-                          station['Day'], station['Level'], station['Flow']]
+        data = np.vstack([station['Time'].astype(str),
+                          station['Year'].astype(str),
+                          station['Month'].astype(str),
+                          station['Day'].astype(str),
+                          station['Level'].astype(str),
+                          station['Flow'].astype(str)]
                          ).transpose().tolist()
         fc.extend(data)
 
@@ -306,9 +309,7 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             os.makedirs(os.path.dirname(filepath))
 
         # Save the csv.
-        with open(filepath, 'w', encoding='iso-8859-1') as f:
-            writer = csv.writer(f, delimiter=',', lineterminator='\n')
-            writer.writerows(fc)
+        save_content_to_csv(filepath, fc)
 
 
 if __name__ == "__main__":

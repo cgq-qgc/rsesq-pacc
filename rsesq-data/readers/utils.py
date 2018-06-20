@@ -9,6 +9,7 @@ Created on Mon Oct 23 09:22:27 2017
 import urllib
 import re
 import numpy as np
+import csv
 
 
 def dms2decdeg(coord):
@@ -33,19 +34,20 @@ def findUnique(pattern, string):
         return None
 
 
-def find_float_from_str(string, sep):
+def find_float_from_str(string):
     """
-    Search a string to find a float number if any.
+    Search a string to find the first float number if any.
     """
+    string = string.replace(',', '.')
     float_ = ''
     digit_sep_found = False
     for char in string:
         if char.isdigit():
             float_ += char
-        else:
-            if char == sep and not digit_sep_found:
-                digit_sep_found = True
-                float_ += '.'
+        elif char == '.' and not digit_sep_found:
+            digit_sep_found = True
+            float_ += char
+
     return float(float_)
 
 
@@ -58,3 +60,14 @@ def format_url_to_ascii(url):
     url[2] = urllib.parse.quote(url[2])
     url = urllib.parse.urlunsplit(url)
     return url
+
+
+def save_content_to_csv(fname, fcontent, mode='w', delimiter=',',
+                        encoding='utf8'):
+    """
+    Save content in a csv file with the specifications provided
+    in arguments.
+    """
+    with open(fname, mode, encoding='utf8') as csvfile:
+        writer = csv.writer(csvfile, delimiter=delimiter, lineterminator='\n')
+        writer.writerows(fcontent)
