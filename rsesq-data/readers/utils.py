@@ -34,19 +34,20 @@ def findUnique(pattern, string):
         return None
 
 
-def find_float_from_str(string, sep):
+def find_float_from_str(string):
     """
-    Search a string to find a float number if any.
+    Search a string to find the first float number if any.
     """
+    string = string.replace(',', '.')
     float_ = ''
     digit_sep_found = False
     for char in string:
         if char.isdigit():
             float_ += char
-        else:
-            if char == sep and not digit_sep_found:
-                digit_sep_found = True
-                float_ += '.'
+        elif char == '.' and not digit_sep_found:
+            digit_sep_found = True
+            float_ += char
+
     return float(float_)
 
 
