@@ -268,6 +268,9 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             self.fetch_station_dlydata(sid)
         station = self._db[sid]
 
+        federal_id = (
+            '' if station["Federal ID"] == '\x97' else station["Federal ID"])
+
         # Generate the file header.
         fc = [['Station ID', station['ID']],
               ['Station Name', station['Name']],
@@ -286,7 +289,7 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
               ['Flow Regime', station['Flow Regime']],
               [],
               ['Source', 'https://www.cehq.gouv.qc.ca'],
-              ['Federal ID', station["Federal ID"]],
+              ['Federal ID', federal_id],
               [],
               ['Time', 'Year', 'Month', 'Day', 'Level (m)', 'Flow (m3/s)']]
 
