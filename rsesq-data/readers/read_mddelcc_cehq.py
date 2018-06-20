@@ -215,6 +215,8 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             stns = [stn for stn in stns if stn['Status'] == 'Station ouverte']
         elif active is False:
             stns = [stn for stn in stns if stn['Status'] == 'Station fermée']
+        elif active is None:
+            stns = [stn for stn in stns]
 
         return stns
 
