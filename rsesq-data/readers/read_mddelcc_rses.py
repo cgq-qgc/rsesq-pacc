@@ -21,7 +21,8 @@ import xlrd
 # ---- Imports: local
 
 from readers.base import AbstractReader
-from readers.utils import findUnique, find_float_from_str, format_url_to_ascii
+from readers.utils import (findUnique, find_float_from_str,
+                           format_url_to_ascii, save_content_to_csv)
 
 # ---- Base functions
 
@@ -110,7 +111,7 @@ def get_wldata_from_xls(url):
     indexes = np.digitize(np.unique(time), time, right=True)
 
     df = {}
-    df['Elevation'] = find_float_from_str(ws.cell_value(2, 2), ',')
+    df['Elevation'] = find_float_from_str(ws.cell_value(2, 2))
     df['Time'] = time[indexes]
     df['Water Level'] = wlvl[indexes]
     df['Temperature'] = wtemp[indexes]
@@ -223,9 +224,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             os.makedirs(os.path.dirname(filepath))
 
         # Save the csv.
-        with open(filepath, 'w') as f:
-            writer = csv.writer(f, delimiter=',', lineterminator='\n')
-            writer.writerows(fc)
+        save_content_to_csv(filepath, fc)
 
 
 if __name__ == "__main__":
