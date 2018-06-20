@@ -21,7 +21,7 @@ from xlrd.xldate import xldate_from_date_tuple
 # ---- Imports: local
 
 from readers.base import AbstractReader
-from readers.utils import findUnique, dms2decdeg
+from readers.utils import findUnique, dms2decdeg, save_content_to_csv
 
 
 # ---- Base functions
@@ -306,9 +306,7 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             os.makedirs(os.path.dirname(filepath))
 
         # Save the csv.
-        with open(filepath, 'w', encoding='iso-8859-1') as f:
-            writer = csv.writer(f, delimiter=',', lineterminator='\n')
-            writer.writerows(fc)
+        save_content_to_csv(filepath, fc)
 
 
 if __name__ == "__main__":
