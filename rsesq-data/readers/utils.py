@@ -9,6 +9,7 @@ Created on Mon Oct 23 09:22:27 2017
 import urllib
 import re
 import numpy as np
+import csv
 
 
 def dms2decdeg(coord):
@@ -58,3 +59,14 @@ def format_url_to_ascii(url):
     url[2] = urllib.parse.quote(url[2])
     url = urllib.parse.urlunsplit(url)
     return url
+
+
+def save_content_to_csv(fname, fcontent, mode='w', delimiter=',',
+                        encoding='utf8'):
+    """
+    Save content in a csv file with the specifications provided
+    in arguments.
+    """
+    with open(fname, mode, encoding='utf8') as csvfile:
+        writer = csv.writer(csvfile, delimiter=delimiter, lineterminator='\n')
+        writer.writerows(fcontent)
