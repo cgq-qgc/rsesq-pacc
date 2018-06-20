@@ -21,8 +21,8 @@ import numpy as np
 # ---- Imports: local
 
 from readers.base import AbstractReader
-from WHAT.meteo.dwnld_weather_data import (RawDataDownloader,
-                                           ConcatenatedDataFrame)
+from gwhat.meteo.dwnld_weather_data import (RawDataDownloader,
+                                            ConcatenatedDataFrame)
 
 
 # ---- Base functions
