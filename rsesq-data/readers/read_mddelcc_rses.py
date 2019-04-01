@@ -239,6 +239,34 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         # Save the csv.
         save_content_to_csv(filepath, fc)
 
+    def save_station_table_to_csv(self, filepath):
+        """
+        Save the information for all the wells of the RSESQ in a csv file.
+        """
+        fcontent = [['#', 'Well_ID', 'Well_Name', 'Latitude_ddeg',
+                     'Longitude_ddeg', 'Elevation', 'Nappe', 'Influenced']]
+        for i, stn_id in enumerate(sorted(self.station_ids())):
+            try:
+                self._db[stn_id]['Elevation']
+            except KeyError:
+                # We need to download the data to get the station
+                # elevation because this info is not in the kml file.
+                self.fetch_station_wldata(stn_id)
+
+            fcontent.append([
+                str(i), stn_id, self._db[stn_id]['Name'],
+                self._db[stn_id]['Latitude'], self._db[stn_id]['Longitude'],
+                self._db[stn_id]['Elevation'], self._db[stn_id]['Nappe'],
+                self._db[stn_id]['Influenced']])
+
+        # Create the destination directory if it doesn't exist.
+        filepath = osp.abspath(filepath)
+        if not osp.exists(osp.dirname(filepath)):
+            os.makedirs(osp.dirname(filepath))
+
+        # Save the csv.
+        save_content_to_csv(filepath, fcontent)
+
 
 if __name__ == "__main__":
     reader = MDDELCC_RSESQ_Reader()
