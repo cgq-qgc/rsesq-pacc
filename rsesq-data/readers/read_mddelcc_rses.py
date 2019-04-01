@@ -161,6 +161,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             )
         return df
 
+    # ---- Load and fetch database
     def load_database(self):
         try:
             self._db = np.load(self.DATABASE_FILEPATH).item()
@@ -177,7 +178,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     def fetch_station_wldata(self, sid):
         url = self._db[sid]['url data']
         if url in [None, '', b'']:
-            return
+            self._db[sid]['Elevation'] = 'nan'
         else:
             self._db[sid].update(get_wldata_from_xls(url))
             np.save(self.DATABASE_FILEPATH, self._db)
