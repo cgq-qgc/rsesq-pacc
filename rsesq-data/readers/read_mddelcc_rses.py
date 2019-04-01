@@ -195,6 +195,20 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         if station['url data'] not in [None, '', b'']:
             urlretrieve(station['url data'], filepath)
 
+    def dwnld_piezo_drilllog(self, station_id, directory):
+        """
+        Download the piezometer drilllog and save it to disk in the
+        specified directory as a pdf file.
+        """
+        # Create the destination directory if it doesn't exist.
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        station = self._db[station_id]
+        if station['url drilllog'] not in [None, '', b'']:
+            filename = 'drillog_{}.pdf'.format(station_id)
+            urlretrieve(station['url drilllog'], osp.join(directory, filename))
+
     # ---- Save to file
 
     def save_station_to_hdf5(self, station_id, filepath):
