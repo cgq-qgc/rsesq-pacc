@@ -5,27 +5,26 @@ Created on Tue Jun 13 14:29:29 2017
 """
 
 # ---- Imports: standard library
-
 from urllib.request import urlopen, urlretrieve
 from io import BytesIO
 import numpy as np
 import os
+import os.path as osp
 import requests
-import csv
+import datetime
 
 # ---- Imports: third parties
-
 from bs4 import BeautifulSoup, CData
 import xlrd
+import pandas as pd
 
 # ---- Imports: local
-
 from readers.base import AbstractReader
 from readers.utils import (findUnique, find_float_from_str,
                            format_url_to_ascii, save_content_to_csv)
 
-# ---- Base functions
 
+# ---- Base functions
 
 def get_xml_url():
     """
@@ -148,7 +147,19 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     def station_ids(self):
         return list(self._db.keys())
 
-    # ---- Load and fetch database
+    def get_station_data(self, stn_id):
+        """
+        Return a pandas dataframe with the temperature and water level time
+        series corresponding to the specified station indexed by date.
+        """
+        data = self[stn_id]
+        df = pd.DataFrame(
+            np.vstack((data['Water Level'], data['Temperature'])).T,
+            [datetime.datetime(*xlrd.xldate_as_tuple(t, 0)) for
+             t in data['Time']],
+            columns=['Water Level (masl)', 'Temperature (degC)']
+            )
+        return df
 
     def load_database(self):
         try:
