@@ -5,16 +5,18 @@ Created on Tue Oct 17 10:38:02 2017
 """
 
 # ---- Imports: standard library
-
 from abc import ABC, abstractmethod
+import os.path as osp
 
 
 class AbstractReader(ABC):
 
     DATABASE_FILEPATH = None
 
-    def __init__(self):
+    def __init__(self, workdir=None):
         super().__init__()
+        if isinstance(workdir, str) and osp.exists(workdir):
+            self.DATABASE_FILEPATH = osp.join(workdir, self.DATABASE_FILEPATH)
         self.load_database()
 
     # ---- Load and fetch database
