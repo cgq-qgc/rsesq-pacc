@@ -21,7 +21,7 @@ import scipy.signal
 from data_readers import MDDELCC_RSESQ_Reader
 
 
-WORKDIR = "D:/Data"
+WORKDIR = osp.dirname(__file__)
 
 
 def generate_earth_tides(latitude, longitude, elevation, start_year, end_year):
@@ -63,15 +63,17 @@ def generate_earth_tides(latitude, longitude, elevation, start_year, end_year):
 rsesq_reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
 rsesq_reader.load_database()
 
-# %% Load NARR data from csv file.
+# %% Load barometric NARR data from csv file.
 
 patm_narr_fname = osp.join(WORKDIR, "patm_narr_data.csv")
 
+# Get the barometric data from the NARR grid.
 narr_baro = pd.read_csv(patm_narr_fname, header=5)
 narr_baro['Date'] = pd.to_datetime(
     narr_baro['Date'], format="%Y-%m-%d %H:%M:%S")
 narr_baro.set_index(['Date'], drop=True, inplace=True)
 
+# Get the latitudes and longitudes of the barometric time series of NARR grid.
 with open(patm_narr_fname, 'r+') as csvfile:
     reader = list(csv.reader(csvfile, delimiter=','))
     for row in reader:
@@ -82,12 +84,13 @@ with open(patm_narr_fname, 'r+') as csvfile:
         elif row[0].lower().startswith('lon'):
             longitudes = np.array(row[1:]).astype(float)
 
-# %% Format water level, barometric, and Earth tide data.
+# %% Format water level, barometric, and Earth tides data.
 
 sid = '03040005'  # Saint-Amable
 sid = '03030018'  # Saint-Hyacinte
 sid = '03040009'  # Saint-Jean-sur-Richelieu
 sid = '03030001'  # Sainte-Victoire
+
 sta_data = rsesq_reader.get_station_data(sid)
 sta_data = sta_data.resample('15min').asfreq()
 
@@ -95,6 +98,7 @@ sta_data = sta_data.resample('15min').asfreq()
 sta_lat = float(rsesq_reader[sid]['Latitude'])
 sta_lon = float(rsesq_reader[sid]['Longitude'])
 sta_ele = float(rsesq_reader[sid]['Elevation'])
+
 dist = calc_dist_from_coord(latitudes, longitudes, sta_lat, sta_lon)
 idx = np.argmin(dist)
 idx_narr_baro = narr_baro[[str(idx)]]
@@ -183,7 +187,7 @@ ax.legend([l1, l2], ["Niveau d'eau non corrigés", "Niveaux d'eau corrigés"],
 
 # ax.plot(WLcorr, '--', lw=2,)
 
-# %%
+# %% Save the data to a CSV file
 filename = osp.join(
     WORKDIR,
     '%s_%s.csv' % (rsesq_reader[sid]['ID'], rsesq_reader[sid]['Name'])

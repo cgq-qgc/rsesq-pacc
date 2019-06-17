@@ -21,7 +21,7 @@ import scipy.signal
 from data_readers import MDDELCC_RSESQ_Reader
 
 
-WORKDIR = "D:/Data"
+WORKDIR = osp.dirname(__file__)
 
 
 def generate_earth_tides(latitude, longitude, elevation, start_year, end_year):
@@ -95,6 +95,7 @@ sta_data = sta_data.resample('15min').asfreq()
 sta_lat = float(rsesq_reader[sid]['Latitude'])
 sta_lon = float(rsesq_reader[sid]['Longitude'])
 sta_ele = float(rsesq_reader[sid]['Elevation'])
+
 dist = calc_dist_from_coord(latitudes, longitudes, sta_lat, sta_lon)
 idx = np.argmin(dist)
 idx_narr_baro = narr_baro[[str(idx)]]
