@@ -19,9 +19,9 @@ import xlrd
 import pandas as pd
 
 # ---- Imports: local
-from readers.base import AbstractReader
-from readers.utils import (findUnique, find_float_from_str,
-                           format_url_to_ascii, save_content_to_csv)
+from .base import AbstractReader
+from .utils import (findUnique, find_float_from_str,
+                    format_url_to_ascii, save_content_to_csv)
 
 
 # ---- Base functions
@@ -88,23 +88,28 @@ def read_xml_datatable(url):
     return db
 
 
-def get_wldata_from_xls(url):
+def get_wldata_from_xls(url_or_fpath):
     """
     Get elevation, time, water level and water temperature data from a xls
     file downloaded from http://www.mddelcc.gouv.qc.ca/eau/piezo/.
     """
-    # Save the content of the file in a memory buffer.
-    response = requests.get(url)
-    bytes_io = BytesIO(response.content)
+    if url_or_fpath.startswith('http://'):
+        # Save the content of the file in a memory buffer.
+        response = requests.get(url_or_fpath)
+        bytes_io = BytesIO(response.content)
 
-    # Read the content of the file and extract the data.
-    with xlrd.open_workbook(file_contents=bytes_io.read()) as wb:
-        ws = wb.sheet_by_index(0)
+        # Read the content of the file and extract the data.
+        with xlrd.open_workbook(file_contents=bytes_io.read()) as wb:
+            ws = wb.sheet_by_index(0)
+    else:
+        # Read the content of the file and extract the data.
+        with xlrd.open_workbook(url_or_fpath) as wb:
+            ws = wb.sheet_by_index(0)
 
-        row_idx = ws.col_values(0).index('Date du relevé')+1
-        time = np.array(ws.col_values(0, start_rowx=row_idx)).astype(float)
-        wlvl = np.array(ws.col_values(1, start_rowx=row_idx)).astype(float)
-        wtemp = np.array(ws.col_values(2, start_rowx=row_idx)).astype(float)
+    row_idx = ws.col_values(0).index('Date du relevé')+1
+    time = np.array(ws.col_values(0, start_rowx=row_idx)).astype(float)
+    wlvl = np.array(ws.col_values(1, start_rowx=row_idx)).astype(float)
+    wtemp = np.array(ws.col_values(2, start_rowx=row_idx)).astype(float)
 
     # Remove duplicates in time series and save in a dataframe
     indexes = np.digitize(np.unique(time), time, right=True)
@@ -132,9 +137,12 @@ def get_wldata_from_xls(url):
 class MDDELCC_RSESQ_Reader(AbstractReader):
 
     DATABASE_FILEPATH = 'mddelcc_rsesq_database.npy'
+    COLUMNS = ['ID', 'Name', 'Lat_ddeg', 'Lon_ddeg', 'Elev',
+               'Nappe', 'Influenced']
 
-    def __init__(self):
-        super(MDDELCC_RSESQ_Reader, self).__init__()
+    def __init__(self, workdir=None):
+        self._stations = pd.DataFrame(columns=self.COLUMNS)
+        super().__init__(workdir)
 
     def __getitem__(self, key):
         return self._db[key]
@@ -142,10 +150,10 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     # ---- Utility functions
 
     def stations(self):
-        return list(self._db.values())
+        return self._stations
 
     def station_ids(self):
-        return list(self._db.keys())
+        return self._stations.index.values
 
     def get_station_data(self, stn_id):
         """
@@ -153,25 +161,49 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         series corresponding to the specified station indexed by date.
         """
         data = self[stn_id]
-        df = pd.DataFrame(
-            np.vstack((data['Water Level'], data['Temperature'])).T,
-            [datetime.datetime(*xlrd.xldate_as_tuple(t, 0)) for
-             t in data['Time']],
-            columns=['Water Level (masl)', 'Temperature (degC)']
-            )
+        columns = ['Water Level (masl)', 'Temperature (degC)']
+        if 'Water Level' in data:
+            df = pd.DataFrame(
+                np.vstack((data['Water Level'], data['Temperature'])).T,
+                [datetime.datetime(*xlrd.xldate_as_tuple(t, 0)) for
+                 t in data['Time']],
+                columns=columns
+                )
+        else:
+            df = pd.DataFrame(columns=columns)
         return df
 
     # ---- Load and fetch database
     def load_database(self):
         try:
-            self._db = np.load(self.DATABASE_FILEPATH).item()
+            self._db = np.load(self.DATABASE_FILEPATH,
+                               allow_pickle=True).item()
         except FileNotFoundError:
             self.fetch_database()
+
+        data = []
+        for stn_id in sorted(list(self._db.keys())):
+            try:
+                self._db[stn_id]['Elevation']
+            except KeyError:
+                # We need to download the data to get the station
+                # elevation because this info is not in the kml file.
+                self.fetch_station_wldata(stn_id)
+
+            data.append([
+                stn_id, self._db[stn_id]['Name'],
+                float(self._db[stn_id]['Latitude']),
+                float(self._db[stn_id]['Longitude']),
+                self._db[stn_id]['Elevation'], self._db[stn_id]['Nappe'],
+                self._db[stn_id]['Influenced']])
+
+        self._stations = pd.DataFrame(data, columns=self.COLUMNS)
+        self._stations.set_index([self.COLUMNS[0]], drop=False, inplace=True)
 
     def fetch_database(self):
         url = get_xml_url()
         self._db = read_xml_datatable(url)
-        np.save(self.DATABASE_FILEPATH, self._db)
+        np.save(self.DATABASE_FILEPATH, self._db, allow_pickle=True)
 
     # ---- Fetch data
 
@@ -181,7 +213,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             self._db[sid]['Elevation'] = 'nan'
         else:
             self._db[sid].update(get_wldata_from_xls(url))
-            np.save(self.DATABASE_FILEPATH, self._db)
+            np.save(self.DATABASE_FILEPATH, self._db, allow_pickle=True)
             return self._db[sid]
 
     def dwnld_raw_xls_datafile(self, station_id, filepath):
@@ -284,8 +316,20 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 
 
 if __name__ == "__main__":
-    reader = MDDELCC_RSESQ_Reader()
-    reader.save_station_table_to_csv("rsesq_stations_info.csv")
+    url = get_xml_url()
+    xml = urlopen(url)
+
+    # reader = MDDELCC_RSESQ_Reader()
+    
+    # WORKDIR = ("C:/Users/User/OneDrive/INRS/2017 - Projet INRS PACC/"
+    #            "Correction Baro RSESQ")
+    # reader.DATABASE_FILEPATH = osp.join(WORKDIR, "mddelcc_rsesq_database.npy")
+
+    # reader.load_database()
+    
+    # stations = reader._stations
+    # print(stations)
+    # reader.save_station_table_to_csv("rsesq_stations_info.csv")
 
     # reader.save_station_to_csv('01160002', 'test.csv')
     # data = reader.fetch_station_wldata('02257001')

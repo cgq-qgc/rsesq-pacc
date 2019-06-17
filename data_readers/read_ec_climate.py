@@ -20,7 +20,7 @@ import numpy as np
 
 # ---- Imports: local
 
-from readers.base import AbstractReader
+from .base import AbstractReader
 from gwhat.meteo.dwnld_weather_data import (RawDataDownloader,
                                             ConcatenatedDataFrame)
 

@@ -18,8 +18,8 @@ from xlrd.xldate import xldate_from_date_tuple
 
 # ---- Imports: local
 
-from readers.base import AbstractReader
-from readers.utils import findUnique, dms2decdeg, save_content_to_csv
+from .base import AbstractReader
+from .utils import findUnique, dms2decdeg, save_content_to_csv
 
 
 # ---- Base functions
