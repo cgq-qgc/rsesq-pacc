@@ -6,15 +6,39 @@
 # Licensed under the terms of the MIT License.
 # -----------------------------------------------------------------------------
 
-import os.path as osp
+# ---- Standard party imports
 import csv
 from datetime import datetime, timedelta
+import os.path as osp
+# ---- Third party imports
 import numpy as np
-import rasterio
 import pandas as pd
+import rasterio
+import xlsxwriter
+# ---- Local imports
+from data_readers import MDDELCC_RSESQ_Reader
 
 
 PATH_TO_ARCV3TIF = "D:/Data/mne_arc_v3_tifs"
+PATH_TO_RSESQ_DATA = "D:/Data"
+
+
+def calc_dist_from_coord(lat1, lon1, lat2, lon2):
+    """
+    Compute the  horizontal distance in km between a location given in
+    decimal degrees and a set of locations also given in decimal degrees.
+    """
+    lat1, lon1 = np.radians(lat1), np.radians(lon1)
+    lat2, lon2 = np.radians(lat2), np.radians(lon2)
+
+    r = 6373  # r is the Earth radius in km
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
+
+    return r * c
 
 
 def calcul_center_latlon(lat, lon):
@@ -33,6 +57,17 @@ def calcul_center_latlon(lat, lon):
     lat_ctr = np.arctan2(z, hyp)
 
     return np.degrees(lat_ctr), np.degrees(lon_ctr)
+
+
+def download_drillogs(dirname):
+    """Download the drillogs pdf from the RSESQ web site."""
+    rsesq_reader = MDDELCC_RSESQ_Reader(workdir=PATH_TO_RSESQ_DATA)
+    rsesq_reader.load_database()
+
+    for stn_id in rsesq_reader.station_ids():
+        print('\rDownloading drillogs {}'.format(stn_id), end='')
+        rsesq_reader.dwnld_piezo_drilllog(stn_id, dirname)
+    print('')
 
 
 def get_elevation_from_larc_tif(lat, lon):
@@ -72,3 +107,22 @@ def read_tsoft_expchan(filename, tstart, tdelta):
     dtarr = [dt0 + timedelta(minutes=(i * 15)) for i in range(len(data))]
 
     return pd.DataFrame(data, dtarr, columns=['earth_tides(nm/s2)'])
+
+
+def save_content_to_csv(fname, fcontent, mode='w', delimiter=',',
+                        encoding='utf8'):
+    """
+    Save fcontent in a csv file with the specifications provided
+    in arguments.
+    """
+    with open(fname, mode, encoding='utf8') as csvfile:
+        writer = csv.writer(csvfile, delimiter=delimiter, lineterminator='\n')
+        writer.writerows(fcontent)
+
+
+def save_content_to_excel(fname, fcontent):
+    """Save content in a xls or xlsx file."""
+    with xlsxwriter.Workbook(fname) as wb:
+        ws = wb.add_worksheet('Data')
+        for i, row in enumerate(fcontent):
+            ws.write_row(i, 0, row)
