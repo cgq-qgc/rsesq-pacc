@@ -19,7 +19,8 @@ from data_readers import MDDELCC_RSESQ_Reader
 from data_readers.read_mddelcc_rses import get_wldata_from_xls
 
 
-def generate_earth_tides(latitude, longitude, elevation, start_year, end_year):
+def generate_earth_tides(latitude, longitude, elevation, start_year, end_year,
+                         samplerate=3600):
     """
     Generate Earth tide synthetic data for the give latitude, longitude and
     elevation.
@@ -30,13 +31,11 @@ def generate_earth_tides(latitude, longitude, elevation, start_year, end_year):
         print("Calculating Earth tides for year %d..." % year)
         start = datetime(year, 1, 1)
         duration = 366 * 24
-        samplerate = 60 * 15
         pt.predict(latitude, longitude, elevation, start, duration, samplerate)
 
         # Retrieve the results as dataframe
         data = pt.results()
         data = data[['UTC', 'Signal [nm/s**2]']]
-        data.loc[:, 'UTC'] = data.loc[:, 'UTC'] - tz_delta
         data.rename(columns={'UTC': 'Date'}, inplace=True)
         data.set_index(['Date'], drop=True, inplace=True)
         data = data.tz_localize(None)
