@@ -67,7 +67,7 @@ for stn_id in rsesq_reader.station_ids():
     if np.isnan(sta_ele):
         continue
 
-    etdata = generate_earth_tides(sta_lat, sta_lon, sta_ele, 2017, 2017)
+    etdata = generate_earth_tides(sta_lat, sta_lon, sta_ele, 1980, 2018)
     etdata.rename(columns={'Signal [nm/s**2]': stn_id}, inplace=True)
     if not len(etdata_stack):
         etdata_stack = etdata
@@ -78,5 +78,5 @@ for stn_id in rsesq_reader.station_ids():
 
 # Save data to a csv file.
 dirname = osp.dirname(__file__)
-filename = osp.join(dirname, 'synthetic_earthtides.csv')
+filename = osp.join(dirname, 'synthetic_earthtides_1980-2017_1H_UTC.csv')
 etdata_stack.to_csv(filename)
