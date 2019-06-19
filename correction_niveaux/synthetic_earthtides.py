@@ -6,6 +6,13 @@
 # Licensed under the terms of the MIT License.
 # -----------------------------------------------------------------------------
 
+"""
+This scripts use PyGTide to produce a set of synthetic Earth tides data at the
+location of each well of the RSESQ. The results are then saved in a csv.
+
+https://github.com/hydrogeoscience/pygtide
+"""
+
 # ---- Standard party imports
 import os.path as osp
 from datetime import datetime
