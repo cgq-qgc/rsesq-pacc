@@ -24,11 +24,6 @@ def generate_earth_tides(latitude, longitude, elevation, start_year, end_year):
     Generate Earth tide synthetic data for the give latitude, longitude and
     elevation.
     """
-    # Define the UTC time delta.
-    utc_dt = pytz.timezone('UTC').localize(datetime(2017, 1, 1))
-    local_dt = pytz.timezone('US/Eastern').localize(datetime(2017, 1, 1))
-    tz_delta = local_dt - utc_dt
-
     pt = pygtide.pygtide()
     etdata = pd.DataFrame()
     for year in range(start_year, end_year + 1):
