@@ -16,7 +16,6 @@ https://github.com/hydrogeoscience/pygtide
 # ---- Standard party imports
 import os.path as osp
 from datetime import datetime
-import pytz
 # ---- Third party imports
 import numpy as np
 import pandas as pd
@@ -32,6 +31,7 @@ def generate_earth_tides(latitude, longitude, elevation, start_year, end_year,
     Generate Earth tide synthetic data for the give latitude, longitude and
     elevation.
     """
+    # We need to loop over the years or else ETERNA complains.
     pt = pygtide.pygtide()
     etdata = pd.DataFrame()
     for year in range(start_year, end_year + 1):
@@ -40,7 +40,7 @@ def generate_earth_tides(latitude, longitude, elevation, start_year, end_year,
         duration = 366 * 24
         pt.predict(latitude, longitude, elevation, start, duration, samplerate)
 
-        # Retrieve the results as dataframe
+        # Retrieve the results as a pandas dataframe.
         data = pt.results()
         data = data[['UTC', 'Signal [nm/s**2]']]
         data.rename(columns={'UTC': 'Date'}, inplace=True)
@@ -57,13 +57,13 @@ rsesq_reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
 rsesq_reader.load_database()
 
 # We need to add data from Sainte-Martine manually because they were not
-# published on the RSESQ website.
+# published on the RSESQ website in 2018.
 data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
 rsesq_reader._db["03097082"].update(data)
 
 # %% Produce and save the synthetic earth tides data to an csv file.
 
-etdata_stack = pd.DataFrame()
+etdata_stack = None
 i = 0
 for stn_id in rsesq_reader.station_ids():
     i += 1
@@ -76,7 +76,7 @@ for stn_id in rsesq_reader.station_ids():
 
     etdata = generate_earth_tides(sta_lat, sta_lon, sta_ele, 1980, 2018)
     etdata.rename(columns={'Signal [nm/s**2]': stn_id}, inplace=True)
-    if not len(etdata_stack):
+    if etdata_stack is None:
         etdata_stack = etdata
     else:
         etdata_stack = pd.merge(etdata_stack, etdata,
