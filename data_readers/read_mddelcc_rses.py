@@ -12,12 +12,10 @@ import os
 import os.path as osp
 import requests
 import datetime
-
 # ---- Imports: third parties
 from bs4 import BeautifulSoup, CData
 import xlrd
 import pandas as pd
-
 # ---- Imports: local
 from .base import AbstractReader
 from .utils import (findUnique, find_float_from_str,

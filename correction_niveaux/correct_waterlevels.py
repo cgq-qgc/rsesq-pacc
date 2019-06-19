@@ -24,40 +24,6 @@ from data_readers import MDDELCC_RSESQ_Reader
 WORKDIR = osp.dirname(__file__)
 
 
-def generate_earth_tides(latitude, longitude, elevation, start_year, end_year):
-    """
-    Generate Earth tide synthetic data for the give latitude, longitude and
-    elevation.
-    """
-    # Define the UTC time delta
-    utc_tz = pytz.timezone('UTC')
-    utc_dt = pytz.timezone('UTC').localize(datetime.datetime(2017, 1, 1))
-    local_tz = pytz.timezone('US/Eastern')
-    local_dt = local_tz.localize(datetime.datetime(2017, 1, 1))
-    tz_delta = local_dt - utc_dt
-
-    pt = pygtide.pygtide()
-    etdata = pd.DataFrame()
-    for year in range(start_year, end_year + 1):
-        print("Calculating Earth tides for year %d..." % year)
-        start = datetime.datetime(year, 1, 1)
-        duration = 366 * 24
-        samplerate = 60 * 15
-        pt.predict(latitude, longitude, elevation, start, duration, samplerate)
-
-        # Retrieve the results as dataframe
-        data = pt.results()
-        data = data[['UTC', 'Signal [nm/s**2]']]
-        data.loc[:, 'UTC'] = data.loc[:, 'UTC'] - tz_delta
-        data.rename(columns={'UTC': 'Index'}, inplace=True)
-        data.set_index(['Index'], drop=True, inplace=True)
-        data = data.tz_localize(None)
-        # data = data.resample('D').asfreq()
-
-        etdata = pd.concat([etdata, data]).drop_duplicates()
-    return etdata
-
-
 # %% Load RSESQ database.
 
 rsesq_reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
