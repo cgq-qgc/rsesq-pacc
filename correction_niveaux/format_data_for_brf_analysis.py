@@ -8,17 +8,16 @@
 
 # ---- Standard party imports
 import csv
-from datetime import datetime, timedelta
 import os
 import os.path as osp
-import re
 # ---- Third party imports
-import netCDF4
-import hydsensread as hsr
 import numpy as np
 import pandas as pd
 # ---- Local imports
-from correction_niveaux.utils import calc_dist_from_coord, save_content_to_csv
+from correction_niveaux.utils import (
+    calc_dist_from_coord, save_content_to_csv,
+    load_baro_from_narr_preprocessed_file,
+    load_earthtides_from_preprocessed_file)
 from data_readers import MDDELCC_RSESQ_Reader
 from data_readers.read_mddelcc_rses import get_wldata_from_xls
 
@@ -119,7 +118,7 @@ rsesq_reader._db["03097082"].update(data)
 # %% Read the level and baro raw data from the Solinst csv files.
 
 dirname = osp.join(osp.dirname(__file__), '15min_formatted_data')
-region = ['monteregie'][0]
+region = ['monteregie', 'chaudiere-appalaches'][0]
 
 # Get the baro data.
 filename = "barodata_{}_15M_LOCAL.csv".format(region)
@@ -152,31 +151,15 @@ rsesq_level_elevations = np.array(
     [float(rsesq_reader[sid]['Elevation']) for sid in rsesq_level_stations])
 
 
-# %% Load NARR data from csv file.
+# %% Load Baro and Earthtides data from preprocessed csv file.
 
 # The 'patm_narr_data.csv' file is generated from the NARR netCDF files with
 # the script 'get_data_from_narr.py'
 
 if BARO_SOURCE == 'NARR':
-    print("Loading NARR barometric data... ", end='')
-    patm_narr_fname = osp.join(osp.dirname(__file__), "patm_narr_data.csv")
+    narr_baro = load_baro_from_narr_preprocessed_file
 
-    # Get the barometric data.
-    narr_baro = pd.read_csv(patm_narr_fname, header=6)
-    narr_baro['Date'] = pd.to_datetime(
-        narr_baro['Date'], format="%Y-%m-%d %H:%M:%S")
-    narr_baro.set_index(['Date'], drop=True, inplace=True)
-    print("done")
-
-# %% Read the synthetic Earth tides.
-
-print("Loading Earth tides synthetic data... ", end='')
-synth_earthtides = pd.read_csv(osp.join(
-    osp.dirname(__file__), 'synthetic_earthtides_1980-2018_1H_UTC.csv'))
-synth_earthtides['Date'] = pd.to_datetime(
-    synth_earthtides['Date'], format="%Y-%m-%d %H:%M:%S")
-synth_earthtides.set_index(['Date'], drop=True, inplace=True)
-print("done")
+synth_earthtides = load_earthtides_from_preprocessed_file()
 
 # %% Format the piezo, baro and earth tides data.
 
@@ -187,16 +170,13 @@ print('{:<8s}'.format('Piezo_id'), '{:<8s}'.format('Baro_id'),
 print('{:<8s}'.format(''), '{:<8s}'.format(''),
       '{:>5s}'.format('(km)'), '{:>6s}'.format('(m)'))
 
-for stn_id in rsesq_level_stations:
+for stn_id in rsesq_level_stations[:]:
     stn_lat = float(rsesq_reader[stn_id]['Latitude'])
     stn_lon = float(rsesq_reader[stn_id]['Longitude'])
     stn_elev = float(rsesq_reader[stn_id]['Elevation'])
 
     # Generate the synthetic earth tides data.
     etdata = synth_earthtides[[stn_id]]
-    etdata.index = etdata.index - pd.Timedelta(hours=5)
-    # !!! It is important to shift the data by 5 hours to match the local time
-    #     of the data from the RSESQ,
 
     # Get the piezometric data from the RSESQ.
     leveldata = rsesq_level[[stn_id]]
@@ -207,11 +187,7 @@ for stn_id in rsesq_level_stations:
     if BARO_SOURCE == 'NARR':
         baro_stn = 'NARR grid'
         delta_elev = 0
-
         barodata = narr_baro[[stn_id]]
-        barodata.index = barodata.index - pd.Timedelta(hours=5)
-        # !!! It is important to shift the data by 5 hours to match the
-        #     local time of the data from the RSESQ,
     elif BARO_SOURCE == 'RSESQ':
         dist = calc_dist_from_coord(
             rsesq_baro_latitudes, rsesq_baro_longitudes, stn_lat, stn_lon)
@@ -241,17 +217,17 @@ for stn_id in rsesq_level_stations:
           )
 
     etdata = etdata[~etdata.index.duplicated()]
-    etdata = etdata.resample('3H').asfreq()
-    barodata = barodata.resample('3H').asfreq()
-    leveldata = leveldata.resample('3H').asfreq()
+    etdata = etdata.resample('1H').asfreq()
+    barodata = barodata.resample('1H').asfreq()
+    leveldata = leveldata.resample('1H').asfreq()
 
     if True:
-        foldername = osp.join(osp.dirname(__file__), '15min_formatted_data')
+        foldername = osp.join(osp.dirname(__file__),
+                              'gwt_correction_baro',
+                              'Water Levels')
         if not osp.exists(foldername):
             os.makedirs(foldername)
         filename = '{}_{}_{}_baro.csv'.format(
             region.lower(), stn_id, BARO_SOURCE.lower())
         fcontent = save_to_gwhat_file(osp.join(foldername, filename),
                                       leveldata, barodata, etdata, fheader)
-
-    break

@@ -92,6 +92,38 @@ def get_elevation_from_larc_tif(lat, lon):
     return elev
 
 
+def load_baro_from_narr_preprocessed_file():
+    print("Loading NARR barometric data... ", end='')
+    patm_narr_fname = osp.join(osp.dirname(__file__), "patm_narr_data.csv")
+
+    # Get the barometric data.
+    narr_baro = pd.read_csv(patm_narr_fname, header=6)
+    narr_baro['Date'] = pd.to_datetime(
+        narr_baro['Date'], format="%Y-%m-%d %H:%M:%S")
+    narr_baro.set_index(['Date'], drop=True, inplace=True)
+
+    # !!! It is important to shift the data by 5 hours to match the
+    #     local time of the data from the RSESQ.
+    narr_baro.index = narr_baro.index - pd.Timedelta(hours=5)
+    print("done")
+    return narr_baro
+
+
+def load_earthtides_from_preprocessed_file():
+    print("Loading Earth tides synthetic data... ", end='')
+    synth_earthtides = pd.read_csv(osp.join(
+        osp.dirname(__file__), 'synthetic_earthtides_1980-2018_1H_UTC.csv'))
+    synth_earthtides['Date'] = pd.to_datetime(
+        synth_earthtides['Date'], format="%Y-%m-%d %H:%M:%S")
+    synth_earthtides.set_index(['Date'], drop=True, inplace=True)
+
+    # !!! It is important to shift the data by 5 hours to match the
+    #     local time of the data from the RSESQ.
+    synth_earthtides.index = synth_earthtides.index - pd.Timedelta(hours=5)
+    print("done")
+    return synth_earthtides
+
+
 def read_tsoft_expchan(filename, tstart, tdelta):
     """
     Read the Earth tides data from a file produced with TSoft.
