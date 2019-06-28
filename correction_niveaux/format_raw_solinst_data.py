@@ -8,17 +8,15 @@
 
 # ---- Standard party imports
 import csv
-from datetime import datetime, timedelta
 import os
 import os.path as osp
 import re
 # ---- Third party imports
-import netCDF4
 import hydsensread as hsr
 import numpy as np
 import pandas as pd
 # ---- Local imports
-from correction_niveaux.utils import calc_dist_from_coord, save_content_to_csv
+from correction_niveaux.utils import calc_dist_from_coord
 from data_readers import MDDELCC_RSESQ_Reader
 from data_readers.read_mddelcc_rses import get_wldata_from_xls
 
