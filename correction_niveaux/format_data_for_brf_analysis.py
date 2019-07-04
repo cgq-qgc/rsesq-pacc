@@ -24,35 +24,6 @@ from data_readers.read_mddelcc_rses import get_wldata_from_xls
 BARO_SOURCE = ['NARR', 'RSESQ'][1]
 
 
-def save_to_gwhat_file(filename, leveldata, barodata, etdata, fheader):
-    """
-    Save the level, baro and earth tides data to a csv file in the GWHAT
-    format.
-    """
-    # Join the data.
-    data = pd.merge(leveldata, barodata,
-                    left_index=True, right_index=True, how='inner')
-    data = pd.merge(data, etdata,
-                    left_index=True, right_index=True, how='inner')
-
-    # Compensate transform the level data in mbgs.
-    data['WL(m)'] = data['WL(m)'] - data['BP(m)']
-    data['WL(m)'] = np.max(data['WL(m)']) - data['WL(m)']
-
-    # Interpolate missing values if any.
-    data = data.interpolate(method='linear')
-
-    # Convert time to string format.
-    datetimes = data.index.strftime("%Y-%m-%dT%H:%M:%S").values.tolist()
-
-    # Save data to files.
-    fcontent = [[datetimes[i]] + data.iloc[i].tolist() for
-                i in range(len(datetimes))]
-    save_content_to_csv(filename, fheader + fcontent)
-
-    return fheader + fcontent
-
-
 def export_to_csv(levelfiles, barofiles, filename=None):
     """
     Match each levelfile with a barofile and generate a summary table that is
@@ -115,10 +86,18 @@ rsesq_reader.load_database()
 data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
 rsesq_reader._db["03097082"].update(data)
 
-# %% Read the level and baro raw data from the Solinst csv files.
+# %% Read the level and baro raw data
+
+# The data are read from the post-processed csv files that were created
+# with the script named 'format_raw_solinst_data.py'.
 
 dirname = osp.join(osp.dirname(__file__), '15min_formatted_data')
-region = ['monteregie', 'chaudiere-appalaches'][0]
+region = ['Monteregie',                # 0
+          'Chaudiere-Appalaches',      # 1
+          'centre-quebec',             # 2
+          'montreal',                  # 3
+          'capitale-nationale'         # 4
+          ][3]
 
 # Get the baro data.
 filename = "barodata_{}_15M_LOCAL.csv".format(region)
@@ -136,7 +115,7 @@ rsesq_baro_elevations = np.array(
     [float(rsesq_reader[sid]['Elevation']) for sid in rsesq_baro_stations])
 
 # Get the level data.
-filename = "leveldata_monteregie_15M_LOCAL.csv"
+filename = "leveldata_{}_15M_LOCAL.csv".format(region)
 rsesq_level = pd.read_csv(osp.join(dirname, filename))
 rsesq_level['Date'] = pd.to_datetime(
     rsesq_level['Date'], format="%Y-%m-%d %H:%M:%S")
@@ -175,7 +154,8 @@ for stn_id in rsesq_level_stations[:]:
     stn_lon = float(rsesq_reader[stn_id]['Longitude'])
     stn_elev = float(rsesq_reader[stn_id]['Elevation'])
 
-    # Generate the synthetic earth tides data.
+    # Get the synthetic earth tides data that were produced for this
+    # observation well.
     etdata = synth_earthtides[[stn_id]]
 
     # Get the piezometric data from the RSESQ.
@@ -216,18 +196,42 @@ for stn_id in rsesq_level_stations[:]:
           '  {}'.format(name)
           )
 
+    # Drop nan.
+    etdata = etdata.dropna()
+    barodata = barodata.dropna()
+    leveldata = leveldata.dropna()
+
+    # Drop duplicates.
     etdata = etdata[~etdata.index.duplicated()]
-    etdata = etdata.resample('1H').asfreq()
-    barodata = barodata.resample('1H').asfreq()
-    leveldata = leveldata.resample('1H').asfreq()
+    barodata = barodata[~barodata.index.duplicated()]
+    leveldata = leveldata[~leveldata.index.duplicated()]
+
+    # Join the data.
+    data = pd.merge(leveldata, barodata,
+                    left_index=True, right_index=True, how='inner')
+    data = pd.merge(data, etdata,
+                    left_index=True, right_index=True, how='inner')
+
+    # Resample and interpolate missing values if any.
+    data = data.resample('1H').asfreq()
+    data = data.interpolate(method='linear')
 
     if True:
-        foldername = osp.join(osp.dirname(__file__),
-                              'gwt_correction_baro',
-                              'Water Levels')
+        foldername = osp.join(
+            osp.dirname(__file__), 'gwt_correction_baro', 'Water Levels')
         if not osp.exists(foldername):
             os.makedirs(foldername)
         filename = '{}_{}_{}_baro.csv'.format(
             region.lower(), stn_id, BARO_SOURCE.lower())
-        fcontent = save_to_gwhat_file(osp.join(foldername, filename),
-                                      leveldata, barodata, etdata, fheader)
+
+        # Compensate transform the level data in mbgs.
+        data['WL(m)'] = data['WL(m)'] - data['BP(m)']
+        data['WL(m)'] = np.max(data['WL(m)']) - data['WL(m)']
+
+        # Convert time to string format.
+        datetimes = data.index.strftime("%Y-%m-%dT%H:%M:%S").values.tolist()
+
+        # Save data to files.
+        fcontent = [[datetimes[i]] + data.iloc[i].tolist() for
+                    i in range(len(datetimes))]
+        save_content_to_csv(osp.join(foldername, filename), fheader + fcontent)

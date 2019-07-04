@@ -21,7 +21,7 @@ from data_readers import MDDELCC_RSESQ_Reader
 from data_readers.read_mddelcc_rses import get_wldata_from_xls
 
 
-def export_to_csv(levelfiles, barofiles, filename=None):
+def export_station_infos_to_csv(levelfiles, barofiles, filename=None):
     fcontent = [["#", "Well_ID", "Location",
                  "Latitude_ddeg", "Longitude_ddeg", "Elevation_m",
                  "Delta_dist_baro_km", "Delta_elev_baro_m"]]
@@ -83,9 +83,12 @@ rsesq_reader._db["03097082"].update(data)
 
 path_to_rawdatafiles = "D:/Data/rsesq_raw_15min_2017"
 
-region = ['Monteregie',
-          'Chaudiere-Appalaches',
-          'Mercier'][2]
+region = ['Monteregie',                # 0
+          'Chaudiere-Appalaches',      # 1
+          'centre-quebec',             # 2
+          'montreal',                  # 3
+          'capitale-nationale'         # 4
+          ][3]
 
 rsesq_barofiles = {}
 rsesq_levelfiles = {}
@@ -94,51 +97,51 @@ rsesq_longitudes = {}
 rsesq_elevations = {}
 
 i = 0
-for period in ['Printemps', 'Automne']:
-    dirname = osp.join(path_to_rawdatafiles, period, region)
-    for file in os.listdir(dirname):
-        if not file.endswith('csv'):
-            continue
-        i += 1
-        print(i, period, region, file)
+dirname = osp.join(path_to_rawdatafiles, region)
+for file in os.listdir(dirname):
+    if not file.endswith('csv'):
+        continue
+    i += 1
+    print(i, region, file)
 
-        solinst_file = hsr.SolinstFileReader(osp.join(dirname, file))
-        if "baro" in file.lower():
-            stn_id = re.sub(
-                '[ -_]?BARO[ -_]?', '', solinst_file.sites.project_name)
-            if stn_id in rsesq_barofiles:
-                rsesq_barofiles[stn_id].records = (
-                    rsesq_barofiles[stn_id].records.append(
-                        solinst_file.records))
-            else:
-                rsesq_barofiles[stn_id] = solinst_file
+    solinst_file = hsr.SolinstFileReader(osp.join(dirname, file))
+    if "baro" in file.lower():
+        stn_id = re.sub('[ -_]?BARO[ -_]?', '',
+                        solinst_file.sites.project_name,
+                        flags=re.IGNORECASE)
+        if stn_id in rsesq_barofiles:
+            rsesq_barofiles[stn_id].records = (
+                rsesq_barofiles[stn_id].records.append(
+                    solinst_file.records, sort=True))
         else:
-            stn_id = solinst_file.sites.project_name
-            if stn_id in rsesq_levelfiles:
-                rsesq_levelfiles[stn_id].records = (
-                    rsesq_levelfiles[stn_id].records.append(
-                        solinst_file.records))
-            else:
-                rsesq_levelfiles[stn_id] = solinst_file
+            rsesq_barofiles[stn_id] = solinst_file
+    else:
+        stn_id = solinst_file.sites.project_name
+        if stn_id in rsesq_levelfiles:
+            rsesq_levelfiles[stn_id].records = (
+                rsesq_levelfiles[stn_id].records.append(
+                    solinst_file.records, sort=True))
+        else:
+            rsesq_levelfiles[stn_id] = solinst_file
 
-        # Get latitude, longitude, and elevation of the well where the
-        # logger is installed.
-        solinst_file.sites.latitude = float(rsesq_reader[stn_id]['Latitude'])
-        solinst_file.sites.longitude = float(rsesq_reader[stn_id]['Longitude'])
-        try:
-            solinst_file.sites.elevation = float(
-                rsesq_reader[stn_id]['Elevation'])
-        except KeyError:
-            # We need to download the data to get the station elevation
-            # because this info is not in the kml file.
-            rsesq_reader.fetch_station_wldata(stn_id)
-        finally:
-            solinst_file.sites.elevation = float(
-                rsesq_reader[stn_id]['Elevation'])
+    # Get latitude, longitude, and elevation of the well where the
+    # logger is installed.
+    solinst_file.sites.latitude = float(rsesq_reader[stn_id]['Latitude'])
+    solinst_file.sites.longitude = float(rsesq_reader[stn_id]['Longitude'])
+    try:
+        solinst_file.sites.elevation = float(
+            rsesq_reader[stn_id]['Elevation'])
+    except KeyError:
+        # We need to download the data to get the station elevation
+        # because this info is not in the kml file.
+        rsesq_reader.fetch_station_wldata(stn_id)
+    finally:
+        solinst_file.sites.elevation = float(
+            rsesq_reader[stn_id]['Elevation'])
 
-    rsesq_latitudes[stn_id] = float(rsesq_reader[stn_id]['Latitude'])
-    rsesq_longitudes[stn_id] = float(rsesq_reader[stn_id]['Longitude'])
-    rsesq_elevations[stn_id] = float(rsesq_reader[stn_id]['Elevation'])
+rsesq_latitudes[stn_id] = float(rsesq_reader[stn_id]['Latitude'])
+rsesq_longitudes[stn_id] = float(rsesq_reader[stn_id]['Longitude'])
+rsesq_elevations[stn_id] = float(rsesq_reader[stn_id]['Elevation'])
 
 # %% Save the formatted data to a csv
 
@@ -154,7 +157,7 @@ for stn_id in rsesq_levelfiles.keys():
                                    level_data_stn,
                                    left_index=True,
                                    right_index=True,
-                                   how='inner')
+                                   how='outer')
 leveldata_stack.index.names = ['Date']
 print('done')
 
@@ -170,11 +173,10 @@ for stn_id in rsesq_barofiles.keys():
                                   baro_data_stn,
                                   left_index=True,
                                   right_index=True,
-                                  how='inner')
+                                  how='outer')
 barodata_stack.index.names = ['Date']
 print('done')
 
-# %% Save data to a csv file.
 print("Saving the level and baro data to a csv... ", end='')
 dirname = osp.join(osp.dirname(__file__), '15min_formatted_data')
 filename = 'leveldata_{}_15M_LOCAL.csv'.format(region.lower())

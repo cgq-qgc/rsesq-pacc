@@ -9,15 +9,16 @@
 
 # ---- Standard party imports
 import csv
-import datetime
 import os.path as osp
-import sys
+import datetime
+
 # ---- Third party imports
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
 import pandas as pd
-from pyhelp.utils import calc_dist_from_coord
 import scipy.signal
+
 # ---- Local import
 from data_readers import MDDELCC_RSESQ_Reader
 from data_readers.read_mddelcc_rses import get_wldata_from_xls
@@ -46,16 +47,35 @@ earthtides = load_earthtides_from_preprocessed_file()
 
 # %% Format water level, barometric, and Earth tide data.
 
+# monteregie (37 wells)
 influenced = ['03030011', '03040013', '03040010', '03040011', '03030005']
+# chaudiere-appalache (27 wells)
+influenced += ['02407004', '02407005', '02340002']
+# centre-quebec (24 wells)
+influenced += ['03027032', '03027061', '03010006', '03010004']
+# capitale-nationale (16 wells)
+influenced += ['05150001', ]
+# montreal (41 wells)
+influenced += ['04017031', '03090006', '03090020', '04017051', '04017011',
+               '04640001', '03097131', '03090014', '03090015', '03070001',
+               '03097102', '04440001', '04647001']
+# Pas de données aux 15 minutes pour la puits #05080003
 
+pdfpages = PdfPages('corrected_water_levels.pdf')
+iwell = 0
 for sid in rsesq_reader.station_ids():
     brf_fname = osp.join(osp.dirname(__file__),
                          'gwt_correction_baro',
+                         'brf_results',
                          'brf_{}.csv'.format(sid))
     if not osp.exists(brf_fname):
         # This means that no BRF is available for this probably, probably
         # because it is influenced by pumping.
         continue
+
+    iwell += 1
+    print("{:>3d} - Correcting water levels for well {}...".format(
+          iwell, sid), end=' ')
 
     # Add baro data to the WL time series.
     barodata = baro_narr[[sid]]
@@ -116,23 +136,10 @@ for sid in rsesq_reader.station_ids():
                         left_index=True, right_index=True,
                         how='inner')
     sta_data = sta_data[~sta_data.index.duplicated()]
-    # sta_data = sta_data.resample('1D').asfreq()
 
     WL = sta_data['WL(masl)'].copy()
     WLcorr = sta_data['WL(masl)'] + sta_data['dWL(m)']
     sta_data['WLcorr(masl)'] = sta_data['WL(masl)'] + sta_data['dWL(m)']
-
-    if False:
-        fig, ax = plt.subplots()
-        l1, = ax.plot(sta_data['WL(masl)'], '-', color='0.75', lw=1)
-        l2, = ax.plot(sta_data['WLcorr(masl)'], '-', lw=1)
-
-        ax.set_ylabel('WL (masl)')
-        ax.set_title(rsesq_reader[sid]['Name'] + ' (#' + sid + ')')
-        ax.legend([l1, l2],
-                  ["Niveau d'eau non corrigés", "Niveaux d'eau corrigés"],
-                  bbox_to_anchor=[1, 1], loc='upper right', ncol=3,
-                  numpoints=1, fontsize=10, frameon=False)
 
     # ---- Save the data to file
     filename = osp.join(
@@ -159,3 +166,46 @@ for sid in rsesq_reader.station_ids():
     with open(filename, 'w', encoding='utf8') as csvfile:
         writer = csv.writer(csvfile, delimiter=',', lineterminator='\n')
         writer.writerows(fcontent)
+
+    # ---- Plot the data.
+    if True:
+        # sta_data = sta_data.resample('1D').asfreq()
+
+        plt.ioff()
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 4)
+
+        data_av_2000 = sta_data[
+            sta_data.index < datetime.datetime(2000, 1, 1)]
+        l1, = ax.plot(data_av_2000['WL(masl)'], '-', color='0.5', lw=1)
+        l2, = ax.plot(data_av_2000['WLcorr(masl)'], '-', color='blue', lw=1)
+
+        data_af_2000 = sta_data[
+            sta_data.index >= datetime.datetime(2000, 1, 1)]
+        ax.plot(data_af_2000['WL(masl)'], '-', color='0.5', lw=1)
+        ax.plot(data_af_2000['WLcorr(masl)'], '-', color='blue', lw=1)
+
+        ax.set_ylabel("Niveaux d'eau p/r n.m.m. (m)",
+                      fontsize=14, labelpad=15)
+        ax.set_title(rsesq_reader[sid]['Name'] + ' (#' + sid + ')',
+                     pad=25)
+
+        # ---- Setup date format
+        adl = ax.get_xaxis().get_major_locator()
+        adl.intervald['MONTHLY'] = [0]
+        adf = ax.get_xaxis().get_major_formatter()
+        adf.scaled[1. / 24] = '%Y'  # set the < 1d scale to H:M
+        adf.scaled[1.0] = '%Y'  # set the > 1d < 1m scale to Y-m-d
+        adf.scaled[30.] = "%Y"  # set the > 1m < 1Y scale to Y-m
+        adf.scaled[365.] = '%Y'  # set the > 1y scale to Y
+
+        ax.legend([l1, l2],
+                  ["Niveaux d'eau non corrigés", "Niveaux d'eau corrigés"],
+                  bbox_to_anchor=[0, 1], loc='lower left', ncol=3,
+                  numpoints=1, fontsize=10, frameon=False, borderaxespad=0,
+                  borderpad=0.25)
+        fig.tight_layout()
+        pdfpages.savefig(fig)
+        plt.close('all')
+    print('done')
+pdfpages.close()
