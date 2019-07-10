@@ -12,10 +12,10 @@
 
 Outils développés à l'[INRS centre Eau-Terre-Environnement](http://www.ete.inrs.ca/) pour récupérer et mettre en forme automatiquement les données temporelles piézométriques, hydrométriques et climatiques qui sont rendues disponibles gratuitement par le [Ministère du Développement Durable, de l'Environnement et de la Lutte contre les Changements Climatiques](http://www.mddelcc.gouv.qc.ca/) du Québec et par [Environnement et Changement climatique Canada](https://www.ec.gc.ca/default.asp?lang=Fr).
 
-## 1.1 API pour télécharger les données du RSESQ du MDDELCC
+## 1.1 Outil pour télécharger les données du RSESQ du MDDELCC
 http://www.mddelcc.gouv.qc.ca/eau/piezo/
 
-Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations piézométriques du MDDELCC dans un fichier csv.
+Le script ci-dessous montre comment il est possible d'utiliser l'outil pour sauvegarder les données journalières de toutes les stations piézométriques du MDDELCC dans un fichier csv.
 
 ```python
 from readers import MDDELCC_RSESQ_Reader
