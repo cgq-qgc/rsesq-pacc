@@ -74,10 +74,10 @@ Le logiciel [WHAT](https://github.com/jnsebgosselin/what), qui est développé d
 ![Prise d'écran de l'interface de WHAT pour télécharger les données climatiques](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/img_src/what_telecharger_donnees_climatiques.png)
 _Figure: Caputre d'écran de l'interface du logiciel [WHAT](https://github.com/jnsebgosselin/what) pour le téléchargement et la mise en forme des données climatique d'[Environnement et Changement climatique Canada](http://climat.meteo.gc.ca/historical_data/search_historic_data_f.html)_
 
-## 1.3 API pour récupérer les données hydrométriques du CEHQ
+## 1.3 Outil pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 
-Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations hydrométriques actives du CEHQ dans un fichier csv.
+Le script ci-dessous montre comment il est possible d'utiliser l'outil pour sauvegarder les données journalières de toutes les stations hydrométriques actives du CEHQ dans un fichier csv.
 
 ```python
 import os
