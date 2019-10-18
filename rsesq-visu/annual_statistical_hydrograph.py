@@ -278,6 +278,12 @@ def plot_all_year_from_sid(sid):
 
 
 if __name__ == "__main__":
+    from matplotlib.backends.backend_pdf import PdfPages
+
     plt.close('all')
-    filename = '03090006 - hydrogramme_statistique_annnuel_2016.pdf'
-    plot_10yrs_annual_statistical_hydrograph('03090006', 2016, filename)
+    pdfpages = PdfPages(
+        '05080001 - hydrogramme_statistique_annnuels_1996-2018.pdf')
+    for year in range(1996, 2019):
+        fig = plot_10yrs_annual_statistical_hydrograph('05080001', year)
+        pdfpages.savefig(fig)
+    pdfpages.close()
