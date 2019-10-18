@@ -12,10 +12,12 @@ import os
 import os.path as osp
 import requests
 import datetime
+
 # ---- Imports: third parties
 from bs4 import BeautifulSoup, CData
 import xlrd
 import pandas as pd
+
 # ---- Imports: local
 from .base import AbstractReader
 from .utils import (findUnique, find_float_from_str,
@@ -61,7 +63,6 @@ def read_xml_datatable(url):
                 pid = findUnique('Piézomètre =(.*?)<br/>', cd)
 
                 # ---- Get well info
-
                 db[pid] = {}
                 db[pid]['ID'] = pid
                 db[pid]['Name'] = name
@@ -70,10 +71,9 @@ def read_xml_datatable(url):
                 db[pid]['Nappe'] = findUnique('Nappe =(.*?)<br/>', cd)
                 db[pid]['Influenced'] = findUnique('Influencé =(.*?)<br/>', cd)
                 db[pid]['Last'] = findUnique(
-                        'Dernière lecture =(.*?)<br/>', cd)
+                    'Dernière lecture =(.*?)<br/>', cd)
 
                 # ---- Get datafiles url
-
                 keys = ['url data', 'url drilllog', 'url graph']
                 ss = ['<br/><a href="(.*?)">Données',
                       'Données</a><br/><a href="(.*?)">Schéma',
