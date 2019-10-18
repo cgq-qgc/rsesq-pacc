@@ -317,6 +317,10 @@ if __name__ == "__main__":
     url = get_xml_url()
     xml = urlopen(url)
 
+    xml = requests.get(url)
+    with open('Reseau_Piezometrique_2019-04-08.xml', 'wb') as file:
+        file.write(xml.content)
+
     # reader = MDDELCC_RSESQ_Reader()
     
     # WORKDIR = ("C:/Users/User/OneDrive/INRS/2017 - Projet INRS PACC/"
