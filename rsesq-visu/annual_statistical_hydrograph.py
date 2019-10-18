@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.transforms as transforms
-from readers import MDDELCC_RSESQ_Reader
+from data_readers import MDDELCC_RSESQ_Reader
 import colorsys
 from xlrd.xldate import xldate_from_date_tuple
 from calendar import monthrange
@@ -87,9 +87,10 @@ def compute_dly_statistics_table(years, months, days, values, q):
 
 def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
                                              filename=None, pool='all'):
-    reader = MDDELCC_RSESQ_Reader()
+    reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
+    reader.load_database()
     stn_data = reader._db[sid]
-
+    
     # Organize month order.
     year = stn_data['Year']
     month = stn_data['Month']
@@ -273,7 +274,7 @@ def plot_all_year_from_sid(sid):
         filename = ('%s - hydrogramme_statistique_annnuel_%d.png' %
                     (stn_data['ID'], yr))
         plot_10yrs_annual_statistical_hydrograph(
-                sid, yr, filename=os.path.join(dirname, filename))
+            sid, yr, filename=os.path.join(dirname, filename))
 
 
 if __name__ == "__main__":
