@@ -191,9 +191,9 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     labels = ['<10', '10-24', '25-75', '76-90', '>90', 'Médiane', 'Mesures']
     x = [0, 0.075, 0.15, 0.225, 0.3, 0.4, 0.5]
 
-    # Add the pathes and labels to the legend.
-    rw = 0.3/fw*1
-    rh = 0.15/fh*1
+    # Add the patches and labels to the legend.
+    rw = 0.3 / fw * 1
+    rh = 0.15 / fh * 1
     mpad = mpl.transforms.ScaledTranslation(0, -5/72, fig.dpi_scale_trans)
     lpad = mpl.transforms.ScaledTranslation(0, -22/72, fig.dpi_scale_trans)
     for i in range(5):
@@ -256,7 +256,7 @@ def plot_and_save_all(year, dirname, pool='all'):
 
         last_month = stn['Month'][stn['Year'] == yr_to_plot][-1]
         plot_10yrs_annual_statistical_hydrograph(
-                stn['ID'], yr_to_plot, last_month, filename, pool)
+            stn['ID'], yr_to_plot, last_month, filename, pool)
         plt.close('all')
 
 
@@ -287,3 +287,7 @@ if __name__ == "__main__":
         fig = plot_10yrs_annual_statistical_hydrograph('05080001', year)
         pdfpages.savefig(fig)
     pdfpages.close()
+
+    reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
+    reader.load_database()
+    stn_data = reader.get_station_data('05080001')
