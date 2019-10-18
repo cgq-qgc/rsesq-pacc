@@ -20,7 +20,6 @@ class AbstractReader(ABC):
         self.load_database()
 
     # ---- Load and fetch database
-
     @abstractmethod
     def load_database(self):
         pass
@@ -29,12 +28,7 @@ class AbstractReader(ABC):
     def fetch_database(self):
         pass
 
-    @abstractmethod
-    def set_local_database_dir(dirname):
-        pass
-
     # ---- Utility functions
-
     @abstractmethod
     def stations(self):
         pass
