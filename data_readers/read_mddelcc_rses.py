@@ -19,9 +19,9 @@ import xlrd
 import pandas as pd
 
 # ---- Imports: local
-from .base import AbstractReader
-from .utils import (findUnique, find_float_from_str,
-                    format_url_to_ascii, save_content_to_csv)
+from data_readers.base import AbstractReader
+from data_readers.utils import (findUnique, find_float_from_str,
+                                format_url_to_ascii, save_content_to_csv)
 
 
 # ---- Base functions
