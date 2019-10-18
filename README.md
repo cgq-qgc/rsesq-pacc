@@ -1,31 +1,21 @@
 # Table des Matières
 
-1. [Feuille de route](#1-feuille-de-route)
-2. [Collecte et mise en forme des données](#2-collecte-et-mise-en-forme-des-données)<br />
-    2.1. [API pour télécharger les données du RSESQ du MDDELCC](#21-api-pour-télécharger-les-données-du-rsesq-du-mddelcc)<br />
-    2.2a. [API pour télécharger les données climatiques d'ECCC](#22a-api-pour-télécharger-les-données-climatiques-deccc)<br />
-    2.2b. [Logiciel pour télécharger les données climatiques d'ECCC](#22b-logiciel-avec-interface-graphique-pour-télécharger-les-données-climatiques-deccc)<br />
-    2.3. [API pour récupérer les données hydrométriques du CEHQ](#23-api-pour-récupérer-les-données-hydrométriques-du-cehq)<br />
-3. [Caractérisation du Réseau](#3-caractérisation-du-réseau)
-4. [License](#4-license)
+1. [Collecte et mise en forme des données](#1-collecte-et-mise-en-forme-des-données)<br />
+    1.1. [API pour télécharger les données du RSESQ du MDDELCC](#11-api-pour-télécharger-les-données-du-rsesq-du-mddelcc)<br />
+    1.2a. [API pour télécharger les données climatiques d'ECCC](#12a-api-pour-télécharger-les-données-climatiques-deccc)<br />
+    1.2b. [Logiciel pour télécharger les données climatiques d'ECCC](#12b-logiciel-avec-interface-graphique-pour-télécharger-les-données-climatiques-deccc)<br />
+    1.3. [API pour récupérer les données hydrométriques du CEHQ](#13-api-pour-récupérer-les-données-hydrométriques-du-cehq)<br />
+2. [Caractérisation du Réseau](#2-caractérisation-du-réseau)
+3. [License](#3-license)
 
-# 1 Feuille de route
-
-Tous les documents en lien avec la planification et le suivi de l'avancement du projet sont rendus disponibles dans le répertoire [inrs-rsesq/roadmap](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap). Le fichier [gantt_chart_projet_inrs_rsesq.xml](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/roadmap/gantt_chart_projet_inrs_rsesq.xml) contient la feuille de route complète du projet et peut être consulté à l'aide du logiciel open source [GanttProject](http://www.ganttproject.biz/). Cette feuille de route est mise à jour en continue selon l'évolution du projet. Des rapports de suivi de l'avancement du projet en format pdf sont également produits sur une base hebdomadaire et sont disponibles dans le dossier [progress report](https://github.com/jnsebgosselin/inrs-rsesq/tree/master/roadmap/progress%20reports).
-
-De plus, la majorité des tâches qui apparaissent dans la planification du projet sont répertoriées dans les [Issues](https://github.com/jnsebgosselin/inrs-rsesq/issues) de ce répertoire GitHub où il est possible de commenter et proposer de nouvelles idées pour le projet.
-
-![Gantt diagram screenshot](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/roadmap/gantt_chart_scs.png)
-_Figure: Diagramme de Gantt du projet tel que vu dans [GanttProject](http://www.ganttproject.biz/)(produit le 16/10/2017)_
-
-# 2 Collecte et mise en forme des données
+# 1 Collecte et mise en forme des données
 
 Outils développés à l'[INRS centre Eau-Terre-Environnement](http://www.ete.inrs.ca/) pour récupérer et mettre en forme automatiquement les données temporelles piézométriques, hydrométriques et climatiques qui sont rendues disponibles gratuitement par le [Ministère du Développement Durable, de l'Environnement et de la Lutte contre les Changements Climatiques](http://www.mddelcc.gouv.qc.ca/) du Québec et par [Environnement et Changement climatique Canada](https://www.ec.gc.ca/default.asp?lang=Fr).
 
-## 2.1 API pour télécharger les données du RSESQ du MDDELCC
+## 1.1 Outil pour télécharger les données du RSESQ du MDDELCC
 http://www.mddelcc.gouv.qc.ca/eau/piezo/
 
-Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations piézométriques du MDDELCC dans un fichier csv.
+Le script ci-dessous montre comment il est possible d'utiliser l'outil pour sauvegarder les données journalières de toutes les stations piézométriques du MDDELCC dans un fichier csv.
 
 ```python
 from readers import MDDELCC_RSESQ_Reader
@@ -39,7 +29,7 @@ for stn in reader.stations():
     reader.save_station_to_csv(stn['ID'], os.path.join(dirname, filename))
 ```
 
-## 2.2a API pour télécharger les données climatiques d'ECCC
+## 1.2a API pour télécharger les données climatiques d'ECCC
 http://climate.weather.gc.ca/historical_data/search_historic_data_e.html
 
 Le script ci-dessous montre comment il est possible d'utiliser l'API pour télécharger, formatter et sauvegarder dans un fichier csv les données climatiques journalières de toutes les stations climatiques actives d'ECCC (Environnement et Changement Climatique Canada) localisées au Québec.
@@ -76,7 +66,7 @@ reader.fetch_database()
 
 Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
 
-## 2.2b Logiciel avec interface graphique pour télécharger les données climatiques d'ECCC
+## 1.2b Logiciel avec interface graphique pour télécharger les données climatiques d'ECCC
 https://github.com/jnsebgosselin/what
 
 Le logiciel [WHAT](https://github.com/jnsebgosselin/what), qui est développé dans le cadre de ce projet, permet également de télécharger les données climatiques d'ECCC (Environnement et Changement Climatique Canada) et de combler les données manquantes à partir d'une interface graphique.
@@ -84,10 +74,10 @@ Le logiciel [WHAT](https://github.com/jnsebgosselin/what), qui est développé d
 ![Prise d'écran de l'interface de WHAT pour télécharger les données climatiques](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/img_src/what_telecharger_donnees_climatiques.png)
 _Figure: Caputre d'écran de l'interface du logiciel [WHAT](https://github.com/jnsebgosselin/what) pour le téléchargement et la mise en forme des données climatique d'[Environnement et Changement climatique Canada](http://climat.meteo.gc.ca/historical_data/search_historic_data_f.html)_
 
-## 2.3 API pour récupérer les données hydrométriques du CEHQ
+## 1.3 Outil pour récupérer les données hydrométriques du CEHQ
 https://www.cehq.gouv.qc.ca/hydrometrie/historique_donnees/default.asp
 
-Le script ci-dessous montre comment il est possible d'utiliser l'API pour sauvegarder les données journalières de toutes les stations hydrométriques actives du CEHQ dans un fichier csv.
+Le script ci-dessous montre comment il est possible d'utiliser l'outil pour sauvegarder les données journalières de toutes les stations hydrométriques actives du CEHQ dans un fichier csv.
 
 ```python
 import os
@@ -119,16 +109,21 @@ reader.fetch_database()
 
 Cela effacera toutefois toutes les données journalières de la base de données locale. Il faudra alors télécharger à nouveau les données journalières pour chacune des stations.
 
-# 3 Caractérisation du Réseau
+# 2 Caractérisation du Réseau
 ![Nombre de stations piézo en fonction des années](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/nbr_stns_actives_vs_temps.png)
-_Figure: Nombre de stations piézométriques actives du RSESQ par tranches de 5 ans (diagramme à bandes bleues) et pour chaque année (ligne pointillée rouge)._<br />
-_Code source: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
+_**Figure**: Nombre de stations piézométriques actives du RSESQ par tranches de 5 ans (diagramme à bandes bleues) et pour chaque année (ligne pointillée rouge)._<br />
+_**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
 
 ![Nombre de stations piézo en fonction du nbr d'années](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/stns_nbr_vs_year_nbr.png)
-_Figure: Diagramme à bandes du nombre de stations piézométriques du RSESQ selon le nombre d'années avec des données disponibles à chacune des stations._<br />
-_Code source: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
+_**Figure**: Diagramme à bandes du nombre de stations piézométriques du RSESQ selon le nombre d'années avec des données disponibles à chacune des stations._<br />
+_**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_timeline.py_
 
-# 4 License
+![Dist. piézo vs climat et hydro](https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_dist_stns_climate_hydro.png)
+_**Figure**: Diagramme à bandes de la distribution du nbr. de stations piézo actives en fonction de la distance min. aux stations climatiques et hydrométriques._<br />
+_**Code source**: https://github.com/jnsebgosselin/inrs-rsesq/blob/master/rsesq-data/rsesq_dist_stns_climate_hydro.py_
+
+
+# 3 License
 
 Copyright 2017 Jean-Sébastien Gosselin. All Rights Reserved.
 
