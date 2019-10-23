@@ -19,9 +19,9 @@ import xlrd
 import pandas as pd
 
 # ---- Imports: local
-from .base import AbstractReader
-from .utils import (findUnique, find_float_from_str,
-                    format_url_to_ascii, save_content_to_csv)
+from data_readers.base import AbstractReader
+from data_readers.utils import (findUnique, find_float_from_str,
+                                format_url_to_ascii, save_content_to_csv)
 
 
 # ---- Base functions
@@ -316,6 +316,10 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 if __name__ == "__main__":
     url = get_xml_url()
     xml = urlopen(url)
+
+    xml = requests.get(url)
+    with open('Reseau_Piezometrique_2019-04-08.xml', 'wb') as file:
+        file.write(xml.content)
 
     # reader = MDDELCC_RSESQ_Reader()
     
