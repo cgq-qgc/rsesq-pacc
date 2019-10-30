@@ -5,6 +5,8 @@ brf_results/
 15_min_formatted_data/
 *.hdf5
 *.csv
+*.gwt
+*.gwt.bak
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
