@@ -4,41 +4,25 @@ Created on Wed Oct 25 20:24:09 2017
 @author: jsgosselin
 """
 
+# ---- Standard library imports
 import os
-import numpy as np
+from calendar import monthrange
+import datetime as dt
+
+# ---- Third party imports
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.transforms as transforms
-from data_readers import MDDELCC_RSESQ_Reader
-import colorsys
-from xlrd.xldate import xldate_from_date_tuple
-from calendar import monthrange
-import datetime
+import numpy as np
 import pandas as pd
-import datetime as dt
 
-# lightnes = 150
-# hls = [[23/255, lightnes/255, 153/255],
-#         [24/255, lightnes/255, 240/255],
-#         [72/255, lightnes/255, 121/255],
-#         [134/255, lightnes/255, 160/255],
-#         [160/255, lightnes/255, 123/255]]
-# RGB = [colorsys.hls_to_rgb(col[0], col[1], col[2]) for col in hls]
+# ---- Local imports
+from data_readers import MDDELCC_RSESQ_Reader
+
 
 RGB = ["#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe"]
 MONTHS = np.array(['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
                    'Jui', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'])
-
-
-# ---- Utility functions
-
-
-def convert_date_to_day_format(years, months, days):
-    day365 = []
-    for y, m, d in zip(years, months, days):
-        date = datetime.date(y, m, d)
-        day365.append(int(date.timetuple().tm_yday))
-    return np.array(day365)
 
 
 def compute_monthly_statistics(tseries, q, pool='all'):
@@ -67,30 +51,6 @@ def compute_monthly_statistics(tseries, q, pool='all'):
 
     percentiles = [np.percentile(v, q) for v in mly_values]
     return np.array(percentiles), np.array(nyear)
-
-
-def compute_dly_statistics_table(years, months, days, values, q):
-    days365 = convert_date_to_day_format(years, months, days)
-    percentiles = []
-    ww = 15
-    for day in range(1, 366):
-        day3 = np.tile(np.arange(1, 366), 3)
-        idx = np.where(day3 == day)[0][1]
-
-        day_lb = day3[idx-ww//2]
-        day_rb = day3[idx+ww//2]
-        if day_lb > day_rb:
-            ixs_lb = np.where(days365 >= day_lb)[0]
-            ixs_rb = np.where(days365 <= day_rb)[0]
-            ixs = np.hstack((ixs_lb, ixs_rb))
-        else:
-            ixs = np.where((days365 >= day_lb) & (days365 <= day_rb))[0]
-        percentiles.append(np.percentile(values[ixs], q))
-
-    return np.array(percentiles), None
-
-
-# ---- Plotting functions
 
 
 def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
@@ -223,17 +183,10 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     ax2.text(1, 1, title, ha='right', va='top', fontsize=12,
              transform=ax2.transAxes+mpad)
 
-    # Plot and save the figure.
+    # Plot and save the figures.
     if filename:
         fig.savefig(filename)
     return fig
-
-
-def produce_tex_table(sid, cur_year, last_month=12, filename=None):
-    pass
-
-
-# ---- Helper functions
 
 
 def plot_and_save_all(year, dirname, pool='all'):
