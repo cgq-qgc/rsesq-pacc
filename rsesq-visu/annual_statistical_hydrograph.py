@@ -14,6 +14,8 @@ import colorsys
 from xlrd.xldate import xldate_from_date_tuple
 from calendar import monthrange
 import datetime
+import pandas as pd
+import datetime as dt
 
 # lightnes = 150
 # hls = [[23/255, lightnes/255, 153/255],
@@ -39,25 +41,31 @@ def convert_date_to_day_format(years, months, days):
     return np.array(day365)
 
 
-def compute_monthly_statistics(years, months, values, q, pool='all'):
+def compute_monthly_statistics(tseries, q, pool='all'):
     percentiles = []
     nyear = []
-    for m in range(1, 13):
-        if pool == 'all':
-            ixs = np.where(months == m)[0]
-            mly_values = values[ixs]
-            nyear.append(len(np.unique(years[ixs])))
-        else:
-            mly_values = []
-            for yr in np.unique(years):
-                ixs = np.where((months == m) & (years == yr))[0]
-                if pool == 'median' and len(ixs) > 0:
-                    mly_values.append(np.median(values[ixs]))
-                elif pool == 'mean' and len(ixs) > 0:
-                    mly_values.append(np.mean(values[ixs]))
-            nyear.append(len(mly_values))
-        percentiles.append(np.percentile(mly_values, q))
+    mly_values = []
 
+    if pool == 'all':
+        for m in range(1, 13):
+            mly_stats = tseries.loc[tseries.index.month == m]
+            mly_values.append(mly_stats.values)
+            nyear.append(len(np.unique(mly_stats.index.year)))
+    else:
+        group = tseries.groupby([tseries.index.year, tseries.index.month])
+        if pool == 'min_max_median':
+            mly_stats = pd.concat(
+                [group.min(), group.median(), group.max()], axis=1)
+        elif pool == 'median':
+            mly_stats = group.median()
+        elif pool == 'mean':
+            mly_stats = group.mean()
+        for m in range(1, 13):
+            mly_stats_m = mly_stats[mly_stats.index.get_level_values(1) == m]
+            mly_values.append(mly_stats_m.values.flatten())
+            nyear.append(len(mly_stats_m))
+
+    percentiles = [np.percentile(v, q) for v in mly_values]
     return np.array(percentiles), np.array(nyear)
 
 
@@ -89,38 +97,31 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
                                              filename=None, pool='all'):
     reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
     reader.load_database()
-    stn_data = reader._db[sid]
-    
-    # Organize month order.
-    year = stn_data['Year']
-    month = stn_data['Month']
-    time = stn_data['Time']
+    stn_name = reader[sid]['Name']
+    stn_id = reader[sid]['ID']
 
+    # Organize month order and define first and last datetime value for
+    # the current data.
     if last_month == 12:
         year_lbl = "Année %d" % cur_year
         mth_idx = np.arange(12)
-        tstart = xldate_from_date_tuple((cur_year, 1, 1), 0)
-        tend = xldate_from_date_tuple((cur_year, 12, 31), 0)
+        dtstart = dt.datetime(cur_year, 1, 1)
+        dtend = dt.datetime(cur_year, 12, 31)
     else:
         year_lbl = "Années %d-%d" % (cur_year-1, cur_year)
         mth_idx = np.arange(last_month, 12)
-        mth_idx = np.hstack((mth_idx, np.arange(12-len(mth_idx))))
-
-        tstart = xldate_from_date_tuple((cur_year-1, mth_idx[0]+1, 1), 0)
-        nday_in_mth = monthrange(cur_year, mth_idx[-1]+1)[-1]
-        tend = xldate_from_date_tuple(
-                (cur_year, mth_idx[-1]+1, nday_in_mth), 0)
-    try:
-        istart = np.where(time >= tstart)[0][0]
-        iend = np.where(time <= tend)[0][-1]
-    except IndexError:
-        istart = iend = 0
+        mth_idx = np.hstack((mth_idx, np.arange(12 - len(mth_idx))))
+        dtstart = dt.datetime(cur_year - 1, mth_idx[0] + 1, 1)
+        dtend = dt.datetime(
+            cur_year,
+            mth_idx[-1] + 1,
+            monthrange(cur_year, mth_idx[-1] + 1)[-1])
 
     # Generate the percentiles.
-    level = stn_data['Elevation'] - stn_data['Water Level']
+    wlevels = (reader['02167001']['Elevation'] -
+               reader.get_station_data('02167001')['Water Level (masl)'])
     q = [100, 90, 75, 50, 25, 10, 0]
-    percentiles, nyear = compute_monthly_statistics(year, month, level,
-                                                    q, pool)
+    percentiles, nyear = compute_monthly_statistics(wlevels, q, pool)
 
     # Produce the figure.
     fw, fh = 8, 6
@@ -146,17 +147,17 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
                edgecolor='black', linewidth=0.5)
     ax.plot(xpos, percentiles[mth_idx, 3], '^k')
 
-    # Plot daily series.
-    year = stn_data['Year']
-    time = stn_data['Time'][istart:iend+1]
-    level = stn_data['Elevation'] - stn_data['Water Level'][istart:iend+1]
-    ax.plot((time-tstart)/365*12-0.5, level, '-', color='red')
+    # Plot the current water level data series.
+    cur_wlevels = wlevels[(wlevels.index >= dtstart) &
+                          (wlevels.index <= dtend)]
+    cur_rel_time = cur_wlevels.index.dayofyear.values / 365 * 12 - 0.5
+    ax.plot(cur_rel_time, cur_wlevels.values, '-', color='red')
 
     # Axe limits.
-    ymax = max(np.max(percentiles), np.max(level))
-    ymin = min(np.min(percentiles), np.min(level))
+    ymax = max(np.max(percentiles), np.max(cur_wlevels))
+    ymin = min(np.min(percentiles), np.min(cur_wlevels))
     yrange = ymax - ymin
-    yoffset = 0.1/fh*yrange
+    yoffset = 0.1 / fh * yrange
     ax.axis([-0.75, 11.75, ymin-yoffset, ymax+yoffset])
     ax.invert_yaxis()
 
@@ -197,10 +198,10 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     mpad = mpl.transforms.ScaledTranslation(0, -5/72, fig.dpi_scale_trans)
     lpad = mpl.transforms.ScaledTranslation(0, -22/72, fig.dpi_scale_trans)
     for i in range(5):
-        ax2.add_patch(
-                mpl.patches.Rectangle((x[i], 1-rh), rw, rh, fc=RGB[i],
-                                      ec='black', linewidth=0.5,
-                                      transform=ax2.transAxes+mpad))
+        patch = mpl.patches.Rectangle(
+            (x[i], 1-rh), rw, rh, fc=RGB[i], ec='black', linewidth=0.5,
+            transform=ax2.transAxes+mpad)
+        ax2.add_patch(patch)
         ax2.text(x[i]+rw/2, 1, labels[i], ha='center', va='top', fontsize=10,
                  transform=ax2.transAxes+lpad)
 
@@ -216,9 +217,9 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     ax2.text(x[i+2], 1, labels[i+2], ha='center', va='top', fontsize=10,
              transform=ax2.transAxes+lpad)
 
-    # Add title: Station name and ID
+    # Add title: Station name and ID.
     mpad = mpl.transforms.ScaledTranslation(0, -5/72, fig.dpi_scale_trans)
-    title = "%s\nStation %s" % (stn_data['Name'], stn_data['ID'])
+    title = "{}\nStation {}".format(stn_name, stn_id)
     ax2.text(1, 1, title, ha='right', va='top', fontsize=12,
              transform=ax2.transAxes+mpad)
 
