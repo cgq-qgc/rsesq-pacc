@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 27 14:29:45 2019
-@author: User
-"""
-from urllib.request import urlopen, urlretrieve
+# -----------------------------------------------------------------------------
+# Copyright © Institut National de la Recherche Scientifique (INRS)
+# https://github.com/cgq-qgc/pacc-inrs
+#
+# Licensed under the terms of the MIT License.
+# -----------------------------------------------------------------------------
+
+# ---- Standard library imports
+from urllib.request import urlretrieve
 import os.path as osp
 
 NAAR_FTP = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/"
