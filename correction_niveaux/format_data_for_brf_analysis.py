@@ -6,13 +6,15 @@
 # Licensed under the terms of the MIT License.
 # -----------------------------------------------------------------------------
 
-# ---- Standard party imports
+# ---- Standard library imports
 import csv
 import os
 import os.path as osp
+
 # ---- Third party imports
 import numpy as np
 import pandas as pd
+
 # ---- Local imports
 from correction_niveaux.utils import (
     calc_dist_from_coord, save_content_to_csv,
@@ -130,13 +132,18 @@ rsesq_level_elevations = np.array(
     [float(rsesq_reader[sid]['Elevation']) for sid in rsesq_level_stations])
 
 
-# %% Load Baro and Earthtides data from preprocessed csv file.
+# %% Load NARR Baro data from preprocessed csv file.
 
 # The 'patm_narr_data.csv' file is generated from the NARR netCDF files with
 # the script 'get_data_from_narr.py'
 
 if BARO_SOURCE == 'NARR':
-    narr_baro = load_baro_from_narr_preprocessed_file
+    narr_baro = load_baro_from_narr_preprocessed_file()
+else:
+    narr_baro = None
+
+
+# %% Load Earthtides data from preprocessed csv file.
 
 synth_earthtides = load_earthtides_from_preprocessed_file()
 
@@ -216,22 +223,22 @@ for stn_id in rsesq_level_stations[:]:
     data = data.resample('1H').asfreq()
     data = data.interpolate(method='linear')
 
-    if True:
-        foldername = osp.join(
-            osp.dirname(__file__), 'gwt_correction_baro', 'Water Levels')
-        if not osp.exists(foldername):
-            os.makedirs(foldername)
-        filename = '{}_{}_{}_baro.csv'.format(
-            region.lower(), stn_id, BARO_SOURCE.lower())
+    # Save the data to a file.
+    foldername = osp.join(
+        osp.dirname(__file__), 'gwt_correction_baro', 'Water Levels')
+    if not osp.exists(foldername):
+        os.makedirs(foldername)
+    filename = '{}_{}_{}_baro.csv'.format(
+        region.lower(), stn_id, BARO_SOURCE.lower())
 
-        # Compensate transform the level data in mbgs.
-        data['WL(m)'] = data['WL(m)'] - data['BP(m)']
-        data['WL(m)'] = np.max(data['WL(m)']) - data['WL(m)']
+    # Compensate transform the level data in mbgs.
+    data['WL(m)'] = data['WL(m)'] - data['BP(m)']
+    data['WL(m)'] = np.max(data['WL(m)']) - data['WL(m)']
 
-        # Convert time to string format.
-        datetimes = data.index.strftime("%Y-%m-%dT%H:%M:%S").values.tolist()
+    # Convert time to string format.
+    datetimes = data.index.strftime("%Y-%m-%dT%H:%M:%S").values.tolist()
 
-        # Save data to files.
-        fcontent = [[datetimes[i]] + data.iloc[i].tolist() for
-                    i in range(len(datetimes))]
-        save_content_to_csv(osp.join(foldername, filename), fheader + fcontent)
+    # Save data to files.
+    fcontent = [[datetimes[i]] + data.iloc[i].tolist() for
+                i in range(len(datetimes))]
+    save_content_to_csv(osp.join(foldername, filename), fheader + fcontent)
