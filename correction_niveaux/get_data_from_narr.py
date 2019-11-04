@@ -11,15 +11,19 @@ This script matches the piezometric stations of the RSESQ with the barometric
 data of the NARR data grid.
 
 ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/
+
+last edited: 23-10-2019
 """
 
-# ---- Standard party imports
+# ---- Standard library imports
 import datetime
 import os.path as osp
+
 # ---- Third party imports
 import netCDF4
 import numpy as np
 import pandas as pd
+
 # ---- Local imports
 from correction_niveaux.utils import calc_dist_from_coord, save_content_to_csv
 from data_readers import MDDELCC_RSESQ_Reader
@@ -55,11 +59,12 @@ dset.close()
 
 # %% Get and save the barometric data to an csv file.
 
+# Get the daily barometric data from the NARR grid for the nodes that are
+# nearest to the stations of the RSESQ.
+
 latlon_idx = []
 latlon_jdx = []
 for lat_sta, lon_sta in zip(lat_rsesq, lon_rsesq):
-    # Get the baro data from the nearest node in the grid for each station
-    # of the RSESQ.
     dist = calc_dist_from_coord(lat_grid, lon_grid, lat_sta, lon_sta)
     idx = np.argmin(np.min(dist, axis=1))
     jdx = np.argmin(dist[idx, :])
@@ -67,7 +72,7 @@ for lat_sta, lon_sta in zip(lat_rsesq, lon_rsesq):
     latlon_idx.append(idx)
     latlon_jdx.append(jdx)
 
-# # Remove duplicated nodes if any.
+# Remove duplicated nodes if any.
 # ijdx = np.vstack(list({(i, j) for i, j in zip(latlon_idx, latlon_jdx)}))
 # latlon_idx = ijdx[:, 0].tolist()
 # latlon_jdx = ijdx[:, 1].tolist()
