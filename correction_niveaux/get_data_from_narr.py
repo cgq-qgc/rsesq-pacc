@@ -40,13 +40,13 @@ rsesq_reader.load_database()
 data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
 rsesq_reader._db["03097082"].update(data)
 
-stations = rsesq_reader._stations
 
 # %% Get lat/lon of RSESQ stations
 
-stn_ids = rsesq_reader.station_ids()
-lat_rsesq = [float(rsesq_reader[sid]['Latitude']) for sid in stn_ids]
-lon_rsesq = [float(rsesq_reader[sid]['Longitude']) for sid in stn_ids]
+stations = rsesq_reader.stations()
+stn_ids = stations['ID'].values
+lat_rsesq = stations['Lat_ddeg'].values
+lon_rsesq = stations['Lon_ddeg'].values
 
 # %% Get NARR Grid
 
