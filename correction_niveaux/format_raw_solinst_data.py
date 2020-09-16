@@ -201,7 +201,7 @@ barodata_stack.index.names = ['Date']
 print('Baro data concatenated successfully.')
 
 print("Saving the level and baro data to a csv... ", end='')
-dirname = osp.join(osp.dirname(__file__), '15min_formatted_data')
+dirname = osp.join(osp.dirname(__file__), 'rsesq_15min_formatted_data')
 filename = 'leveldata_{}_15M_LOCAL.csv'.format(region.lower())
 leveldata_stack.to_csv(osp.join(dirname, filename))
 filename = 'barodata_{}_15M_LOCAL.csv'.format(region.lower())
