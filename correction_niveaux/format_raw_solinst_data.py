@@ -138,8 +138,7 @@ for file in os.listdir(dirname):
         # because this info is not in the kml file.
         rsesq_reader.fetch_station_wldata(stn_id)
     finally:
-        solinst_file.sites.elevation = float(
-            rsesq_reader[stn_id]['Elevation'])
+        solinst_file.sites.elevation = float(rsesq_reader[stn_id]['Elevation'])
 
 rsesq_latitudes[stn_id] = float(rsesq_reader[stn_id]['Latitude'])
 rsesq_longitudes[stn_id] = float(rsesq_reader[stn_id]['Longitude'])
