@@ -2,7 +2,8 @@
 backup/
 gwt_correction_baro/
 brf_results/
-15_min_formatted_data/
+rsesq_15min_formatted_data/
+rsesq_raw_15min_2017/
 *.hdf5
 *.csv
 *.gwt
