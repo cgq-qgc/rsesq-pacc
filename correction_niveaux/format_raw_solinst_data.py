@@ -198,7 +198,7 @@ for stn_id in rsesq_barofiles.keys():
                                   right_index=True,
                                   how='outer')
 barodata_stack.index.names = ['Date']
-print('done')
+print('Baro data concatenated successfully.')
 
 print("Saving the level and baro data to a csv... ", end='')
 dirname = osp.join(osp.dirname(__file__), '15min_formatted_data')
@@ -206,4 +206,4 @@ filename = 'leveldata_{}_15M_LOCAL.csv'.format(region.lower())
 leveldata_stack.to_csv(osp.join(dirname, filename))
 filename = 'barodata_{}_15M_LOCAL.csv'.format(region.lower())
 barodata_stack.to_csv(osp.join(dirname, filename))
-print('Baro data concatenated successfully.')
+print('done')
