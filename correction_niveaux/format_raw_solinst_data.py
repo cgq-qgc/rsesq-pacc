@@ -73,12 +73,12 @@ def export_station_infos_to_csv(levelfiles, barofiles, filename=None):
 
 # %% Read data from the RSESQ
 
-rsesq_reader = MDDELCC_RSESQ_Reader(workdir='D:/Data')
+rsesq_reader = MDDELCC_RSESQ_Reader(workdir=osp.join(osp.dirname(__file__)))
 rsesq_reader.load_database()
 
 # We need to add data from Sainte-Martine manually because they were not
 # published on the RSESQ website.
-data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
+data = get_wldata_from_xls("data_sainte_martine_03097082.xls")
 rsesq_reader._db["03097082"].update(data)
 
 # %% Read the level and baro raw data from the Solinst csv files.
@@ -90,7 +90,7 @@ region = ['Monteregie',                # 0
           'centre-quebec',             # 2
           'montreal',                  # 3
           'capitale-nationale'         # 4
-          ][3]
+          ][1]
 
 rsesq_barofiles = {}
 rsesq_levelfiles = {}
