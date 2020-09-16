@@ -107,6 +107,9 @@ for file in os.listdir(dirname):
     print(i, region, file)
 
     solinst_file = hsr.SolinstFileReader(osp.join(dirname, file))
+    solinst_file.undo_zero_point_offset()
+    solinst_file.undo_altitude_correction()
+
     if "baro" in file.lower():
         stn_id = re.sub('[ -_]?BARO[ -_]?', '',
                         solinst_file.sites.project_name,
