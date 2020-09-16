@@ -147,7 +147,7 @@ rsesq_elevations[stn_id] = float(rsesq_reader[stn_id]['Elevation'])
 
 # %% Save the formatted data to a csv
 
-print("Concatenating the level data... ", end='')
+print("Concatenating the level data... ")
 leveldata_stack = None
 for stn_id in rsesq_levelfiles.keys():
     level_data_stn = rsesq_levelfiles[stn_id].records[['Level_m']]
@@ -161,9 +161,9 @@ for stn_id in rsesq_levelfiles.keys():
                                    right_index=True,
                                    how='outer')
 leveldata_stack.index.names = ['Date']
-print('done')
+print('Level data concatenated successfully.')
 
-print("Concatenating the baro data... ", end='')
+print("Concatenating the baro data... ")
 barodata_stack = None
 for stn_id in rsesq_barofiles.keys():
     baro_data_stn = rsesq_barofiles[stn_id].records[['Level_m']]
@@ -185,4 +185,4 @@ filename = 'leveldata_{}_15M_LOCAL.csv'.format(region.lower())
 leveldata_stack.to_csv(osp.join(dirname, filename))
 filename = 'barodata_{}_15M_LOCAL.csv'.format(region.lower())
 barodata_stack.to_csv(osp.join(dirname, filename))
-print('done')
+print('Baro data concatenated successfully.')
