@@ -184,6 +184,8 @@ for stn_id in rsesq_barofiles.keys():
             # We convert into meters.
             if column.lower().endswith('_cm'):
                 baro_data_stn[column] = baro_data_stn[column] / 100
+            elif column.lower().endswith('_kpa'):
+                baro_data_stn[column] = baro_data_stn[column] * 0.101972
             baro_data_stn = baro_data_stn.rename(columns={column: stn_id})
             break
     else:
