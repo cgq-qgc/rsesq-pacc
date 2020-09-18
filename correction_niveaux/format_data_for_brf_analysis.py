@@ -225,7 +225,7 @@ for stn_id in rsesq_level_stations[:]:
 
     # Save the data to a file.
     foldername = osp.join(
-        osp.dirname(__file__), 'gwt_correction_baro', 'Water Levels')
+        osp.dirname(__file__), 'water_levels_for_brf_eval_1hour')
     if not osp.exists(foldername):
         os.makedirs(foldername)
     filename = '{}_{}_{}_baro.csv'.format(
