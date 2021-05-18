@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 20 11:24:10 2019
-@author: User
+Un script pour classifier les descriptions lithologiques des logs de forage
+en hydrofaciès, tracer les logs d'hydrofaciès sur un graphique et évaluer
+le niveau de confinement à partir des séquences d'hydrofaciès.
 """
 from math import ceil
 
