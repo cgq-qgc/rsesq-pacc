@@ -80,12 +80,12 @@ def export_to_csv(levelfiles, barofiles, filename=None):
 
 # %% Read data from the RSESQ
 
-rsesq_reader = MDDELCC_RSESQ_Reader(workdir='D:/Data')
+rsesq_reader = MDDELCC_RSESQ_Reader(workdir=osp.join(osp.dirname(__file__)))
 rsesq_reader.load_database()
 
 # We need to add data from Sainte-Martine manually because they were not
 # published on the RSESQ website.
-data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
+data = get_wldata_from_xls("data_sainte_martine_03097082.xls")
 rsesq_reader._db["03097082"].update(data)
 
 # %% Read the level and baro raw data
@@ -93,13 +93,13 @@ rsesq_reader._db["03097082"].update(data)
 # The data are read from the post-processed csv files that were created
 # with the script named 'format_raw_solinst_data.py'.
 
-dirname = osp.join(osp.dirname(__file__), '15min_formatted_data')
+dirname = osp.join(osp.dirname(__file__), 'rsesq_15min_formatted_data')
 region = ['Monteregie',                # 0
           'Chaudiere-Appalaches',      # 1
           'centre-quebec',             # 2
           'montreal',                  # 3
           'capitale-nationale'         # 4
-          ][3]
+          ][1]
 
 # Get the baro data.
 filename = "barodata_{}_15M_LOCAL.csv".format(region)
@@ -225,7 +225,7 @@ for stn_id in rsesq_level_stations[:]:
 
     # Save the data to a file.
     foldername = osp.join(
-        osp.dirname(__file__), 'gwt_correction_baro', 'Water Levels')
+        osp.dirname(__file__), 'water_levels_for_brf_eval_1hour')
     if not osp.exists(foldername):
         os.makedirs(foldername)
     filename = '{}_{}_{}_baro.csv'.format(

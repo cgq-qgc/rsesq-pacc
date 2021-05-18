@@ -73,12 +73,12 @@ def export_station_infos_to_csv(levelfiles, barofiles, filename=None):
 
 # %% Read data from the RSESQ
 
-rsesq_reader = MDDELCC_RSESQ_Reader(workdir='D:/Data')
+rsesq_reader = MDDELCC_RSESQ_Reader(workdir=osp.join(osp.dirname(__file__)))
 rsesq_reader.load_database()
 
 # We need to add data from Sainte-Martine manually because they were not
 # published on the RSESQ website.
-data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
+data = get_wldata_from_xls("data_sainte_martine_03097082.xls")
 rsesq_reader._db["03097082"].update(data)
 
 # %% Read the level and baro raw data from the Solinst csv files.
@@ -90,7 +90,7 @@ region = ['Monteregie',                # 0
           'centre-quebec',             # 2
           'montreal',                  # 3
           'capitale-nationale'         # 4
-          ][3]
+          ][1]
 
 rsesq_barofiles = {}
 rsesq_levelfiles = {}
@@ -107,6 +107,9 @@ for file in os.listdir(dirname):
     print(i, region, file)
 
     solinst_file = hsr.SolinstFileReader(osp.join(dirname, file))
+    solinst_file.undo_zero_point_offset()
+    solinst_file.undo_altitude_correction()
+
     if "baro" in file.lower():
         stn_id = re.sub('[ -_]?BARO[ -_]?', '',
                         solinst_file.sites.project_name,
@@ -138,8 +141,7 @@ for file in os.listdir(dirname):
         # because this info is not in the kml file.
         rsesq_reader.fetch_station_wldata(stn_id)
     finally:
-        solinst_file.sites.elevation = float(
-            rsesq_reader[stn_id]['Elevation'])
+        solinst_file.sites.elevation = float(rsesq_reader[stn_id]['Elevation'])
 
 rsesq_latitudes[stn_id] = float(rsesq_reader[stn_id]['Latitude'])
 rsesq_longitudes[stn_id] = float(rsesq_reader[stn_id]['Longitude'])
@@ -147,11 +149,21 @@ rsesq_elevations[stn_id] = float(rsesq_reader[stn_id]['Elevation'])
 
 # %% Save the formatted data to a csv
 
-print("Concatenating the level data... ", end='')
+print("Concatenating the level data... ")
 leveldata_stack = None
 for stn_id in rsesq_levelfiles.keys():
-    level_data_stn = rsesq_levelfiles[stn_id].records[['Level_m']]
-    level_data_stn.rename(columns={'Level_m': stn_id}, inplace=True)
+    for column in rsesq_levelfiles[stn_id].records:
+        if column.lower().startswith('level'):
+            level_data_stn = rsesq_levelfiles[stn_id].records[[column]].copy()
+            # We convert into meters.
+            if column.lower().endswith('_cm'):
+                level_data_stn[column] = level_data_stn[column] / 100
+            level_data_stn = level_data_stn.rename(columns={column: stn_id})
+            break
+    else:
+        print("Warning: there is no level data in that record.")
+        continue
+
     if leveldata_stack is None:
         leveldata_stack = level_data_stn
     else:
@@ -161,13 +173,24 @@ for stn_id in rsesq_levelfiles.keys():
                                    right_index=True,
                                    how='outer')
 leveldata_stack.index.names = ['Date']
-print('done')
+print('Level data concatenated successfully.')
 
-print("Concatenating the baro data... ", end='')
+print("Concatenating the baro data... ")
 barodata_stack = None
 for stn_id in rsesq_barofiles.keys():
-    baro_data_stn = rsesq_barofiles[stn_id].records[['Level_m']]
-    baro_data_stn.rename(columns={'Level_m': stn_id}, inplace=True)
+    for column in rsesq_barofiles[stn_id].records.columns:
+        if column.lower().startswith('level'):
+            baro_data_stn = rsesq_barofiles[stn_id].records[[column]].copy()
+            # We convert into meters.
+            if column.lower().endswith('_cm'):
+                baro_data_stn[column] = baro_data_stn[column] / 100
+            elif column.lower().endswith('_kpa'):
+                baro_data_stn[column] = baro_data_stn[column] * 0.101972
+            baro_data_stn = baro_data_stn.rename(columns={column: stn_id})
+            break
+    else:
+        print("Warning: there is no level data in that record.")
+        continue
     if barodata_stack is None:
         barodata_stack = baro_data_stn
     else:
@@ -177,10 +200,10 @@ for stn_id in rsesq_barofiles.keys():
                                   right_index=True,
                                   how='outer')
 barodata_stack.index.names = ['Date']
-print('done')
+print('Baro data concatenated successfully.')
 
 print("Saving the level and baro data to a csv... ", end='')
-dirname = osp.join(osp.dirname(__file__), '15min_formatted_data')
+dirname = osp.join(osp.dirname(__file__), 'rsesq_15min_formatted_data')
 filename = 'leveldata_{}_15M_LOCAL.csv'.format(region.lower())
 leveldata_stack.to_csv(osp.join(dirname, filename))
 filename = 'barodata_{}_15M_LOCAL.csv'.format(region.lower())
