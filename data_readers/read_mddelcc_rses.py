@@ -130,14 +130,10 @@ def get_wldata_from_xls(url_or_fpath):
     return df
 
 
-# ---- API
-
-
 class MDDELCC_RSESQ_Reader(AbstractReader):
 
     DATABASE_FILEPATH = 'mddelcc_rsesq_database.npy'
-    COLUMNS = ['ID', 'Name', 'Lat_ddeg', 'Lon_ddeg', 'Elev',
-               'Nappe', 'Influenced']
+    COLUMNS = ['ID', 'Name', 'Lat_ddeg', 'Lon_ddeg', 'Nappe', 'Influenced']
 
     def __init__(self, workdir=None):
         self._stations = pd.DataFrame(columns=self.COLUMNS)
@@ -182,18 +178,11 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 
         data = []
         for stn_id in sorted(list(self._db.keys())):
-            try:
-                self._db[stn_id]['Elevation']
-            except KeyError:
-                # We need to download the data to get the station
-                # elevation because this info is not in the kml file.
-                self.fetch_station_wldata(stn_id)
-
             data.append([
                 stn_id, self._db[stn_id]['Name'],
                 float(self._db[stn_id]['Latitude']),
                 float(self._db[stn_id]['Longitude']),
-                self._db[stn_id]['Elevation'], self._db[stn_id]['Nappe'],
+                self._db[stn_id]['Nappe'],
                 self._db[stn_id]['Influenced']])
 
         self._stations = pd.DataFrame(data, columns=self.COLUMNS)
