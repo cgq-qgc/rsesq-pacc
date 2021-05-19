@@ -104,7 +104,7 @@ def get_wldata_from_xls(url_or_fpath):
         with xlrd.open_workbook(url_or_fpath) as wb:
             ws = wb.sheet_by_index(0)
 
-    row_idx = ws.col_values(0).index('Date du relevé')+1
+    row_idx = ws.col_values(0).index('Date du relevé') + 1
     time = np.array(ws.col_values(0, start_rowx=row_idx)).astype(float)
     wlvl = np.array(ws.col_values(1, start_rowx=row_idx)).astype(float)
     wtemp = np.array(ws.col_values(2, start_rowx=row_idx)).astype(float)
