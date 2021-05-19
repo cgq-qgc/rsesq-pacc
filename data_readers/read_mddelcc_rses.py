@@ -302,25 +302,9 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 
 
 if __name__ == "__main__":
-    url = get_xml_url()
-    xml = urlopen(url)
+    reader = MDDELCC_RSESQ_Reader()
+    stations = reader.stations()
+    print(stations)
 
-    xml = requests.get(url)
-    with open('Reseau_Piezometrique_2019-04-08.xml', 'wb') as file:
-        file.write(xml.content)
-
-    # reader = MDDELCC_RSESQ_Reader()
-    
-    # WORKDIR = ("C:/Users/User/OneDrive/INRS/2017 - Projet INRS PACC/"
-    #            "Correction Baro RSESQ")
-    # reader.DATABASE_FILEPATH = osp.join(WORKDIR, "mddelcc_rsesq_database.npy")
-
-    # reader.load_database()
-    
-    # stations = reader._stations
-    # print(stations)
-    # reader.save_station_table_to_csv("rsesq_stations_info.csv")
-
-    # reader.save_station_to_csv('01160002', 'test.csv')
-    # data = reader.fetch_station_wldata('02257001')
-    # reader.save_station_to_csv('02257001', 'stantonin_doublon.csv')
+    data = reader.get_station_data('03020008')
+    print(data)
