@@ -229,8 +229,21 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             filename = 'drillog_{}.pdf'.format(station_id)
             urlretrieve(station['url drilllog'], osp.join(directory, filename))
 
-    # ---- Save to file
+    def dwnld_piezo_graph(self, station_id, directory):
+        """
+        Download the hydrograph and save it to disk in the
+        specified directory as a pdf file.
+        """
+        # Create the destination directory if it doesn't exist.
+        if not osp.exists(directory):
+            os.makedirs(directory)
 
+        station = self._db[station_id]
+        if station['url graph'] not in [None, '', b'']:
+            filename = 'graphique_{}.pdf'.format(station_id)
+            urlretrieve(station['url graph'], osp.join(directory, filename))
+
+    # ---- Save to file
     def save_station_to_hdf5(self, station_id, filepath):
         pass
 
