@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 20 11:24:10 2019
-@author: User
+Un script pour classifier les descriptions lithologiques des logs de forage
+en hydrofaciès, tracer les logs d'hydrofaciès sur un graphique et évaluer
+le niveau de confinement à partir des séquences d'hydrofaciès.
 """
 from math import ceil
 
@@ -15,15 +16,6 @@ from matplotlib.transforms import ScaledTranslation
 from itertools import combinations
 from matplotlib.backends.backend_pdf import PdfPages
 
-
-WIDS_ME = sorted([
-    '03030001', '03030002', '03030003', '03030004', '03030005', '03030006',
-    '03030007', '03030008', '03030010', '03030011', '03030012', '03030013',
-    '03030014', '03030015', '03030016', '03030017', '03030018', '03037031',
-    '03037041', '03037071', '03040001', '03040002', '03040005', '03040006',
-    '03040007', '03040008', '03040009', '03040010', '03040011', '03040012',
-    '03040013', '03040014', '03040015', '03040016', '03040017', '03040018'
-    ])
 
 secteurs_station_ids = {
     'Châteauguay': [

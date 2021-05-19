@@ -4,7 +4,7 @@ Created on Tue Jun 13 14:29:29 2017
 @author: jnsebgosselin
 """
 
-# ---- Imports: standard library
+# ---- Standard library imports
 from urllib.request import urlopen, urlretrieve
 from io import BytesIO
 import numpy as np
@@ -13,15 +13,15 @@ import os.path as osp
 import requests
 import datetime
 
-# ---- Imports: third parties
+# ---- Third party imports
 from bs4 import BeautifulSoup, CData
 import xlrd
 import pandas as pd
 
-# ---- Imports: local
+# ---- Local imports
 from data_readers.base import AbstractReader
-from data_readers.utils import (findUnique, find_float_from_str,
-                                format_url_to_ascii, save_content_to_csv)
+from data_readers.utils import (
+    findUnique, find_float_from_str, save_content_to_csv)
 
 
 # ---- Base functions
@@ -60,9 +60,9 @@ def read_xml_datatable(url):
         name = place.find('name').text
         for cd in desc.findAll(text=True):
             if isinstance(cd, CData):
-                pid = findUnique('Piézomètre =(.*?)<br/>', cd)
+                pid = findUnique('Station =(.*?)<br/>', cd)
 
-                # ---- Get well info
+                # Get station info.
                 db[pid] = {}
                 db[pid]['ID'] = pid
                 db[pid]['Name'] = name
@@ -73,7 +73,7 @@ def read_xml_datatable(url):
                 db[pid]['Last'] = findUnique(
                     'Dernière lecture =(.*?)<br/>', cd)
 
-                # ---- Get datafiles url
+                # Get datafiles url.
                 keys = ['url data', 'url drilllog', 'url graph']
                 ss = ['<br/><a href="(.*?)">Données',
                       'Données</a><br/><a href="(.*?)">Schéma',
@@ -81,7 +81,7 @@ def read_xml_datatable(url):
 
                 for key, s in zip(keys, ss):
                     url = findUnique(s, cd)
-                    db[pid][key] = url if None else format_url_to_ascii(url)
+                    db[pid][key] = url
 
     return db
 
@@ -104,7 +104,7 @@ def get_wldata_from_xls(url_or_fpath):
         with xlrd.open_workbook(url_or_fpath) as wb:
             ws = wb.sheet_by_index(0)
 
-    row_idx = ws.col_values(0).index('Date du relevé')+1
+    row_idx = ws.col_values(0).index('Date du relevé') + 1
     time = np.array(ws.col_values(0, start_rowx=row_idx)).astype(float)
     wlvl = np.array(ws.col_values(1, start_rowx=row_idx)).astype(float)
     wtemp = np.array(ws.col_values(2, start_rowx=row_idx)).astype(float)
@@ -113,7 +113,7 @@ def get_wldata_from_xls(url_or_fpath):
     indexes = np.digitize(np.unique(time), time, right=True)
 
     df = {}
-    df['Elevation'] = find_float_from_str(ws.cell_value(2, 2))
+    df['Elevation'] = find_float_from_str(ws.cell_value(4, 2))
     df['Time'] = time[indexes]
     df['Water Level'] = wlvl[indexes]
     df['Temperature'] = wtemp[indexes]
@@ -129,14 +129,8 @@ def get_wldata_from_xls(url_or_fpath):
     return df
 
 
-# ---- API
-
-
 class MDDELCC_RSESQ_Reader(AbstractReader):
-
-    DATABASE_FILEPATH = 'mddelcc_rsesq_database.npy'
-    COLUMNS = ['ID', 'Name', 'Lat_ddeg', 'Lon_ddeg', 'Elev',
-               'Nappe', 'Influenced']
+    COLUMNS = ['ID', 'Name', 'Lat_ddeg', 'Lon_ddeg', 'Nappe', 'Influenced']
 
     def __init__(self, workdir=None):
         self._stations = pd.DataFrame(columns=self.COLUMNS)
@@ -146,7 +140,6 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         return self._db[key]
 
     # ---- Utility functions
-
     def stations(self):
         return self._stations
 
@@ -158,7 +151,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         Return a pandas dataframe with the temperature and water level time
         series corresponding to the specified station indexed by date.
         """
-        data = self[stn_id]
+        data = self.fetch_station_wldata(stn_id)
         columns = ['Water Level (masl)', 'Temperature (degC)']
         if 'Water Level' in data:
             df = pd.DataFrame(
@@ -171,28 +164,17 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             df = pd.DataFrame(columns=columns)
         return df
 
-    # ---- Load and fetch database
+    # ---- Load and fetch data
     def load_database(self):
-        try:
-            self._db = np.load(self.DATABASE_FILEPATH,
-                               allow_pickle=True).item()
-        except FileNotFoundError:
-            self.fetch_database()
+        self.fetch_database()
 
         data = []
         for stn_id in sorted(list(self._db.keys())):
-            try:
-                self._db[stn_id]['Elevation']
-            except KeyError:
-                # We need to download the data to get the station
-                # elevation because this info is not in the kml file.
-                self.fetch_station_wldata(stn_id)
-
             data.append([
                 stn_id, self._db[stn_id]['Name'],
                 float(self._db[stn_id]['Latitude']),
                 float(self._db[stn_id]['Longitude']),
-                self._db[stn_id]['Elevation'], self._db[stn_id]['Nappe'],
+                self._db[stn_id]['Nappe'],
                 self._db[stn_id]['Influenced']])
 
         self._stations = pd.DataFrame(data, columns=self.COLUMNS)
@@ -201,20 +183,18 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     def fetch_database(self):
         url = get_xml_url()
         self._db = read_xml_datatable(url)
-        np.save(self.DATABASE_FILEPATH, self._db, allow_pickle=True)
-
-    # ---- Fetch data
 
     def fetch_station_wldata(self, sid):
         url = self._db[sid]['url data']
-        if url in [None, '', b'']:
-            self._db[sid]['Elevation'] = 'nan'
-        else:
-            self._db[sid].update(get_wldata_from_xls(url))
-            np.save(self.DATABASE_FILEPATH, self._db, allow_pickle=True)
-            return self._db[sid]
+        if url not in [None, '', b'']:
+            return get_wldata_from_xls(url)
 
+    # ---- Download files
     def dwnld_raw_xls_datafile(self, station_id, filepath):
+        """
+        Download the water level data file and save it to disk in the
+        specified directory.
+        """
         # Create the destination directory if it doesn't exist.
         filepath = os.path.abspath(filepath)
         if not os.path.exists(os.path.dirname(filepath)):
@@ -239,8 +219,21 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             filename = 'drillog_{}.pdf'.format(station_id)
             urlretrieve(station['url drilllog'], osp.join(directory, filename))
 
-    # ---- Save to file
+    def dwnld_piezo_graph(self, station_id, directory):
+        """
+        Download the hydrograph and save it to disk in the
+        specified directory as a pdf file.
+        """
+        # Create the destination directory if it doesn't exist.
+        if not osp.exists(directory):
+            os.makedirs(directory)
 
+        station = self._db[station_id]
+        if station['url graph'] not in [None, '', b'']:
+            filename = 'graphique_{}.pdf'.format(station_id)
+            urlretrieve(station['url graph'], osp.join(directory, filename))
+
+    # ---- Save to file
     def save_station_to_hdf5(self, station_id, filepath):
         pass
 
@@ -289,19 +282,14 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         Save the information for all the wells of the RSESQ in a csv file.
         """
         fcontent = [['#', 'Well_ID', 'Well_Name', 'Latitude_ddeg',
-                     'Longitude_ddeg', 'Elevation', 'Nappe', 'Influenced']]
+                     'Longitude_ddeg', 'Nappe', 'Influenced']]
         for i, stn_id in enumerate(sorted(self.station_ids())):
-            try:
-                self._db[stn_id]['Elevation']
-            except KeyError:
-                # We need to download the data to get the station
-                # elevation because this info is not in the kml file.
-                self.fetch_station_wldata(stn_id)
-
             fcontent.append([
-                str(i), stn_id, self._db[stn_id]['Name'],
-                self._db[stn_id]['Latitude'], self._db[stn_id]['Longitude'],
-                self._db[stn_id]['Elevation'], self._db[stn_id]['Nappe'],
+                str(i), stn_id,
+                self._db[stn_id]['Name'],
+                self._db[stn_id]['Latitude'],
+                self._db[stn_id]['Longitude'],
+                self._db[stn_id]['Nappe'],
                 self._db[stn_id]['Influenced']])
 
         # Create the destination directory if it doesn't exist.
@@ -314,25 +302,9 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 
 
 if __name__ == "__main__":
-    url = get_xml_url()
-    xml = urlopen(url)
+    reader = MDDELCC_RSESQ_Reader()
+    stations = reader.stations()
+    print(stations)
 
-    xml = requests.get(url)
-    with open('Reseau_Piezometrique_2019-04-08.xml', 'wb') as file:
-        file.write(xml.content)
-
-    # reader = MDDELCC_RSESQ_Reader()
-    
-    # WORKDIR = ("C:/Users/User/OneDrive/INRS/2017 - Projet INRS PACC/"
-    #            "Correction Baro RSESQ")
-    # reader.DATABASE_FILEPATH = osp.join(WORKDIR, "mddelcc_rsesq_database.npy")
-
-    # reader.load_database()
-    
-    # stations = reader._stations
-    # print(stations)
-    # reader.save_station_table_to_csv("rsesq_stations_info.csv")
-
-    # reader.save_station_to_csv('01160002', 'test.csv')
-    # data = reader.fetch_station_wldata('02257001')
-    # reader.save_station_to_csv('02257001', 'stantonin_doublon.csv')
+    data = reader.get_station_data('03020008')
+    print(data)
