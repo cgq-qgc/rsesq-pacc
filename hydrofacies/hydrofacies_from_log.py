@@ -509,8 +509,11 @@ for secteur, wells_ids in secteurs_station_ids.items():
             print(("Warning: The wells #{} and #{} have the same exact "
                    "HF sequence.").format(wid1, wid2))
 
-dirname = osp.dirname(__file__)
-filename = osp.join(dirname, 'confinement_from_hf.csv')
-with open(filename, 'w', encoding='utf8') as f:
-    writer = csv.writer(f, delimiter='\t', lineterminator='\n')
-    writer.writerows(fcontent)
+import pandas.io.formats.excel
+pandas.io.formats.excel.ExcelFormatter.header_style = None
+
+dataframe = pd.DataFrame(
+    data=fcontent,
+    columns=['secteur', 'station', 'confinement'])
+filename = osp.join(osp.dirname(__file__), 'confinement_from_hf.xlsx')
+dataframe.to_excel(filename, index=False)
