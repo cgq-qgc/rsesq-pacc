@@ -5,7 +5,6 @@ Created on Tue Jun 13 14:29:29 2017
 """
 
 # ---- Standard library imports
-import json
 from urllib.request import urlopen, urlretrieve
 from io import BytesIO
 import numpy as np
@@ -21,8 +20,8 @@ import pandas as pd
 
 # ---- Local imports
 from data_readers.base import AbstractReader
-from data_readers.utils import (findUnique, find_float_from_str,
-                                format_url_to_ascii, save_content_to_csv)
+from data_readers.utils import (
+    findUnique, find_float_from_str, save_content_to_csv)
 
 
 # ---- Base functions
