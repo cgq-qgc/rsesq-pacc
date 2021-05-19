@@ -131,8 +131,6 @@ def get_wldata_from_xls(url_or_fpath):
 
 
 class MDDELCC_RSESQ_Reader(AbstractReader):
-
-    DATABASE_FILEPATH = 'mddelcc_rsesq_database.npy'
     COLUMNS = ['ID', 'Name', 'Lat_ddeg', 'Lon_ddeg', 'Nappe', 'Influenced']
 
     def __init__(self, workdir=None):
@@ -143,7 +141,6 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         return self._db[key]
 
     # ---- Utility functions
-
     def stations(self):
         return self._stations
 
@@ -155,7 +152,7 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         Return a pandas dataframe with the temperature and water level time
         series corresponding to the specified station indexed by date.
         """
-        data = self[stn_id]
+        data = self.fetch_station_wldata(stn_id)
         columns = ['Water Level (masl)', 'Temperature (degC)']
         if 'Water Level' in data:
             df = pd.DataFrame(
@@ -168,13 +165,9 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             df = pd.DataFrame(columns=columns)
         return df
 
-    # ---- Load and fetch database
+    # ---- Load and fetch data
     def load_database(self):
-        try:
-            self._db = np.load(self.DATABASE_FILEPATH,
-                               allow_pickle=True).item()
-        except FileNotFoundError:
-            self.fetch_database()
+        self.fetch_database()
 
         data = []
         for stn_id in sorted(list(self._db.keys())):
@@ -191,18 +184,11 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
     def fetch_database(self):
         url = get_xml_url()
         self._db = read_xml_datatable(url)
-        np.save(self.DATABASE_FILEPATH, self._db, allow_pickle=True)
-
-    # ---- Fetch data
 
     def fetch_station_wldata(self, sid):
         url = self._db[sid]['url data']
-        if url in [None, '', b'']:
-            self._db[sid]['Elevation'] = 'nan'
-        else:
-            self._db[sid].update(get_wldata_from_xls(url))
-            np.save(self.DATABASE_FILEPATH, self._db, allow_pickle=True)
-            return self._db[sid]
+        if url not in [None, '', b'']:
+            return get_wldata_from_xls(url)
 
     # ---- Download files
     def dwnld_raw_xls_datafile(self, station_id, filepath):
@@ -297,19 +283,14 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         Save the information for all the wells of the RSESQ in a csv file.
         """
         fcontent = [['#', 'Well_ID', 'Well_Name', 'Latitude_ddeg',
-                     'Longitude_ddeg', 'Elevation', 'Nappe', 'Influenced']]
+                     'Longitude_ddeg', 'Nappe', 'Influenced']]
         for i, stn_id in enumerate(sorted(self.station_ids())):
-            try:
-                self._db[stn_id]['Elevation']
-            except KeyError:
-                # We need to download the data to get the station
-                # elevation because this info is not in the kml file.
-                self.fetch_station_wldata(stn_id)
-
             fcontent.append([
-                str(i), stn_id, self._db[stn_id]['Name'],
-                self._db[stn_id]['Latitude'], self._db[stn_id]['Longitude'],
-                self._db[stn_id]['Elevation'], self._db[stn_id]['Nappe'],
+                str(i), stn_id,
+                self._db[stn_id]['Name'],
+                self._db[stn_id]['Latitude'],
+                self._db[stn_id]['Longitude'],
+                self._db[stn_id]['Nappe'],
                 self._db[stn_id]['Influenced']])
 
         # Create the destination directory if it doesn't exist.
