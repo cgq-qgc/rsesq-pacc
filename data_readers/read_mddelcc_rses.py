@@ -114,7 +114,7 @@ def get_wldata_from_xls(url_or_fpath):
     indexes = np.digitize(np.unique(time), time, right=True)
 
     df = {}
-    df['Elevation'] = find_float_from_str(ws.cell_value(2, 2))
+    df['Elevation'] = find_float_from_str(ws.cell_value(4, 2))
     df['Time'] = time[indexes]
     df['Water Level'] = wlvl[indexes]
     df['Temperature'] = wtemp[indexes]
