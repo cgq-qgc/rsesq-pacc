@@ -4,7 +4,8 @@ Created on Tue Jun 13 14:29:29 2017
 @author: jnsebgosselin
 """
 
-# ---- Imports: standard library
+# ---- Standard library imports
+import json
 from urllib.request import urlopen, urlretrieve
 from io import BytesIO
 import numpy as np
@@ -13,12 +14,12 @@ import os.path as osp
 import requests
 import datetime
 
-# ---- Imports: third parties
+# ---- Third party imports
 from bs4 import BeautifulSoup, CData
 import xlrd
 import pandas as pd
 
-# ---- Imports: local
+# ---- Local imports
 from data_readers.base import AbstractReader
 from data_readers.utils import (findUnique, find_float_from_str,
                                 format_url_to_ascii, save_content_to_csv)
