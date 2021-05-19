@@ -204,7 +204,12 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
             np.save(self.DATABASE_FILEPATH, self._db, allow_pickle=True)
             return self._db[sid]
 
+    # ---- Download files
     def dwnld_raw_xls_datafile(self, station_id, filepath):
+        """
+        Download the water level data file and save it to disk in the
+        specified directory.
+        """
         # Create the destination directory if it doesn't exist.
         filepath = os.path.abspath(filepath)
         if not os.path.exists(os.path.dirname(filepath)):
