@@ -61,9 +61,9 @@ def read_xml_datatable(url):
         name = place.find('name').text
         for cd in desc.findAll(text=True):
             if isinstance(cd, CData):
-                pid = findUnique('Piézomètre =(.*?)<br/>', cd)
+                pid = findUnique('Station =(.*?)<br/>', cd)
 
-                # ---- Get well info
+                # Get station info.
                 db[pid] = {}
                 db[pid]['ID'] = pid
                 db[pid]['Name'] = name
@@ -74,7 +74,7 @@ def read_xml_datatable(url):
                 db[pid]['Last'] = findUnique(
                     'Dernière lecture =(.*?)<br/>', cd)
 
-                # ---- Get datafiles url
+                # Get datafiles url.
                 keys = ['url data', 'url drilllog', 'url graph']
                 ss = ['<br/><a href="(.*?)">Données',
                       'Données</a><br/><a href="(.*?)">Schéma',
@@ -82,7 +82,7 @@ def read_xml_datatable(url):
 
                 for key, s in zip(keys, ss):
                     url = findUnique(s, cd)
-                    db[pid][key] = url if None else format_url_to_ascii(url)
+                    db[pid][key] = url
 
     return db
 
