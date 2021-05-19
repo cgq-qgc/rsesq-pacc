@@ -5,7 +5,7 @@ en hydrofaciès, tracer les logs d'hydrofaciès sur un graphique et évaluer
 le niveau de confinement à partir des séquences d'hydrofaciès.
 """
 from math import ceil
-
+import csv
 import numpy as np
 import os.path as osp
 import pandas as pd
@@ -410,31 +410,62 @@ with PdfPages(osp.join(dirname, filename)) as pdf:
         # fig.savefig(osp.join(dirname, filename), dpi=300)
         pdf.savefig(fig)
 
-# %% Determine confinement from HF sequence
+# %% Déterminer le confinement à partir des séquences d'hydrofaciès.
 
 
 def eval_confinement(hfseq):
-    h_hf1 = 0
-    h_hf2 = 0
-    h_hfx = 0
+    """
+    Détermine les conditions de confinement de l’aquifère rocheux à
+    partir de critères établis sur l’épaisseur des hydrofaciès définies dans
+    les séquences qui sont fournies dans le dictionnaire hfseq.
+    """
+    if not len(hfseq):
+        return ['Indéterminé']
+
+    h_hf1 = 0  # matériaux de type argileux
+    h_hf2 = 0  # matériaux de type silt et limon
+    h_hfx = 0  # matériaux indifférenciés
     for hf in hfseq:
         if hf[0] == 'HF1':
-            h_hf1 += (hf[2] - hf[1])
+            h_hf1 += hf[3]
         elif hf[0] == 'HFX':
-            h_hfx += (hf[2] - hf[1])
-        elif (hf[0] == 'HF2' or hf[0] == 'HF3' or
-              hf[0] == 'HF4' or hf[0] == 'HF5'):
-            h_hf2 += (hf[2] - hf[1])
+            h_hfx += hf[3]
+        elif hf[0] == 'HF2':
+            h_hf2 += hf[3]
+    # Note: les matériaux de type sable et gravier ne sont pas pris en compte
+    # dans l'évaluation du niveau de confinement de l'aquifère rocheux.
+
+    # Critère établi sur l'épaisseur des couches de types hf1 pour déterminer
+    # si l'aquifère rocheux est libre.
+    crit_hf1_libre = 1
+    # Critère établi sur la somme de l'épaisseur des couches de types
+    # hf1 et hf2 pour déterminer si l'aquifère rocheux est libre.
+    crit_hf1_hf2_libre = 3
+    # Critère établis sur l'épaisseur des couches de types hf1 pour déterminer
+    # si l'aquifère rocheux est captif.
+    crit_hf1_captive = 5
 
     confinement = []
-    if h_hf1 > 5:
+    if crit_hf1_captive > 5:
         confinement.append('Captive')
-    elif h_hf1 < 1 and (h_hf1 + h_hf2) < 3:
+    elif h_hf1 < crit_hf1_libre and (h_hf1 + h_hf2) < crit_hf1_hf2_libre:
         confinement.append('Libre')
     else:
         confinement.append('Semi-captive')
 
-    # Now we add the HDFX material to the HDF1 class.
+    # Parce que la perméabilité des couches de till et diamictons
+    # indifférenciés peut varier sur plusieurs ordres de grandeur dépendamment
+    # de la facon dont ces couches ont été formées (ex.: till de fond vs till
+    # d'ablation), on considère alors plusieurs scénarios.
+    # C'est pour cela que pour l'on peut avoir plusieurs types de
+    # confinement attribués à une même station.
+
+    # Pour ces stations, il faudra revoir les logs et juger si les
+    # couches de till et diamictons indifférenciés agissent comme des couches
+    # confinantes.
+
+    # Si on ajoute l'épaisseur des couches de till et diamicton
+    # indifférencié à la classe HDF1, on obtient alors:
     if (h_hf1 + h_hfx) > 5:
         confinement.append('Captive')
     elif (h_hf1 + h_hfx) < 1 and (h_hf1 + h_hf2 + h_hfx) < 3:
@@ -442,7 +473,8 @@ def eval_confinement(hfseq):
     else:
         confinement.append('Semi-captive')
 
-    # Now we add the HDFX material to the HDF2 class.
+    # Si on ajoute l'épaisseur des couches de till et diamicton
+    # indifférencié à la classe HDF2, on obtient alors:
     if h_hf1 > 5:
         confinement.append('Captive')
     elif h_hf1 < 1 and (h_hf1 + h_hf2 + h_hfx) < 3:
@@ -453,22 +485,32 @@ def eval_confinement(hfseq):
     return sorted(set(confinement))
 
 
-confinement = []
-for i, wid in enumerate(WIDS_ME):
-    hf_seq = wells_hf_seq[wid]
-    confinement.append(eval_confinement(hf_seq))
+confinement = {}
+fcontent = []
+for secteur, wells_ids in secteurs_station_ids.items():
+    print('-' * 72)
+    print(secteur)
+    print('-' * 72)
+    confinement[secteur] = []
+    wells_hf_seq = eval_hf_seq(stratum, wells_ids)
+    for wid in wells_ids:
+        hf_seq = wells_hf_seq[wid]
+        well_confinement = eval_confinement(hf_seq)
+        confinement[secteur].append(well_confinement)
+        print(wid, ', '.join(well_confinement))
+        fcontent.append([secteur, wid, ', '.join(well_confinement)])
 
-# Check that it is unique in case there is a double piezo in one borehole.
-for pair in combinations(WIDS_ME, 2):
-    if wells_hf_seq[pair[0]] == wells_hf_seq[pair[1]]:
-        raise Warning(("The wells #{} and #{} have the same exact HF sequence."
-                       ).format(*pair))
+    # Check that it is unique in case there is a double
+    # piezo in one borehole.
+    for (wid1, wid2) in combinations(wells_ids, 2):
+        hf_seq_1 = wells_hf_seq[wid1]
+        hf_seq_2 = wells_hf_seq[wid2]
+        if len(hf_seq_1) and len(hf_seq_2) and (hf_seq_1 == hf_seq_2):
+            print(("Warning: The wells #{} and #{} have the same exact "
+                   "HF sequence.").format(wid1, wid2))
 
-# for wid in WIDS_ME:
-#     hf_seq = wells_hf_seq[wid]
-#     for wid2 in WIDS_ME:
-#         if wid == wid2:
-#             continue
-#         else:
-#             if wells_hf_seq[wid] == wells_hf_seq[wid2]:
-#                 print(wid, wid2)
+dirname = osp.dirname(__file__)
+filename = osp.join(dirname, 'confinement_from_hf.csv')
+with open(filename, 'w', encoding='utf8') as f:
+    writer = csv.writer(f, delimiter='\t', lineterminator='\n')
+    writer.writerows(fcontent)
