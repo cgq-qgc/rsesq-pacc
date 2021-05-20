@@ -2,8 +2,6 @@
 backup/
 gwt_correction_baro/
 brf_results/
-rsesq_15min_formatted_data/
-rsesq_raw_15min_2017/
 brf_1hour_results/
 water_levels_for_brf_eval_1hour/
 corrected_water_levels/
