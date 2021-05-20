@@ -12,6 +12,7 @@ from matplotlib.transforms import ScaledTranslation
 from matplotlib.backends.backend_pdf import PdfPages
 from itertools import product
 
+
 class InfoClimatGridReader:
     """
     The :attr:`~pyhelp.weather_reader.InfoClimatGridReader` is a class
@@ -198,7 +199,7 @@ figwidth = 11
 figheight = 7
 left_margin = 1.1 / figwidth
 right_margin = 0.35 / figwidth
-bottom_margin = 0.75 / figheight
+bottom_margin = 0.95 / figheight
 top_margin = 0.6 / figheight
 hspace = 0.65 / figwidth
 vspace = 1.5 / figheight
@@ -493,7 +494,7 @@ figwidth = 11
 figheight = 7
 left_margin = 1.1 / figwidth
 right_margin = 0.35 / figwidth
-bottom_margin = 0.75 / figheight
+bottom_margin = 0.95 / figheight
 top_margin = 0.6 / figheight
 hspace = 0.65 / figwidth
 vspace = 1.5 / figheight
