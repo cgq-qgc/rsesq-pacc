@@ -34,6 +34,13 @@ def findUnique(pattern, string):
         return None
 
 
+def find_all(regex, string):
+    """
+    Return the stripped results found in string using the provided regex.
+    """
+    return [s.strip() for s in re.findall(regex, string)]
+
+
 def find_float_from_str(string):
     """
     Search a string to find the first float number if any.

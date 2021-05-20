@@ -21,7 +21,7 @@ import pandas as pd
 # ---- Local imports
 from data_readers.base import AbstractReader
 from data_readers.utils import (
-    findUnique, find_float_from_str, save_content_to_csv)
+    find_float_from_str, save_content_to_csv, find_all)
 
 
 # ---- Base functions
@@ -60,28 +60,37 @@ def read_xml_datatable(url):
         name = place.find('name').text
         for cd in desc.findAll(text=True):
             if isinstance(cd, CData):
-                pid = findUnique('Station =(.*?)<br/>', cd)
+                # pid = findUnique('Station =(.*?)<br/>', cd)
 
-                # Get station info.
-                db[pid] = {}
-                db[pid]['ID'] = pid
-                db[pid]['Name'] = name
-                db[pid]['Longitude'] = findUnique('Longitude =(.*?)<br/>', cd)
-                db[pid]['Latitude'] = findUnique('Latitude =(.*?)<br/>', cd)
-                db[pid]['Nappe'] = findUnique('Nappe =(.*?)<br/>', cd)
-                db[pid]['Influenced'] = findUnique('Influencé =(.*?)<br/>', cd)
-                db[pid]['Last'] = findUnique(
-                    'Dernière lecture =(.*?)<br/>', cd)
+                pids = find_all('Station =(.*?)<br/>', cd)
+                for i, pid in enumerate(pids):
+                    db[pid] = {}
+                    db[pid]['ID'] = pid
+                    db[pid]['Name'] = name
+                    db[pid]['Longitude'] = find_all(
+                        'Longitude =(.*?)<br/>', cd)[i]
+                    db[pid]['Latitude'] = find_all(
+                        'Latitude =(.*?)<br/>', cd)[i]
+                    db[pid]['Nappe'] = find_all(
+                        'Nappe =(.*?)<br/>', cd)[i]
+                    db[pid]['Influenced'] = find_all(
+                        'Influencé =(.*?)<br/>', cd)[i]
+                    try:
+                        db[pid]['Last'] = find_all(
+                            'Dernière lecture =(.*?)<br/>', cd)[i]
+                    except IndexError:
+                        db[pid]['Last'] = None
 
-                # Get datafiles url.
-                keys = ['url data', 'url drilllog', 'url graph']
-                ss = ['<br/><a href="(.*?)">Données',
-                      'Données</a><br/><a href="(.*?)">Schéma',
-                      'Schéma</a><br/><a href="(.*?)">Graphique']
-
-                for key, s in zip(keys, ss):
-                    url = findUnique(s, cd)
-                    db[pid][key] = url
+                    # Get datafiles url.
+                    keys = ['url data', 'url drilllog', 'url graph']
+                    ss = ['<br/><a href="(.*?)">Données',
+                          'Données</a><br/><a href="(.*?)">Schéma',
+                          'Schéma</a><br/><a href="(.*?)">Graphique']
+                    for key, s in zip(keys, ss):
+                        try:
+                            db[pid][key] = find_all(s, cd)[i]
+                        except IndexError:
+                            db[pid][key] = None
 
     return db
 
@@ -302,9 +311,18 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 
 
 if __name__ == "__main__":
+    # url = get_xml_url()
+    # xml = urlopen(url).read()
+    # dirname = osp.dirname(__file__)
+    # with open(osp.join(dirname, 'xml_file.xml'), 'wb') as f:
+    #     f.write(xml)
+
     reader = MDDELCC_RSESQ_Reader()
     stations = reader.stations()
     print(stations)
 
-    data = reader.get_station_data('03020008')
-    print(data)
+    print('03030014' in stations['ID'].values.tolist())
+    print('03030015' in stations['ID'].values.tolist())
+
+    # data = reader.get_station_data('03020008')
+    # print(data)
