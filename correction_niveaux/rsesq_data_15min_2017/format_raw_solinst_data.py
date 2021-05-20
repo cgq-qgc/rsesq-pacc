@@ -75,16 +75,16 @@ def export_station_infos_to_csv(levelfiles, barofiles, filename=None):
 
 rsesq_reader = MDDELCC_RSESQ_Reader()
 
-# %% Read the level and baro raw data from the Solinst csv files.
-
-region = ['Monteregie', 'Chaudiere-Appalaches', 'centre-quebec', 'montreal',
+region = ['Monteregie',
+          'Chaudiere-Appalaches',
+          'centre-quebec',
+          'montreal',
           'capitale-nationale'][1]
 
 rsesq_barofiles = {}
 rsesq_levelfiles = {}
 rsesq_latitudes = {}
 rsesq_longitudes = {}
-rsesq_elevations = {}
 
 i = 0
 dirname = osp.join(osp.dirname(__file__), 'rsesq_data_15min_2017', region)
