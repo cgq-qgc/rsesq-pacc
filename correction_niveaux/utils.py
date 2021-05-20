@@ -10,13 +10,12 @@
 import csv
 from datetime import datetime, timedelta
 import os.path as osp
+
 # ---- Third party imports
 import numpy as np
 import pandas as pd
 import rasterio
 import xlsxwriter
-# ---- Local imports
-from data_readers import MDDELCC_RSESQ_Reader
 
 
 PATH_TO_ARCV3TIF = "D:/Data/mne_arc_v3_tifs"
@@ -57,17 +56,6 @@ def calcul_center_latlon(lat, lon):
     lat_ctr = np.arctan2(z, hyp)
 
     return np.degrees(lat_ctr), np.degrees(lon_ctr)
-
-
-def download_drillogs(dirname):
-    """Download the drillogs pdf from the RSESQ web site."""
-    rsesq_reader = MDDELCC_RSESQ_Reader(workdir=PATH_TO_RSESQ_DATA)
-    rsesq_reader.load_database()
-
-    for stn_id in rsesq_reader.station_ids():
-        print('\rDownloading drillogs {}'.format(stn_id), end='')
-        rsesq_reader.dwnld_piezo_drilllog(stn_id, dirname)
-    print('')
 
 
 def get_elevation_from_larc_tif(lat, lon):

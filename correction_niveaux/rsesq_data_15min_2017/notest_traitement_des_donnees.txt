@@ -1,0 +1,5 @@
+Chaudiere Appalache - Automne - 2071191__2017_11_02.csv : Aucune idée où ce logger est installé. J'ai déplacé le fichier dans le dossier Backup.
+
+Chaudiere Appalache - Printemps et Automne - 1048393_Black-Lake-BARO_2017-04-28_.csv : J'ai dû renommer le projet de 02407004-5-BARO à 02407004-BARO
+
+Mercier - Printemps et Automne - 1016382_03097095_Barologger_2017-11-23_.csv: J'ai dû remplacer la valeur de Location pour Sainte-Martine et Project ID pour 03097095-BARO.
