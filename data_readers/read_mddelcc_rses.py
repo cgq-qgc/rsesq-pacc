@@ -311,18 +311,9 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
 
 
 if __name__ == "__main__":
-    # url = get_xml_url()
-    # xml = urlopen(url).read()
-    # dirname = osp.dirname(__file__)
-    # with open(osp.join(dirname, 'xml_file.xml'), 'wb') as f:
-    #     f.write(xml)
-
     reader = MDDELCC_RSESQ_Reader()
     stations = reader.stations()
     print(stations)
 
-    print('03030014' in stations['ID'].values.tolist())
-    print('03030015' in stations['ID'].values.tolist())
-
-    # data = reader.get_station_data('03020008')
-    # print(data)
+    data = reader.get_station_data('03020008')
+    print(data)
