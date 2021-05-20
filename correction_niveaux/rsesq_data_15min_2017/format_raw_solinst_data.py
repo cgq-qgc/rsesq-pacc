@@ -7,84 +7,24 @@
 # -----------------------------------------------------------------------------
 
 # ---- Standard library imports
-import csv
 import os
 import os.path as osp
 import re
 
 # ---- Third party imports
 import hydsensread as hsr
-import numpy as np
 import pandas as pd
 
-# ---- Local imports
-from correction_niveaux.utils import calc_dist_from_coord
-from data_readers import MDDELCC_RSESQ_Reader
-from data_readers.read_mddelcc_rses import get_wldata_from_xls
-
-
-def export_station_infos_to_csv(levelfiles, barofiles, filename=None):
-    fcontent = [["#", "Well_ID", "Location",
-                 "Latitude_ddeg", "Longitude_ddeg", "Elevation_m",
-                 "Delta_dist_baro_km", "Delta_elev_baro_m"]]
-
-    baro_stations = list(barofiles.keys())
-    baro_latitudes = np.array(
-        [barofiles[stn].sites.latitude for stn in baro_stations])
-    baro_longitudes = np.array(
-        [barofiles[stn].sites.longitude for stn in baro_stations])
-
-    print('#  ', '{:<8s}'.format('Piezo_id'), '{:<8s}'.format('Baro_id'),
-          '{:>5s}'.format('dist'), '{:>6s}'.format('delev'),
-          '  Location')
-    print('   ', '{:<8s}'.format(''), '{:<8s}'.format(''),
-          '{:>5s}'.format('(km)'), '{:>6s}'.format('(m)'))
-    for i, stn_id in enumerate(sorted(list(levelfiles.keys()))):
-        level_latitude = levelfiles[stn_id].sites.latitude
-        level_longitude = levelfiles[stn_id].sites.longitude
-        level_elevation = levelfiles[stn_id].sites.elevation
-
-        dist = calc_dist_from_coord(baro_latitudes, baro_longitudes,
-                                    level_latitude, level_longitude)
-        baro_stn = baro_stations[np.argmin(dist)]
-        delta_elev = (level_elevation - barofiles[baro_stn].sites.elevation)
-
-        print('{:02d} '.format(i + 1),
-              '{:<8s}'.format(stn_id),
-              '{:<8s}'.format(baro_stn),
-              '{:5.1f}'.format(np.min(dist)),
-              '{:-6.1f}'.format(delta_elev),
-              '  {}'.format(levelfiles[stn_id].sites.site_name)
-              )
-
-        fcontent.append(
-            ["{:02d}".format(i), stn_id, levelfiles[stn_id].sites.site_name,
-             "{}".format(level_latitude), "{}".format(level_longitude),
-             "{}".format(level_elevation),
-             "{:.1f}".format(np.min(dist)), "{:.1f}".format(delta_elev)
-             ])
-
-    if filename:
-        root, ext = osp.splitext(filename)
-        with open(root + '.csv', 'w', encoding='utf8') as csvfile:
-            writer = csv.writer(csvfile, delimiter=',', lineterminator='\n')
-            writer.writerows(fcontent)
-
-
-# %% Read data from the RSESQ
-
-rsesq_reader = MDDELCC_RSESQ_Reader()
 
 region = ['Monteregie',
           'Chaudiere-Appalaches',
           'centre-quebec',
           'montreal',
-          'capitale-nationale'][1]
+          'capitale-nationale'
+          ][1]
 
 rsesq_barofiles = {}
 rsesq_levelfiles = {}
-rsesq_latitudes = {}
-rsesq_longitudes = {}
 
 i = 0
 dirname = osp.join(osp.dirname(__file__), 'rsesq_data_15min_2017', region)
@@ -117,13 +57,6 @@ for file in os.listdir(dirname):
         else:
             rsesq_levelfiles[stn_id] = solinst_file
 
-    # Get the latitude and longitude of the well where the
-    # logger is installed.
-    solinst_file.sites.latitude = float(rsesq_reader[stn_id]['Latitude'])
-    solinst_file.sites.longitude = float(rsesq_reader[stn_id]['Longitude'])
-
-rsesq_latitudes[stn_id] = float(rsesq_reader[stn_id]['Latitude'])
-rsesq_longitudes[stn_id] = float(rsesq_reader[stn_id]['Longitude'])
 
 print("Concatenating the level data... ")
 leveldata_stack = None
