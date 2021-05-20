@@ -77,14 +77,8 @@ rsesq_reader = MDDELCC_RSESQ_Reader()
 
 # %% Read the level and baro raw data from the Solinst csv files.
 
-path_to_rawdatafiles = "D:/Data/rsesq_raw_15min_2017"
-
-region = ['Monteregie',                # 0
-          'Chaudiere-Appalaches',      # 1
-          'centre-quebec',             # 2
-          'montreal',                  # 3
-          'capitale-nationale'         # 4
-          ][1]
+region = ['Monteregie', 'Chaudiere-Appalaches', 'centre-quebec', 'montreal',
+          'capitale-nationale'][1]
 
 rsesq_barofiles = {}
 rsesq_levelfiles = {}
@@ -93,7 +87,7 @@ rsesq_longitudes = {}
 rsesq_elevations = {}
 
 i = 0
-dirname = osp.join(path_to_rawdatafiles, region)
+dirname = osp.join(osp.dirname(__file__), 'rsesq_data_15min_2017', region)
 for file in os.listdir(dirname):
     if not file.endswith('csv'):
         continue
@@ -123,25 +117,13 @@ for file in os.listdir(dirname):
         else:
             rsesq_levelfiles[stn_id] = solinst_file
 
-    # Get latitude, longitude, and elevation of the well where the
+    # Get the latitude and longitude of the well where the
     # logger is installed.
     solinst_file.sites.latitude = float(rsesq_reader[stn_id]['Latitude'])
     solinst_file.sites.longitude = float(rsesq_reader[stn_id]['Longitude'])
-    try:
-        solinst_file.sites.elevation = float(
-            rsesq_reader[stn_id]['Elevation'])
-    except KeyError:
-        # We need to download the data to get the station elevation
-        # because this info is not in the kml file.
-        rsesq_reader.fetch_station_wldata(stn_id)
-    finally:
-        solinst_file.sites.elevation = float(rsesq_reader[stn_id]['Elevation'])
 
 rsesq_latitudes[stn_id] = float(rsesq_reader[stn_id]['Latitude'])
 rsesq_longitudes[stn_id] = float(rsesq_reader[stn_id]['Longitude'])
-rsesq_elevations[stn_id] = float(rsesq_reader[stn_id]['Elevation'])
-
-# %% Save the formatted data to a csv
 
 print("Concatenating the level data... ")
 leveldata_stack = None
@@ -197,9 +179,9 @@ barodata_stack.index.names = ['Date']
 print('Baro data concatenated successfully.')
 
 print("Saving the level and baro data to a csv... ", end='')
-dirname = osp.join(osp.dirname(__file__), 'rsesq_15min_formatted_data')
-filename = 'leveldata_{}_15M_LOCAL.csv'.format(region.lower())
+dirname = osp.dirname(__file__)
+filename = 'leveldata_{}_15M_LOCALTIME.csv'.format(region.lower())
 leveldata_stack.to_csv(osp.join(dirname, filename))
-filename = 'barodata_{}_15M_LOCAL.csv'.format(region.lower())
+filename = 'barodata_{}_15M_LOCALTIME.csv'.format(region.lower())
 barodata_stack.to_csv(osp.join(dirname, filename))
 print('done')
