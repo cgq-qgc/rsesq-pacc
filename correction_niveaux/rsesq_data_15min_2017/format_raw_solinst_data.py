@@ -21,13 +21,13 @@ region = ['Monteregie',
           'centre-quebec',
           'montreal',
           'capitale-nationale'
-          ][1]
+          ][3]
 
 rsesq_barofiles = {}
 rsesq_levelfiles = {}
 
 i = 0
-dirname = osp.join(osp.dirname(__file__), 'rsesq_data_15min_2017', region)
+dirname = osp.join(osp.dirname(__file__), region)
 for file in os.listdir(dirname):
     if not file.endswith('csv'):
         continue
@@ -56,7 +56,6 @@ for file in os.listdir(dirname):
                     solinst_file.records, sort=True))
         else:
             rsesq_levelfiles[stn_id] = solinst_file
-
 
 print("Concatenating the level data... ")
 leveldata_stack = None
@@ -113,8 +112,8 @@ print('Baro data concatenated successfully.')
 
 print("Saving the level and baro data to a csv... ", end='')
 dirname = osp.dirname(__file__)
-filename = 'leveldata_{}_15M_LOCALTIME.csv'.format(region.lower())
+filename = 'formatted_leveldata_{}_15min_LOCALTIME.csv'.format(region.lower())
 leveldata_stack.to_csv(osp.join(dirname, filename))
-filename = 'barodata_{}_15M_LOCALTIME.csv'.format(region.lower())
+filename = 'formatted_barodata_{}_15min_LOCALTIME.csv'.format(region.lower())
 barodata_stack.to_csv(osp.join(dirname, filename))
 print('done')
