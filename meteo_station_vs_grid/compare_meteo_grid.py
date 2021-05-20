@@ -12,7 +12,6 @@ from matplotlib.transforms import ScaledTranslation
 from matplotlib.backends.backend_pdf import PdfPages
 from itertools import product
 
-
 class InfoClimatGridReader:
     """
     The :attr:`~pyhelp.weather_reader.InfoClimatGridReader` is a class
@@ -159,39 +158,8 @@ class InfoClimatGridReader:
 
 # %% Read Station Data
 
-filenames = [
-    "ARTHABASKA (7020305)_1969-2020.csv",
-    "BONSECOURS (7020828)_1967-2020.csv",
-    "DESCHAMBAULT (7011982)_1971-2020.csv",
-    "DRUMMONDVILLE (7022160)_1913-2020.csv",
-    "FARNHAM (7022320)_1917-2020.csv",
-    "FLEURY (7022375)_1967-2020.csv",
-    "FRELIGHSBURG (7022579)_1993-2020.csv",
-    "GEORGEVILLE (7022720)_1951-2020.csv",
-    "GRANBY (7022800)_1948-2020.csv",
-    "HEMMINGFORD FOUR WINDS (7023075)_1960-2020.csv",
-    "LAURIERVILLE (7024250)_1963-2020.csv",
-    "LEMIEUX (701Q009)_1999-2020.csv",
-    "MARIEVILLE (7024627)_1960-2020.csv",
-    "QUEBEC_JEAN LESAGE INTL (701S001)_1992-2020.csv",
-    "RICHMOND (7026465)_1871-2020.csv",
-    "SAWYERVILLE NORD (7027802)_1961-2020.csv",
-    "SHERBROOKE (7028123)_2009-2020.csv",
-    "ST ANICET (7026836)_1960-2020.csv",
-    "ST CAMILLE (7056930)_1963-2020.csv",
-    "ST CAMILLE WOLFE (702FR30)_1975-2020.csv",
-    "ST EPHREM (7027200)_1929-2020.csv",
-    "ST GEORGES (7027283)_1963-2020.csv",
-    "ST HYACINTHE 2 (7027361)_1963-2020.csv",
-    "ST PIERRE DE BROUGHTON (7027656)_1965-2020.csv",
-    "STE GERMAINE (7057287)_1963-2013.csv",
-    "STE MARTINE (7027540)_1963-2020.csv",
-    "SUTTON (7028292)_1978-2020.csv",
-    "THETFORD MINES (7028441)_1960-2020.csv"
-    ]
-
-dirname = ("D:/OneDrive/INRS/2017 - Projet INRS PACC/"
-           "Éval recharge (GWHAT)/weather_data")
+dirname = osp.join(osp.dirname(__file__), 'data_station')
+filenames = os.listdir(dirname)
 
 sta_lats = []
 sta_lons = []
@@ -240,7 +208,8 @@ axwidth = (1 - left_margin - right_margin - (ncol - 1) * hspace) / ncol
 periods = ['daily', 'monthly', 'yearly']
 
 for period in periods:
-    print('Producing scatter plot for {} precip.'.format(period))
+    print('Producing scatter plot for {} precip...'.format(period))
+    print('-' * 50)
     scale = {'daily': 50, 'monthly': 100, 'yearly': 500}[period]
     scale_minor = {'daily': 10, 'monthly': 20, 'yearly': 100}[period]
     minval = {'daily': 0, 'monthly': 0, 'yearly': 500}[period]
@@ -377,6 +346,7 @@ for period in periods:
     print('Ptot {} min me = {:0.5f}'.format(period, np.min(me_stack)))
     print('Ptot {} max me = {:0.5f}'.format(period, np.max(me_stack)))
     print('Ptot {} mean me = {:0.5f}'.format(period, np.mean(me_stack)))
+    print('-' * 50)
 
     dirname = osp.dirname(__file__)
     filename = 'precip_grid_vs_station_{}.pdf'.format(period)
@@ -540,7 +510,8 @@ rmse_stack = []
 me_stack = []
 r_stack = []
 for var in ['tamin', 'tamax']:
-    print('Producing scatter plot for {} temperature.'.format(var))
+    print('Producing scatter plot for {} temperature...'.format(var))
+    print('-' * 50)
     figures = []
     for j in range(npage):
         fig = plt.figure()
@@ -665,6 +636,7 @@ for var in ['tamin', 'tamax']:
     print('{} min me = {:0.5f}'.format(var, np.min(me_stack)))
     print('{} max me = {:0.5f}'.format(var, np.max(me_stack)))
     print('{} mean me = {:0.5f}'.format(var, np.mean(me_stack)))
+    print('-' * 50)
     dirname = osp.dirname(__file__)
     filename = '{}_grid_vs_station_daily.pdf'.format(var)
     with PdfPages(osp.join(dirname, filename)) as pdf:
