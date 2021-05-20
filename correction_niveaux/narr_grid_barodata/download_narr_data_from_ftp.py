@@ -8,14 +8,16 @@
 
 # ---- Standard library imports
 from urllib.request import urlretrieve
+import os
 import os.path as osp
 
 NAAR_FTP = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/"
-DIRNAME = "D:/Data_NARR"
+DIRNAME = osp.join(osp.dirname(__file__), 'baro_naar_netcdf')
+if not osp.exists(DIRNAME):
+    os.makedirs(DIRNAME)
 
 filenames = ["pres.sfc.{}.nc".format(y) for y in range(1979, 2020)]
-
 for filename in filenames:
     print("Downloading {}...".format(filename), end='')
     urlretrieve(osp.join(NAAR_FTP, filename), osp.join(DIRNAME, filename))
-    print(" done".format(filename))
+    print(" done")
