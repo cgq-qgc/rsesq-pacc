@@ -105,7 +105,7 @@ lon_dd = list(lon_grid[latlon_idx, latlon_jdx])
 
 # %% Save extracted data to a file
 
-fname = osp.join(osp.dirname(__file__), "patm_narr_data.csv")
+fname = osp.join(osp.dirname(__file__), "patm_narr_data_gtm0.csv")
 
 Ndt, Ndset = np.shape(patm)
 fheader = [
