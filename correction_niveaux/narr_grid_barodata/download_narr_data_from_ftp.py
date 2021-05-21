@@ -6,18 +6,27 @@
 # Licensed under the terms of the MIT License.
 # -----------------------------------------------------------------------------
 
+"""
+A script to download in batch the atmospheric pressure data
+of the North American Regional Reanalysis (NARR) grid.
+
+https://psl.noaa.gov/data/gridded/data.narr.html
+"""
+
 # ---- Standard library imports
 from urllib.request import urlretrieve
 import os
 import os.path as osp
 
-NAAR_FTP = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/"
-DIRNAME = osp.join(osp.dirname(__file__), 'baro_naar_netcdf')
-if not osp.exists(DIRNAME):
-    os.makedirs(DIRNAME)
+narr_ftp = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/"
 
-filenames = ["pres.sfc.{}.nc".format(y) for y in range(1979, 2020)]
-for filename in filenames:
+dirname = osp.join(osp.dirname(__file__), 'baro_naar_netcdf')
+if not osp.exists(dirname):
+    os.makedirs(dirname)
+
+years = range(1979, 2020)
+for year in years:
+    filename = "pres.sfc.{}.nc".format(year)
     print("Downloading {}...".format(filename), end='')
-    urlretrieve(osp.join(NAAR_FTP, filename), osp.join(DIRNAME, filename))
+    urlretrieve(osp.join(narr_ftp, filename), osp.join(dirname, filename))
     print(" done")
