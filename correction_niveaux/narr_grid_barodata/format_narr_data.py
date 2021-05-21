@@ -109,15 +109,12 @@ fname = osp.join(osp.dirname(__file__), "patm_narr_data.csv")
 
 Ndt, Ndset = np.shape(patm)
 fheader = [
-    ['Atmospheric pressure (m)'],
-    ['Created from NARR grid'],
-    ['', ''],
     ['Latitude (dd)'] + lat_dd,
     ['Longitude (dd)'] + lon_dd,
-    ['', '']]
-data_header = [['Date'] + list(stn_ids)]
+    ['Station'] + list(stn_ids)
+    ]
 fdata = [[datestrings[i]] + list(patm[i]) for i in range(Ndt)]
-fcontent = fheader + data_header + fdata
+fcontent = fheader + fdata
 with open(fname, 'w', encoding='utf8') as csvfile:
     writer = csv.writer(csvfile, delimiter=',', lineterminator='\n')
     writer.writerows(fcontent)
