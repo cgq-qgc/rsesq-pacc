@@ -8,9 +8,8 @@
 
 """
 This script matches the piezometric stations of the RSESQ with the barometric
-data of the NARR data grid.
-
-ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/
+data of the NARR data grid, extract the atmospheric pressure from the
+NARR grid files and save the extracted data in a csv file.
 """
 
 # ---- Standard library imports
@@ -44,7 +43,7 @@ def calc_dist_from_coord(lat1, lon1, lat2, lon2):
     return r * c
 
 
-# %% Get RSESQ stations
+# %% Get RSESQ station locations
 
 rsesq_reader = MDDELCC_RSESQ_Reader()
 stations = rsesq_reader.stations()
@@ -52,7 +51,7 @@ stn_ids = stations['ID'].values
 lat_rsesq = stations['Lat_ddeg'].values
 lon_rsesq = stations['Lon_ddeg'].values
 
-# %% Get NARR Grid
+# %% Get NARR grid nodes
 
 path_to_narr = osp.join(osp.dirname(__file__), 'baro_naar_netcdf')
 filename = osp.join(path_to_narr, "pres.sfc.2017.nc")
@@ -61,7 +60,7 @@ lat_grid = np.array(dset['lat'])
 lon_grid = np.array(dset['lon'])
 dset.close()
 
-# %% Get and save the barometric data to an csv file.
+# %% Match RSESQ stations with NARR grid
 
 # Get the daily barometric data from the NARR grid for the nodes that are
 # nearest to the stations of the RSESQ.
@@ -76,12 +75,8 @@ for lat_sta, lon_sta in zip(lat_rsesq, lon_rsesq):
     latlon_idx.append(idx)
     latlon_jdx.append(jdx)
 
-# Remove duplicated nodes if any.
-# ijdx = np.vstack(list({(i, j) for i, j in zip(latlon_idx, latlon_jdx)}))
-# latlon_idx = ijdx[:, 0].tolist()
-# latlon_jdx = ijdx[:, 1].tolist()
 
-# %% Get baro data from NARR grid
+# %% Extract baro data from NARR grid
 
 patm_stacks = []
 datetimes = []
@@ -108,7 +103,7 @@ lat_dd = list(lat_grid[latlon_idx, latlon_jdx])
 lon_dd = list(lon_grid[latlon_idx, latlon_jdx])
 
 
-# %% Save data to file.
+# %% Save extracted data to a file
 
 fname = osp.join(osp.dirname(__file__), "patm_narr_data.csv")
 
