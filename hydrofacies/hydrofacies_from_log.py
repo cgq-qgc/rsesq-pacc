@@ -186,8 +186,10 @@ for label in stratum:
     elif x.startswith(('fin du forage', 'fracture')):
         FIN.append(label)
 
-stratum = [x for x in stratum if x not in
-           HF1 + HF2 + HF3 + HF4 + HF5 + ROC + AUTRE + HFX + HFO + FIN]
+unclassified = [
+    x for x in stratum if x not in
+    HF1 + HF2 + HF3 + HF4 + HF5 + ROC + AUTRE + HFX + HFO + FIN]
+print('unclassifier:', unclassified)
 
 HF_LABEL_STRINGS = {
     'HF5': '; '.join(HF5) + '.',
