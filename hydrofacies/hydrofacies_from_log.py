@@ -219,7 +219,7 @@ with open(osp.join(dirname, filename), 'w', encoding='utf8') as txtfile:
 # %% Analyze data
 
 
-def eval_hf_seq(stratum, well_ids):
+def eval_hf_seq(well_ids):
     wells_hf_seq = {}
     for wid in wells_ids:
         strati = rsesq_data[rsesq_data['PointID'] == wid]
@@ -362,7 +362,7 @@ def plot_hf_seq(wells_hf_seq, title):
 plt.close('all')
 figures = []
 for secteur, wells_ids in secteurs_station_ids.items():
-    wells_hf_seq = eval_hf_seq(stratum, wells_ids)
+    wells_hf_seq = eval_hf_seq(wells_ids)
     figures.extend(plot_hf_seq(wells_hf_seq, secteur))
 
 dirname = osp.dirname(__file__)
@@ -454,7 +454,7 @@ for secteur, wells_ids in secteurs_station_ids.items():
     print(secteur)
     print('-' * 72)
     confinement[secteur] = []
-    wells_hf_seq = eval_hf_seq(stratum, wells_ids)
+    wells_hf_seq = eval_hf_seq(wells_ids)
     for wid in wells_ids:
         hf_seq = wells_hf_seq[wid]
         well_confinement = eval_confinement(hf_seq)
