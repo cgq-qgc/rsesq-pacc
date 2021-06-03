@@ -116,30 +116,6 @@ for label in stratum:
     elif x == ("Interstratification de lits de sable fin à grossier, "
                "traces de gravier et de silt argileux compact"):
         x = 'Sable fin'
-    elif x == "Diamicton. Présence de cailloux":
-        x = 'Diamicton caillouteux'
-    elif x == "Diamicton passant de caillouteux à sablo-silteux":
-        x = 'Diamicton caillouteux'
-    elif x == "Diamicton (sable silteux avec un peu de gravier)":
-        x = 'Diamicton sablo-silteux'
-    elif x == "Diamicton. Sable graveleux et silteux, présence de cailloux":
-        x = 'Diamicton sablo-graveleux'
-    elif x == ("Till (sable et gravier, traces de blocs "
-               "de cailloux et de silt)"):
-        x = 'Till sablo-graveleux'
-    elif x == ("Till, sable et gravier"):
-        x = 'Till sablo-graveleux'
-    elif x == "Till gris avec lits de sable silteux brun":
-        x = 'Till sablo-silteux'
-    elif x == "Till (épaisseur approximative)":
-        x = 'Till'
-    elif x == "Till, cailloux et sable":
-        x = 'Till caillouteux et sableux'
-    elif x == "Till glaciaire":
-        x = 'Till'
-    elif x == ("Till délavé, fragments de quartzite et de schiste, "
-               "présence de sable"):
-        x = 'Till'
     elif x == "Refus sur sol gelé":
         x = "Sol gelé"
     elif x == "Sol organique sablonneux":
@@ -167,7 +143,11 @@ for label in stratum:
     x = x.replace('à matrice gravelo-sableuse', 'gravelo-sableux')
 
     # Classify labels.
-    if x.startswith('terre'):
+    if 'till' in x:
+        HFX.append(label)
+    elif 'diamicton' in x:
+        HFX.append(label)
+    elif x.startswith('terre'):
         HFO.append(label)
     elif x.startswith(('argile', 'sol gelé', 'dépôts meubles argileux')):
         HF1.append(label)
@@ -205,36 +185,6 @@ for label in stratum:
         AUTRE.append(label)
     elif x.startswith(('fin du forage', 'fracture')):
         FIN.append(label)
-    elif x.startswith('till'):
-        if x == 'till':
-            HFX.append(label)
-        elif x.startswith(('till argileux', 'till silteux', 'till compact',
-                           'till plus compact')):
-            HF1.append(label)
-        elif x.startswith(('till silto-sableux')):
-            HF2.append(label)
-        elif x.startswith(('till sablo-silteux')):
-            HF3.append(label)
-        elif x.startswith(('till sableux', 'till sablonneux',
-                           'till sablo-graveleux')):
-            HF4.append(label)
-        elif x.startswith(('till caillouteux', 'till avec blocs',
-                           'till graveleux')):
-            HF5.append(label)
-    elif x.startswith('diamicton'):
-        if x == 'diamicton':
-            HFX.append(label)
-        elif x.startswith(('diamicton graveleux', 'diamicton gravelo-sableux',
-                           'diamicton caillouteux')):
-            HF5.append(label)
-        elif x.startswith(('diamicton sableux', 'diamicton sablo-graveleux')):
-            HF4.append(label)
-        elif x.startswith(('diamicton sablo-silteux',
-                           'diamicton à matrice délavée')):
-            HF3.append(label)
-        elif x.startswith(('diamicton silto-sableux',
-                           'diamicton silto-argileux')):
-            HF2.append(label)
 
 stratum = [x for x in stratum if x not in
            HF1 + HF2 + HF3 + HF4 + HF5 + ROC + AUTRE + HFX + HFO + FIN]
