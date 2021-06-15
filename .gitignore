@@ -1,4 +1,10 @@
-# Data
+# My gitignores
+patm_narr_data_gtm0.csv
+*/narr_grid_barodata/baro_naar_netcdf
+*.npy
+/data_files
+Hydat.sqlite3
+demande_UQAM_meteo_debit.xlsx
 backup/
 gwt_correction_baro/
 brf_results/
@@ -110,10 +116,3 @@ ENV/
 
 # mypy
 .mypy_cache/
-
-#my gitignores
-/data_files
-*.npy
-*/data_files/*
-Hydat.sqlite3
-demande_UQAM_meteo_debit.xlsx
