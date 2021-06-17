@@ -8,9 +8,8 @@ Hydat.sqlite3
 demande_UQAM_meteo_debit.xlsx
 backup/
 gwt_correction_baro/
-brf_results/
 brf_1hour_results/
-water_levels_for_brf_eval_1hour/
+brf_1hour_input_data/
 corrected_water_levels/
 *.hdf5
 *.gwt
