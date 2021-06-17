@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright © Jean-Sébastien Gosselin
+# Copyright © Institut National de la Recherche Scientifique (INRS)
 # https://github.com/cgq-qgc/pacc-inrs
 #
 # Licensed under the terms of the MIT License.
 # -----------------------------------------------------------------------------
+
+"""
+Script to match piezometric, barometric and earth tide data and saved
+them in format that is compatible with GWHAT.
+"""
 
 # ---- Standard library imports
 import csv
