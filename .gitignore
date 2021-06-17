@@ -9,6 +9,7 @@ demande_UQAM_meteo_debit.xlsx
 backup/
 gwt_correction_baro/
 raw_baro_and_level_data/
+formatted_baro_and_level_data/
 brf_1hour_results/
 brf_1hour_input_data/
 corrected_water_levels/
