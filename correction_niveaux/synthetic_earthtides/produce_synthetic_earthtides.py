@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright © Jean-Sébastien Gosselin
+# Copyright © Institut National de la Recherche Scientifique (INRS)
 # https://github.com/cgq-qgc/pacc-inrs
 #
 # Licensed under the terms of the MIT License.
@@ -16,13 +16,14 @@ https://github.com/hydrogeoscience/pygtide
 # ---- Standard party imports
 import os.path as osp
 from datetime import datetime
+
 # ---- Third party imports
 import numpy as np
 import pandas as pd
 import pygtide
+
 # ---- Local imports
 from data_readers import MDDELCC_RSESQ_Reader
-from data_readers.read_mddelcc_rses import get_wldata_from_xls
 
 
 def generate_earth_tides(latitude, longitude, elevation, start_year, end_year,
@@ -51,18 +52,9 @@ def generate_earth_tides(latitude, longitude, elevation, start_year, end_year,
     return etdata
 
 
-# %% Load RSESQ database.
-
-rsesq_reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
-rsesq_reader.load_database()
-
-# We need to add data from Sainte-Martine manually because they were not
-# published on the RSESQ website in 2018.
-data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
-rsesq_reader._db["03097082"].update(data)
-
 # %% Produce and save the synthetic earth tides data to an csv file.
 
+rsesq_reader = MDDELCC_RSESQ_Reader()
 etdata_stack = None
 i = 0
 for stn_id in rsesq_reader.station_ids():
