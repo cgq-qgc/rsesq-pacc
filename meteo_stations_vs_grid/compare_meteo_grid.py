@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# Copyright © Institut National de la Recherche Scientifique (INRS)
+# https://github.com/cgq-qgc/pacc-inrs
+#
+# Licensed under the terms of the MIT License.
+# -----------------------------------------------------------------------------
+
 from math import ceil, floor
 import datetime
 import os
