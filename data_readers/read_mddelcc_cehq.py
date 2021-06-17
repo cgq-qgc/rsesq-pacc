@@ -19,7 +19,7 @@ from xlrd.xldate import xldate_from_date_tuple
 # ---- Imports: local
 
 from .base import AbstractReader
-from .utils import findUnique, dms2decdeg, save_content_to_csv
+from .utils import find_unique, dms2decdeg, save_content_to_csv
 
 
 # ---- Base functions
@@ -82,7 +82,7 @@ def scrape_station_datasheet(sid):
     data = {'ID': sid}
     for field, key in FIELDS_KEYS:
         idx = html.find(field)
-        data[key] = findUnique('<td width="421">(.*?)&nbsp;</td>', html[idx:])
+        data[key] = find_unique('<td width="421">(.*?)&nbsp;</td>', html[idx:])
 
     data['Active period'] = data['Active period'].replace('<br>', ' ; ')
 
