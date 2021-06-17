@@ -26,7 +26,6 @@ from correction_niveaux.utils import (
     load_baro_from_narr_preprocessed_file,
     load_earthtides_from_preprocessed_file)
 from data_readers import MDDELCC_RSESQ_Reader
-from data_readers.read_mddelcc_rses import get_wldata_from_xls
 
 BARO_SOURCE = ['NARR', 'RSESQ'][1]
 
@@ -83,17 +82,9 @@ def export_to_csv(levelfiles, barofiles, filename=None):
             writer.writerows(fcontent)
 
 
-# %% Read data from the RSESQ
-
-rsesq_reader = MDDELCC_RSESQ_Reader(workdir=osp.join(osp.dirname(__file__)))
-rsesq_reader.load_database()
-
-# We need to add data from Sainte-Martine manually because they were not
-# published on the RSESQ website.
-data = get_wldata_from_xls("data_sainte_martine_03097082.xls")
-rsesq_reader._db["03097082"].update(data)
-
 # %% Read the level and baro raw data
+
+rsesq_reader = MDDELCC_RSESQ_Reader()
 
 # The data are read from the post-processed csv files that were created
 # with the script named 'format_raw_solinst_data.py'.
