@@ -1,5 +1,6 @@
 # My gitignores
 patm_narr_data_gtm0.csv
+synthetic_earthtides_1980-2018_1H_UTC.csv
 */narr_grid_barodata/baro_naar_netcdf
 *.npy
 /data_files
