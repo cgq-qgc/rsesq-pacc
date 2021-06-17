@@ -220,8 +220,7 @@ for stn_id in rsesq_level_stations[:]:
     data = data.interpolate(method='linear')
 
     # Save the data to a file.
-    foldername = osp.join(
-        osp.dirname(__file__), 'water_levels_for_brf_eval_1hour')
+    foldername = osp.join(osp.dirname(__file__), 'brf_1hour_input_data')
     if not osp.exists(foldername):
         os.makedirs(foldername)
     filename = '{}_{}_{}_baro.csv'.format(
