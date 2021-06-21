@@ -21,29 +21,18 @@ import scipy.signal
 
 # ---- Local import
 from data_readers import MDDELCC_RSESQ_Reader
-from data_readers.read_mddelcc_rses import get_wldata_from_xls
 from correction_niveaux.utils import (load_baro_from_narr_preprocessed_file,
                                       load_earthtides_from_preprocessed_file)
 
 
-WORKDIR = osp.dirname(__file__)
+# Load RSESQ database.
+rsesq_reader = MDDELCC_RSESQ_Reader()
 
 
-# %% Load RSESQ database.
-
-rsesq_reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
-rsesq_reader.load_database()
-
-# We need to add data from Sainte-Martine manually because they were not
-# published on the RSESQ website.
-data = get_wldata_from_xls("D:/Data/Données_03097082.xls")
-rsesq_reader._db["03097082"].update(data)
-
-
-# %% Load Baro and Earthtides data from preprocessed csv file.
-
+# Load Baro and Earthtides data from preprocessed csv file.
 baro_narr = load_baro_from_narr_preprocessed_file()
 earthtides = load_earthtides_from_preprocessed_file()
+
 
 # %% Format water level, barometric, and Earth tide data.
 
@@ -59,7 +48,7 @@ influenced += ['05150001', ]
 influenced += ['04017031', '03090006', '03090020', '04017051', '04017011',
                '04640001', '03097131', '03090014', '03090015', '03070001',
                '03097102', '04440001', '04647001']
-# Pas de données aux 15 minutes pour la puits #05080003
+# Pas de données aux 15 minutes pour le puits #05080003
 
 pdfpages = PdfPages('corrected_water_levels.pdf')
 iwell = 0
