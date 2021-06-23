@@ -1,10 +1,21 @@
-# Data
+# My gitignores
+patm_narr_data_gtm0.csv
+synthetic_earthtides_1980-2018_1H_UTC.csv
+*/narr_grid_barodata/baro_naar_netcdf
+*.npy
+/data_files
+Hydat.sqlite3
+demande_UQAM_meteo_debit.xlsx
 backup/
 gwt_correction_baro/
-brf_results/
+raw_baro_and_level_data/
+formatted_baro_and_level_data/
 brf_1hour_results/
-water_levels_for_brf_eval_1hour/
-corrected_water_levels/
+brf_1hour_input_data/
+corrected_water_levels_hors_zone/
+corrected_water_levels_zone_pacc/
+not_corrected_water_levels/
+corrected_water_levels.pdf
 *.hdf5
 *.gwt
 *.gwt.bak
@@ -110,10 +121,3 @@ ENV/
 
 # mypy
 .mypy_cache/
-
-#my gitignores
-/data_files
-*.npy
-*/data_files/*
-Hydat.sqlite3
-demande_UQAM_meteo_debit.xlsx

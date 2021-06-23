@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# Copyright © Institut National de la Recherche Scientifique (INRS)
+# https://github.com/cgq-qgc/pacc-inrs
+#
+# Licensed under the terms of the MIT License.
+# -----------------------------------------------------------------------------
+
 from math import ceil, floor
 import datetime
 import os
@@ -354,7 +361,7 @@ for period in periods:
     with PdfPages(osp.join(dirname, filename)) as pdf:
         for i, fig in enumerate(figures):
             filename = 'precip_grid_vs_station_{}_page{}.png'.format(period, i)
-            fig.savefig(osp.join(dirname, filename), dpi=300)
+            fig.savefig(osp.join(dirname, 'figures_png', filename), dpi=300)
             pdf.savefig(fig)
 plt.close('all')
 
@@ -476,7 +483,7 @@ filename = 'fdp_precip_grid_vs_station.pdf'
 with PdfPages(osp.join(dirname, filename)) as pdf:
     for i, fig in enumerate(figures):
         filename = 'fdp_precip_grid_vs_station_page{}.png'.format(i)
-        fig.savefig(osp.join(dirname, filename), dpi=300)
+        fig.savefig(osp.join(dirname, 'figures_png', filename), dpi=300)
         pdf.savefig(fig)
 plt.close('all')
 
@@ -643,6 +650,6 @@ for var in ['tamin', 'tamax']:
     with PdfPages(osp.join(dirname, filename)) as pdf:
         for i, fig in enumerate(figures):
             filename = '{}_grid_vs_station_daily_page{}.png'.format(var, i)
-            fig.savefig(osp.join(dirname, filename), dpi=300)
+            fig.savefig(osp.join(dirname, 'figures_png', filename), dpi=300)
             pdf.savefig(fig)
 plt.close('all')

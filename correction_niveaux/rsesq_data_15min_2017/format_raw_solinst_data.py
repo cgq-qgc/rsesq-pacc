@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright © Jean-Sébastien Gosselin
+# Copyright © Institut National de la Recherche Scientifique (INRS)
 # https://github.com/cgq-qgc/pacc-inrs
 #
 # Licensed under the terms of the MIT License.
@@ -27,7 +27,7 @@ rsesq_barofiles = {}
 rsesq_levelfiles = {}
 
 i = 0
-dirname = osp.join(osp.dirname(__file__), region)
+dirname = osp.join(osp.dirname(__file__), 'raw_baro_and_level_data', region)
 for file in os.listdir(dirname):
     if not file.endswith('csv'):
         continue
@@ -111,7 +111,7 @@ barodata_stack.index.names = ['Date']
 print('Baro data concatenated successfully.')
 
 print("Saving the level and baro data to a csv... ", end='')
-dirname = osp.dirname(__file__)
+dirname = osp.join(osp.dirname(__file__), 'formatted_baro_and_level_data')
 filename = 'formatted_leveldata_{}_15min_LOCALTIME.csv'.format(region.lower())
 leveldata_stack.to_csv(osp.join(dirname, filename))
 filename = 'formatted_barodata_{}_15min_LOCALTIME.csv'.format(region.lower())
