@@ -216,8 +216,8 @@ for label in stratum:
 
 unclassified = [
     x for x in stratum if x not in
-    HF1 + HF2 + HF3 + HF4 + HF5 + ROC + AUTRE + HFX + HFO + FIN]
-print('unclassifier:', unclassified)
+    HF1 + HF2 + ROC + AUTRE + HFX + HFO + FIN]
+print('unclassified:', unclassified)
 
 HF_LABEL_STRINGS = {
     'HF5': '; '.join(HF5) + '.',
