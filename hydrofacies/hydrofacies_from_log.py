@@ -220,9 +220,6 @@ unclassified = [
 print('unclassified:', unclassified)
 
 HF_LABEL_STRINGS = {
-    'HF5': '; '.join(HF5) + '.',
-    'HF4': '; '.join(HF4) + '.',
-    'HF3': '; '.join(HF3) + '.',
     'HF2': '; '.join(HF2) + '.',
     'HF1': '; '.join(HF1) + '.',
     'HFX': '; '.join(HFX) + '.',
@@ -231,8 +228,9 @@ HF_LABEL_STRINGS = {
     'AUTRE': '; '.join(AUTRE) + '.'
     }
 
-HF_LABELS = {'HF5': HF5, 'HF4': HF4, 'HF3': HF3, 'HF2': HF2, 'HF1': HF1,
-             'HFX': HFX, 'HFO': HFO, 'ROC': ROC, 'AUTRE': AUTRE, 'FIN': FIN}
+HF_LABELS = {'HF2': HF2, 'HF1': HF1, 'HFX': HFX, 'HFO': HFO,
+             'ROC': ROC, 'AUTRE': AUTRE, 'FIN': FIN}
+
 # Count the number of unique descriptions.
 n = 0
 for hf, labels in HF_LABELS.items():
@@ -242,8 +240,8 @@ for hf, labels in HF_LABELS.items():
 # Save the classification to a file.
 fcontent = ''
 for hf, labels in HF_LABEL_STRINGS.items():
-    fcontent += hf + '\n'
-    fcontent += '-' * len(hf) + '\n'
+    fcontent += HF_DESCS[hf] + '\n'
+    fcontent += '-' * len(HF_DESCS[hf]) + '\n'
     fcontent += labels + '\n\n'
 
 dirname = osp.dirname(__file__)
