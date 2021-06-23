@@ -97,14 +97,11 @@ for i, s in enumerate(stratum):
         stratum[i] = s.replace('Argle', 'Argile')
 stratum = sorted(set(stratum))
 
-HF5 = []  # Gravier, blocs, cailloux et diamictons
-HF4 = []  # Sable et gravier, sable graveleux, sable grossier
-HF3 = []  # Sable moyen à très fin, sable moyen, sable silteux, sable argileux
-HF2 = []  # Silt ou limon
-HF1 = []  # Argile
-ROC = []
-HFX = []  # Till et diamicton indifférencé
 HFO = []  # Sol organique
+HF1 = []  # Argile, silt et sol gelé
+HF2 = []  # Sable et gravier
+HFX = []  # Till et diamicton indifférencé
+ROC = []
 AUTRE = []
 FIN = []
 for label in stratum:
