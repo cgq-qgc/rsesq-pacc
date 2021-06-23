@@ -104,6 +104,16 @@ HFX = []  # Till et diamicton indifférencé
 ROC = []
 AUTRE = []
 FIN = []
+
+HF_DESCS = {
+    'HFO': 'HFO: terre organique',
+    'HF1': 'HF1: argile, silt et sol gelé',
+    'HF2': 'HF2: sable et gravier',
+    'HFX': 'HFX: till et diamicton',
+    'ROC': 'ROC',
+    'AUTRE': 'AUTRE'
+    }
+
 for label in stratum:
     x = copy(label)
 
