@@ -114,6 +114,7 @@ HF_DESCS = {
     'AUTRE': 'AUTRE'
     }
 
+# HF1 = # Argile et silt
 for label in stratum:
     x = copy(label)
 
@@ -122,11 +123,12 @@ for label in stratum:
         x = 'Sable'
     elif x == ("Interstratification de lits de sable fin à grossier, "
                "traces de gravier et de silt argileux compact"):
+        x = 'Till'
+    elif x == ("Sable fin, traces de gravier. Présence de petits cailloux. "
+               "Présence d'argile de 19.2 à 22.9 m"):
         x = 'Sable fin'
     elif x == "Refus sur sol gelé":
         x = "Sol gelé"
-    elif x == "Sol organique sablonneux":
-        x = "Terre végétale"
     elif x == "Remblai et terre végétale":
         x = "Terre végétale"
     elif x == "Alternance de lits de silt et de sable fin à moyen":
