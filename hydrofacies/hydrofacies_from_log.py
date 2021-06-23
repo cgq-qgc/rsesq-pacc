@@ -233,6 +233,11 @@ HF_LABEL_STRINGS = {
 
 HF_LABELS = {'HF5': HF5, 'HF4': HF4, 'HF3': HF3, 'HF2': HF2, 'HF1': HF1,
              'HFX': HFX, 'HFO': HFO, 'ROC': ROC, 'AUTRE': AUTRE, 'FIN': FIN}
+# Count the number of unique descriptions.
+n = 0
+for hf, labels in HF_LABELS.items():
+    n += len(labels)
+
 
 # Save the classification to a file.
 fcontent = ''
