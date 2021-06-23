@@ -152,44 +152,63 @@ for label in stratum:
     x = x.replace('à matrice gravelo-sableuse', 'gravelo-sableux')
 
     # Classify labels.
-    if 'till' in x:
+
+    # =========================================================================
+    # Till et diamicton
+    # =========================================================================
+    if 'till' in x or 'diamicton' in x or 'bloc' in x:
         HFX.append(label)
-    elif 'diamicton' in x:
-        HFX.append(label)
-    elif x.startswith('terre'):
+    # =========================================================================
+    # Sol organique
+    # =========================================================================
+    elif 'terre' in x:
         HFO.append(label)
+    elif 'sol organique' in x:
+        HFO.append(label)
+    # =========================================================================
+    # Argile et silt
+    # =========================================================================
     elif x.startswith(('argile', 'sol gelé', 'dépôts meubles argileux')):
         HF1.append(label)
     elif x.startswith(('silt', 'remblai silto-argileux')):
+        HF1.append(label)
+    # =========================================================================
+    # Sable et gravier
+    # =========================================================================
+    elif x.startswith(('gravier', 'cailloux')):
         HF2.append(label)
-    elif (x.startswith(('gravier', 'bloc', 'cailloux'))):
-        HF5.append(label)
     elif x.startswith('remblai'):
         x = x.replace(':', '')
         if x == 'remblai':
-            HF5.append(label)
+            HF2.append(label)
+        elif x.startswith(('remblai gravier')):
+            HF2.append(label)
         if x.startswith('remblai silto-argileux'):
             HF1.append(label)
         elif x.startswith(('remblai sable fin')):
-            HF3.append(label)
+            HF2.append(label)
         elif x.startswith(('remblai de sable et gravier',
                            'remblai sable et cailloux')):
-            HF4.append(label)
-        elif x.startswith(('remblai gravier')):
-            HF5.append(label)
+            HF2.append(label)
     elif x.startswith('sable'):
         if x == 'sable':
-            HF4.append(label)
+            HF2.append(label)
         elif x.startswith(('sable,', 'sable et gravier', 'sable graveleux',
                            'sable grossier', 'sable avec')):
-            HF4.append(label)
+            HF2.append(label)
         elif x.startswith(('sable argileux', 'sable silteux', 'sable compact',
                            'sable très fin', 'sable fin', 'sable moyen',
                            'sable et argile')):
-            HF3.append(label)
+            HF2.append(label)
+    # =========================================================================
+    # Roc
+    # =========================================================================
     elif x.startswith(('alternance', 'calcaire', 'dolomie', 'roc', 'grès',
                        'schiste', 'shale')):
         ROC.append(label)
+    # =========================================================================
+    # Autres
+    # =========================================================================
     elif x.startswith(('nan', 'fracture')):
         AUTRE.append(label)
     elif x.startswith(('fin du forage', 'fracture')):
