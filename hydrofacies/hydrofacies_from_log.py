@@ -277,7 +277,7 @@ def eval_hf_seq(well_ids):
 
 def plot_hf_seq(wells_hf_seq, title):
     wells_ids = sorted(wells_hf_seq.keys())
-    HF_COLORS = {'HF1': '#00ccff', 'HF2': '#aaffee', 'HF3': '#ffeda0',
+    HF_COLORS = {'HF1': '#aaffee', 'HF2': '#fed976', 'HF3': '#ffeda0',
                  'HF4': '#fed976', 'HF5': '#feb24c', 'HFX': '#66CC00',
                  'HFO': '#784421', 'ROC': '0.5', 'AUTRE': '#f768a1',
                  'FIN': 'white'}
@@ -363,22 +363,17 @@ def plot_hf_seq(wells_hf_seq, title):
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HFO'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF1'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF2'], ec='none'),
-            Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF3'], ec='none'),
-            Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF4'], ec='none'),
-            Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF5'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HFX'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['ROC'], ec='none'),
             ]
         lg_labels = [
             'Terre organique',
-            'HF1 - Argile',
-            'HF2 - Silt et limon',
-            'HF3 - Sable très fin à moyen',
-            'HF4 - Sable grossier',
-            'HF5 - Gravier',
+            'Argile, silt et sol gelé',
+            'Sable et gravier',
             'Till et Diamicton indifférencié',
             'Roc fracturé',
             ]
+
         lg = ax.legend(
             lg_artists, lg_labels, numpoints=1, fontsize=10, ncol=3,
             borderaxespad=0, loc='upper left', borderpad=0,
