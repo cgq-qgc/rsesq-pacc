@@ -397,7 +397,11 @@ dirname = osp.dirname(__file__)
 filename = 'wells_hf_seq.pdf'
 with PdfPages(osp.join(dirname, filename)) as pdf:
     for i, fig in enumerate(figures):
-        # fig.savefig(osp.join(dirname, filename), dpi=300)
+        fig.savefig(
+            osp.join(dirname,
+                     'wells_hf_seq_png',
+                     'wells_hf_seq_{:02d}.png'.format(i)),
+            dpi=300)
         pdf.savefig(fig)
 
 # %% Déterminer le confinement à partir des séquences d'hydrofaciès.
@@ -473,3 +477,16 @@ dataframe = pd.DataFrame(
     columns=['secteur', 'station', 'confinement'])
 filename = osp.join(osp.dirname(__file__), 'confinement_from_hf.xlsx')
 dataframe.to_excel(filename, index=False)
+
+# %%
+colums = ['']
+for key, values in confinement.items():
+    print(key)
+    print('-' * len(key))
+    total_puits = 0
+    for cond in ['Libre', 'Semi-captive', 'Captive']:
+        nbr_puits = np.sum([v == cond for v in values])
+        total_puits += nbr_puits
+        print('{}= {}'.format(cond, nbr_puits))
+    print('{}= {}'.format('total', total_puits))
+    print()
