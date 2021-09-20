@@ -5,7 +5,7 @@ en hydrofaciès, tracer les logs d'hydrofaciès sur un graphique et évaluer
 le niveau de confinement à partir des séquences d'hydrofaciès.
 """
 from math import ceil
-import csv
+import numpy as np
 import numpy as np
 import os.path as osp
 import pandas as pd
