@@ -5,24 +5,18 @@ Created on Tue Jun 13 14:29:29 2017
 """
 
 # ---- Imports: standard library
-
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 import numpy as np
 import os
 
 # ---- Imports: third parties
-
 from bs4 import BeautifulSoup
 from xlrd.xldate import xldate_from_date_tuple
 
 # ---- Imports: local
-
 from .base import AbstractReader
 from .utils import find_unique, dms2decdeg, save_content_to_csv
-
-
-# ---- Base functions
 
 
 def read_html_from_url(url):

@@ -5,7 +5,7 @@ en hydrofaciès, tracer les logs d'hydrofaciès sur un graphique et évaluer
 le niveau de confinement à partir des séquences d'hydrofaciès.
 """
 from math import ceil
-import csv
+import numpy as np
 import numpy as np
 import os.path as osp
 import pandas as pd
@@ -97,16 +97,24 @@ for i, s in enumerate(stratum):
         stratum[i] = s.replace('Argle', 'Argile')
 stratum = sorted(set(stratum))
 
-HF5 = []  # Gravier, blocs, cailloux et diamictons
-HF4 = []  # Sable et gravier, sable graveleux, sable grossier
-HF3 = []  # Sable moyen à très fin, sable moyen, sable silteux, sable argileux
-HF2 = []  # Silt ou limon
-HF1 = []  # Argile
-ROC = []
-HFX = []  # Till et diamicton indifférencé
 HFO = []  # Sol organique
+HF1 = []  # Argile, silt et sol gelé
+HF2 = []  # Sable et gravier
+HFX = []  # Till et diamicton indifférencé
+ROC = []
 AUTRE = []
 FIN = []
+
+HF_DESCS = {
+    'HFO': 'HFO: terre organique',
+    'HF1': 'HF1: argile, silt et sol gelé',
+    'HF2': 'HF2: sable et gravier',
+    'HFX': 'HFX: till et diamicton',
+    'ROC': 'ROC',
+    'AUTRE': 'AUTRE'
+    }
+
+# HF1 = # Argile et silt
 for label in stratum:
     x = copy(label)
 
@@ -115,35 +123,12 @@ for label in stratum:
         x = 'Sable'
     elif x == ("Interstratification de lits de sable fin à grossier, "
                "traces de gravier et de silt argileux compact"):
+        x = 'Till'
+    elif x == ("Sable fin, traces de gravier. Présence de petits cailloux. "
+               "Présence d'argile de 19.2 à 22.9 m"):
         x = 'Sable fin'
-    elif x == "Diamicton. Présence de cailloux":
-        x = 'Diamicton caillouteux'
-    elif x == "Diamicton passant de caillouteux à sablo-silteux":
-        x = 'Diamicton caillouteux'
-    elif x == "Diamicton (sable silteux avec un peu de gravier)":
-        x = 'Diamicton sablo-silteux'
-    elif x == "Diamicton. Sable graveleux et silteux, présence de cailloux":
-        x = 'Diamicton sablo-graveleux'
-    elif x == ("Till (sable et gravier, traces de blocs "
-               "de cailloux et de silt)"):
-        x = 'Till sablo-graveleux'
-    elif x == ("Till, sable et gravier"):
-        x = 'Till sablo-graveleux'
-    elif x == "Till gris avec lits de sable silteux brun":
-        x = 'Till sablo-silteux'
-    elif x == "Till (épaisseur approximative)":
-        x = 'Till'
-    elif x == "Till, cailloux et sable":
-        x = 'Till caillouteux et sableux'
-    elif x == "Till glaciaire":
-        x = 'Till'
-    elif x == ("Till délavé, fragments de quartzite et de schiste, "
-               "présence de sable"):
-        x = 'Till'
     elif x == "Refus sur sol gelé":
         x = "Sol gelé"
-    elif x == "Sol organique sablonneux":
-        x = "Terre végétale"
     elif x == "Remblai et terre végétale":
         x = "Terre végétale"
     elif x == "Alternance de lits de silt et de sable fin à moyen":
@@ -167,82 +152,74 @@ for label in stratum:
     x = x.replace('à matrice gravelo-sableuse', 'gravelo-sableux')
 
     # Classify labels.
-    if x.startswith('terre'):
+
+    # =========================================================================
+    # Till et diamicton
+    # =========================================================================
+    if 'till' in x or 'diamicton' in x or 'bloc' in x:
+        HFX.append(label)
+    # =========================================================================
+    # Sol organique
+    # =========================================================================
+    elif 'terre' in x:
         HFO.append(label)
+    elif 'sol organique' in x:
+        HFO.append(label)
+    # =========================================================================
+    # Argile et silt
+    # =========================================================================
     elif x.startswith(('argile', 'sol gelé', 'dépôts meubles argileux')):
         HF1.append(label)
     elif x.startswith(('silt', 'remblai silto-argileux')):
+        HF1.append(label)
+    # =========================================================================
+    # Sable et gravier
+    # =========================================================================
+    elif x.startswith(('gravier', 'cailloux')):
         HF2.append(label)
-    elif (x.startswith(('gravier', 'bloc', 'cailloux'))):
-        HF5.append(label)
     elif x.startswith('remblai'):
         x = x.replace(':', '')
         if x == 'remblai':
-            HF5.append(label)
+            HF2.append(label)
+        elif x.startswith(('remblai gravier')):
+            HF2.append(label)
         if x.startswith('remblai silto-argileux'):
             HF1.append(label)
         elif x.startswith(('remblai sable fin')):
-            HF3.append(label)
+            HF2.append(label)
         elif x.startswith(('remblai de sable et gravier',
                            'remblai sable et cailloux')):
-            HF4.append(label)
-        elif x.startswith(('remblai gravier')):
-            HF5.append(label)
+            HF2.append(label)
     elif x.startswith('sable'):
         if x == 'sable':
-            HF4.append(label)
+            HF2.append(label)
         elif x.startswith(('sable,', 'sable et gravier', 'sable graveleux',
                            'sable grossier', 'sable avec')):
-            HF4.append(label)
+            HF2.append(label)
         elif x.startswith(('sable argileux', 'sable silteux', 'sable compact',
                            'sable très fin', 'sable fin', 'sable moyen',
                            'sable et argile')):
-            HF3.append(label)
+            HF2.append(label)
+    # =========================================================================
+    # Roc
+    # =========================================================================
     elif x.startswith(('alternance', 'calcaire', 'dolomie', 'roc', 'grès',
                        'schiste', 'shale')):
         ROC.append(label)
+    # =========================================================================
+    # Autres
+    # =========================================================================
     elif x.startswith(('nan', 'fracture')):
         AUTRE.append(label)
     elif x.startswith(('fin du forage', 'fracture')):
         FIN.append(label)
-    elif x.startswith('till'):
-        if x == 'till':
-            HFX.append(label)
-        elif x.startswith(('till argileux', 'till silteux', 'till compact',
-                           'till plus compact')):
-            HF1.append(label)
-        elif x.startswith(('till silto-sableux')):
-            HF2.append(label)
-        elif x.startswith(('till sablo-silteux')):
-            HF3.append(label)
-        elif x.startswith(('till sableux', 'till sablonneux',
-                           'till sablo-graveleux')):
-            HF4.append(label)
-        elif x.startswith(('till caillouteux', 'till avec blocs',
-                           'till graveleux')):
-            HF5.append(label)
-    elif x.startswith('diamicton'):
-        if x == 'diamicton':
-            HFX.append(label)
-        elif x.startswith(('diamicton graveleux', 'diamicton gravelo-sableux',
-                           'diamicton caillouteux')):
-            HF5.append(label)
-        elif x.startswith(('diamicton sableux', 'diamicton sablo-graveleux')):
-            HF4.append(label)
-        elif x.startswith(('diamicton sablo-silteux',
-                           'diamicton à matrice délavée')):
-            HF3.append(label)
-        elif x.startswith(('diamicton silto-sableux',
-                           'diamicton silto-argileux')):
-            HF2.append(label)
 
-stratum = [x for x in stratum if x not in
-           HF1 + HF2 + HF3 + HF4 + HF5 + ROC + AUTRE + HFX + HFO + FIN]
+unclassified = [
+    x for x in stratum if x not in
+    HF1 + HF2 + ROC + AUTRE + HFX + HFO + FIN]
+print('unclassified:', unclassified)
 
 HF_LABEL_STRINGS = {
-    'HF5': '; '.join(HF5) + '.',
-    'HF4': '; '.join(HF4) + '.',
-    'HF3': '; '.join(HF3) + '.',
     'HF2': '; '.join(HF2) + '.',
     'HF1': '; '.join(HF1) + '.',
     'HFX': '; '.join(HFX) + '.',
@@ -251,14 +228,20 @@ HF_LABEL_STRINGS = {
     'AUTRE': '; '.join(AUTRE) + '.'
     }
 
-HF_LABELS = {'HF5': HF5, 'HF4': HF4, 'HF3': HF3, 'HF2': HF2, 'HF1': HF1,
-             'HFX': HFX, 'HFO': HFO, 'ROC': ROC, 'AUTRE': AUTRE, 'FIN': FIN}
+HF_LABELS = {'HF2': HF2, 'HF1': HF1, 'HFX': HFX, 'HFO': HFO,
+             'ROC': ROC, 'AUTRE': AUTRE, 'FIN': FIN}
+
+# Count the number of unique descriptions.
+n = 0
+for hf, labels in HF_LABELS.items():
+    n += len(labels)
+
 
 # Save the classification to a file.
 fcontent = ''
 for hf, labels in HF_LABEL_STRINGS.items():
-    fcontent += hf + '\n'
-    fcontent += '-' * len(hf) + '\n'
+    fcontent += HF_DESCS[hf] + '\n'
+    fcontent += '-' * len(HF_DESCS[hf]) + '\n'
     fcontent += labels + '\n\n'
 
 dirname = osp.dirname(__file__)
@@ -269,7 +252,7 @@ with open(osp.join(dirname, filename), 'w', encoding='utf8') as txtfile:
 # %% Analyze data
 
 
-def eval_hf_seq(stratum, well_ids):
+def eval_hf_seq(well_ids):
     wells_hf_seq = {}
     for wid in wells_ids:
         strati = rsesq_data[rsesq_data['PointID'] == wid]
@@ -294,7 +277,7 @@ def eval_hf_seq(stratum, well_ids):
 
 def plot_hf_seq(wells_hf_seq, title):
     wells_ids = sorted(wells_hf_seq.keys())
-    HF_COLORS = {'HF1': '#00ccff', 'HF2': '#aaffee', 'HF3': '#ffeda0',
+    HF_COLORS = {'HF1': '#aaffee', 'HF2': '#fed976', 'HF3': '#ffeda0',
                  'HF4': '#fed976', 'HF5': '#feb24c', 'HFX': '#66CC00',
                  'HFO': '#784421', 'ROC': '0.5', 'AUTRE': '#f768a1',
                  'FIN': 'white'}
@@ -380,22 +363,17 @@ def plot_hf_seq(wells_hf_seq, title):
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HFO'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF1'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF2'], ec='none'),
-            Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF3'], ec='none'),
-            Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF4'], ec='none'),
-            Rectangle((0, 0), 1, 1, fc=HF_COLORS['HF5'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['HFX'], ec='none'),
             Rectangle((0, 0), 1, 1, fc=HF_COLORS['ROC'], ec='none'),
             ]
         lg_labels = [
             'Terre organique',
-            'HF1 - Argile',
-            'HF2 - Silt et limon',
-            'HF3 - Sable très fin à moyen',
-            'HF4 - Sable grossier',
-            'HF5 - Gravier',
+            'Argile, silt et sol gelé',
+            'Sable et gravier',
             'Till et Diamicton indifférencié',
             'Roc fracturé',
             ]
+
         lg = ax.legend(
             lg_artists, lg_labels, numpoints=1, fontsize=10, ncol=3,
             borderaxespad=0, loc='upper left', borderpad=0,
@@ -412,14 +390,17 @@ def plot_hf_seq(wells_hf_seq, title):
 plt.close('all')
 figures = []
 for secteur, wells_ids in secteurs_station_ids.items():
-    wells_hf_seq = eval_hf_seq(stratum, wells_ids)
+    wells_hf_seq = eval_hf_seq(wells_ids)
     figures.extend(plot_hf_seq(wells_hf_seq, secteur))
 
 dirname = osp.dirname(__file__)
 filename = 'wells_hf_seq.pdf'
 with PdfPages(osp.join(dirname, filename)) as pdf:
     for i, fig in enumerate(figures):
-        # fig.savefig(osp.join(dirname, filename), dpi=300)
+        fig.savefig(
+            osp.join(dirname, 'wells_hf_seq_png',
+                     'wells_hf_seq_{:02d}.png'.format(i)),
+            dpi=300)
         pdf.savefig(fig)
 
 # %% Déterminer le confinement à partir des séquences d'hydrofaciès.
@@ -434,67 +415,33 @@ def eval_confinement(hfseq):
     if not len(hfseq):
         return ['Indéterminé']
 
-    h_hf1 = 0  # matériaux de type argileux
-    h_hf2 = 0  # matériaux de type silt et limon
+    h_hf1 = 0  # matériaux fins
     h_hfx = 0  # matériaux indifférenciés
     for hf in hfseq:
         if hf[0] == 'HF1':
             h_hf1 += hf[3]
         elif hf[0] == 'HFX':
             h_hfx += hf[3]
-        elif hf[0] == 'HF2':
-            h_hf2 += hf[3]
     # Note: les matériaux de type sable et gravier ne sont pas pris en compte
     # dans l'évaluation du niveau de confinement de l'aquifère rocheux.
 
     # Critère établi sur l'épaisseur des couches de types hf1 pour déterminer
     # si l'aquifère rocheux est libre.
     crit_hf1_libre = 1
-    # Critère établi sur la somme de l'épaisseur des couches de types
-    # hf1 et hf2 pour déterminer si l'aquifère rocheux est libre.
-    crit_hf1_hf2_libre = 3
+    # Critère établi sur l'épaisseur des couches de types hfx pour
+    # détermine si l'aquifère rocheux est libre.
+    crit_hf1_hfx_libre = 3
     # Critère établis sur l'épaisseur des couches de types hf1 pour déterminer
     # si l'aquifère rocheux est captif.
     crit_hf1_captive = 5
 
-    confinement = []
-    if crit_hf1_captive > 5:
-        confinement.append('Captive')
-    elif h_hf1 < crit_hf1_libre and (h_hf1 + h_hf2) < crit_hf1_hf2_libre:
-        confinement.append('Libre')
+    if h_hf1 >= crit_hf1_captive:
+        confinement = 'Captive'
+    elif h_hf1 < crit_hf1_libre and h_hfx < crit_hf1_hfx_libre:
+        confinement = 'Libre'
     else:
-        confinement.append('Semi-captive')
-
-    # Parce que la perméabilité des couches de till et diamictons
-    # indifférenciés peut varier sur plusieurs ordres de grandeur dépendamment
-    # de la facon dont ces couches ont été formées (ex.: till de fond vs till
-    # d'ablation), on considère alors plusieurs scénarios.
-    # C'est pour cela que pour l'on peut avoir plusieurs types de
-    # confinement attribués à une même station.
-
-    # Pour ces stations, il faudra revoir les logs et juger si les
-    # couches de till et diamictons indifférenciés agissent comme des couches
-    # confinantes.
-
-    # Si on ajoute l'épaisseur des couches de till et diamicton
-    # indifférencié à la classe HDF1, on obtient alors:
-    if (h_hf1 + h_hfx) > 5:
-        confinement.append('Captive')
-    elif (h_hf1 + h_hfx) < 1 and (h_hf1 + h_hf2 + h_hfx) < 3:
-        confinement.append('Libre')
-    else:
-        confinement.append('Semi-captive')
-
-    # Si on ajoute l'épaisseur des couches de till et diamicton
-    # indifférencié à la classe HDF2, on obtient alors:
-    if h_hf1 > 5:
-        confinement.append('Captive')
-    elif h_hf1 < 1 and (h_hf1 + h_hf2 + h_hfx) < 3:
-        confinement.append('Libre')
-    else:
-        confinement.append('Semi-captive')
-
-    return sorted(set(confinement))
+        confinement = 'Semi-captive'
+    return confinement
 
 
 confinement = {}
@@ -504,13 +451,13 @@ for secteur, wells_ids in secteurs_station_ids.items():
     print(secteur)
     print('-' * 72)
     confinement[secteur] = []
-    wells_hf_seq = eval_hf_seq(stratum, wells_ids)
+    wells_hf_seq = eval_hf_seq(wells_ids)
     for wid in wells_ids:
         hf_seq = wells_hf_seq[wid]
         well_confinement = eval_confinement(hf_seq)
         confinement[secteur].append(well_confinement)
-        print(wid, ', '.join(well_confinement))
-        fcontent.append([secteur, wid, ', '.join(well_confinement)])
+        print(wid, well_confinement)
+        fcontent.append([secteur, wid, well_confinement])
 
     # Check that it is unique in case there is a double
     # piezo in one borehole.
@@ -529,3 +476,17 @@ dataframe = pd.DataFrame(
     columns=['secteur', 'station', 'confinement'])
 filename = osp.join(osp.dirname(__file__), 'confinement_from_hf.xlsx')
 dataframe.to_excel(filename, index=False)
+
+# %%
+print()
+colums = ['']
+for key, values in confinement.items():
+    print(key)
+    print('-' * len(key))
+    total_puits = 0
+    for cond in ['Libre', 'Semi-captive', 'Captive']:
+        nbr_puits = np.sum([v == cond for v in values])
+        total_puits += nbr_puits
+        print('{}= {}'.format(cond, nbr_puits))
+    print('{}= {}'.format('total', total_puits))
+    print()
