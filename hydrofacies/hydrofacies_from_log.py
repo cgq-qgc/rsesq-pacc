@@ -412,67 +412,33 @@ def eval_confinement(hfseq):
     if not len(hfseq):
         return ['Indéterminé']
 
-    h_hf1 = 0  # matériaux de type argileux
-    h_hf2 = 0  # matériaux de type silt et limon
+    h_hf1 = 0  # matériaux fins
     h_hfx = 0  # matériaux indifférenciés
     for hf in hfseq:
         if hf[0] == 'HF1':
             h_hf1 += hf[3]
         elif hf[0] == 'HFX':
             h_hfx += hf[3]
-        elif hf[0] == 'HF2':
-            h_hf2 += hf[3]
     # Note: les matériaux de type sable et gravier ne sont pas pris en compte
     # dans l'évaluation du niveau de confinement de l'aquifère rocheux.
 
     # Critère établi sur l'épaisseur des couches de types hf1 pour déterminer
     # si l'aquifère rocheux est libre.
     crit_hf1_libre = 1
-    # Critère établi sur la somme de l'épaisseur des couches de types
-    # hf1 et hf2 pour déterminer si l'aquifère rocheux est libre.
-    crit_hf1_hf2_libre = 3
+    # Critère établi sur l'épaisseur des couches de types hfx pour
+    # détermine si l'aquifère rocheux est libre.
+    crit_hf1_hfx_libre = 3
     # Critère établis sur l'épaisseur des couches de types hf1 pour déterminer
     # si l'aquifère rocheux est captif.
     crit_hf1_captive = 5
 
-    confinement = []
-    if crit_hf1_captive > 5:
-        confinement.append('Captive')
-    elif h_hf1 < crit_hf1_libre and (h_hf1 + h_hf2) < crit_hf1_hf2_libre:
-        confinement.append('Libre')
+    if h_hf1 >= crit_hf1_captive:
+        confinement = 'Captive'
+    elif h_hf1 < crit_hf1_libre and h_hfx < crit_hf1_hfx_libre:
+        confinement = 'Libre'
     else:
-        confinement.append('Semi-captive')
-
-    # Parce que la perméabilité des couches de till et diamictons
-    # indifférenciés peut varier sur plusieurs ordres de grandeur dépendamment
-    # de la facon dont ces couches ont été formées (ex.: till de fond vs till
-    # d'ablation), on considère alors plusieurs scénarios.
-    # C'est pour cela que pour l'on peut avoir plusieurs types de
-    # confinement attribués à une même station.
-
-    # Pour ces stations, il faudra revoir les logs et juger si les
-    # couches de till et diamictons indifférenciés agissent comme des couches
-    # confinantes.
-
-    # Si on ajoute l'épaisseur des couches de till et diamicton
-    # indifférencié à la classe HDF1, on obtient alors:
-    if (h_hf1 + h_hfx) > 5:
-        confinement.append('Captive')
-    elif (h_hf1 + h_hfx) < 1 and (h_hf1 + h_hf2 + h_hfx) < 3:
-        confinement.append('Libre')
-    else:
-        confinement.append('Semi-captive')
-
-    # Si on ajoute l'épaisseur des couches de till et diamicton
-    # indifférencié à la classe HDF2, on obtient alors:
-    if h_hf1 > 5:
-        confinement.append('Captive')
-    elif h_hf1 < 1 and (h_hf1 + h_hf2 + h_hfx) < 3:
-        confinement.append('Libre')
-    else:
-        confinement.append('Semi-captive')
-
-    return sorted(set(confinement))
+        confinement = 'Semi-captive'
+    return confinement
 
 
 confinement = {}
@@ -487,8 +453,8 @@ for secteur, wells_ids in secteurs_station_ids.items():
         hf_seq = wells_hf_seq[wid]
         well_confinement = eval_confinement(hf_seq)
         confinement[secteur].append(well_confinement)
-        print(wid, ', '.join(well_confinement))
-        fcontent.append([secteur, wid, ', '.join(well_confinement)])
+        print(wid, well_confinement)
+        fcontent.append([secteur, wid, well_confinement])
 
     # Check that it is unique in case there is a double
     # piezo in one borehole.
