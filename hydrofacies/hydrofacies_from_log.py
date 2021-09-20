@@ -398,8 +398,7 @@ filename = 'wells_hf_seq.pdf'
 with PdfPages(osp.join(dirname, filename)) as pdf:
     for i, fig in enumerate(figures):
         fig.savefig(
-            osp.join(dirname,
-                     'wells_hf_seq_png',
+            osp.join(dirname, 'wells_hf_seq_png',
                      'wells_hf_seq_{:02d}.png'.format(i)),
             dpi=300)
         pdf.savefig(fig)
@@ -479,6 +478,7 @@ filename = osp.join(osp.dirname(__file__), 'confinement_from_hf.xlsx')
 dataframe.to_excel(filename, index=False)
 
 # %%
+print()
 colums = ['']
 for key, values in confinement.items():
     print(key)
