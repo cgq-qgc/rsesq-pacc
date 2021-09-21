@@ -157,7 +157,7 @@ def plot_10yrs_annual_statistical_hydrograph(stn_info, stn_data, cur_year,
     lpad = mpl.transforms.ScaledTranslation(0, -22/72, fig.dpi_scale_trans)
     for i in range(5):
         patch = mpl.patches.Rectangle(
-            (x[i], 1-rh), rw, rh, fc=RGB[i], ec='black', linewidth=0.5,
+            (x[i], 1-rh), rw, rh, fc=RGB[-1-i], ec='black', linewidth=0.5,
             transform=ax2.transAxes+mpad)
         ax2.add_patch(patch)
         ax2.text(x[i]+rw/2, 1, labels[i], ha='center', va='top', fontsize=10,
@@ -188,10 +188,17 @@ def plot_10yrs_annual_statistical_hydrograph(stn_info, stn_data, cur_year,
 
 
 def plot_and_save_all(year, dirname, pool='all'):
+    if not osp.exists(dirname):
+        os.makedirs(dirname)
+
     reader = MDDELCC_RSESQ_Reader()
     stations = reader.stations()
     for stn_id, stn_info in stations.iterrows():
+        print(stn_id)
+
         stn_data = reader.get_station_data(stn_id)
+        if stn_data is None:
+            return
 
         avail_years = stn_data.index.year.unique()
         if len(avail_years) < 10:
@@ -201,13 +208,10 @@ def plot_and_save_all(year, dirname, pool='all'):
         if year_to_plot not in avail_years:
             continue
 
-        if not osp.exists(dirname):
-            os.makedirs(dirname)
         filename = osp.join(
             dirname,
             '{} - hydrogramme_statistique ({}).png'
-            .format(stn_id, year_to_plot)
-            )
+            .format(stn_id, year_to_plot))
 
         last_month = 12
         plot_10yrs_annual_statistical_hydrograph(
@@ -234,6 +238,6 @@ def plot_all_year_from_sid(sid):
 
 if __name__ == "__main__":
     stn_data = plot_and_save_all(
-        year=2020,
+        year=2019,
         dirname=osp.join(osp.dirname(__file__), 'figures_hydrogrammes'),
         pool='min_max_median')
