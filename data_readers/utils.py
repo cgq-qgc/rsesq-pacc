@@ -4,8 +4,7 @@ Created on Mon Oct 23 09:22:27 2017
 @author: jsgosselin
 """
 
-# ---- Imports: standard library
-
+# ---- Standard library imports
 import urllib
 import re
 import numpy as np
@@ -22,7 +21,7 @@ def dms2decdeg(coord):
     return sign*dd
 
 
-def findUnique(pattern, string):
+def find_unique(pattern, string):
     """
     Return the first result found for the regex search or return None if
     nothing is found.
@@ -32,6 +31,13 @@ def findUnique(pattern, string):
         return result[0].strip()
     else:
         return None
+
+
+def find_all(regex, string):
+    """
+    Return the stripped results found in string using the provided regex.
+    """
+    return [s.strip() for s in re.findall(regex, string)]
 
 
 def find_float_from_str(string):
