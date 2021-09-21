@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="INRS-ETE" webLink="https://github.com/RSESQ" view-date="2017-10-08" view-index="0" gantt-divider-location="408" resource-divider-location="300" version="2.8.5" locale="en">
+    <description/>
+    <view zooming-state="default:5" id="gantt-chart">
+        <field id="tpd3" name="Name" width="244" order="0"/>
+        <field id="tpd4" name="Begin date" width="61" order="1"/>
+        <field id="tpd5" name="End date" width="83" order="2"/>
+        <option id="taskLabelUp" value=""/>
+        <option id="taskLabelLeft" value="name"/>
+        <option id="taskLabelRight" value=""/>
+        <timeline><![CDATA[145]]></timeline>
+        <option id="color.recent"><![CDATA[#000000 #f0f0f0 #333333 #999999 #00ff66 #ffff00 #cccccc]]></option>
+    </view>
+    <view id="resource-table">
+        <field id="0" name="Name" width="211" order="0"/>
+        <field id="1" name="Default role" width="86" order="1"/>
+    </view>
+    <!-- -->
+    <calendars base-id="ca.quebec">
+        <day-types>
+            <day-type id="0"/>
+            <day-type id="1"/>
+            <default-week id="1" name="default" sun="1" mon="0" tue="0" wed="0" thu="0" fri="0" sat="1"/>
+            <only-show-weekends value="false"/>
+            <overriden-day-types/>
+            <days/>
+        </day-types>
+        <date year="" month="1" date="1" type="HOLIDAY"><![CDATA[New Year's Day]]></date>
+        <date year="" month="6" date="24" type="HOLIDAY"><![CDATA[St. Jean Baptiste Day]]></date>
+        <date year="" month="7" date="1" type="HOLIDAY"><![CDATA[Canada Day]]></date>
+        <date year="" month="12" date="25" type="HOLIDAY"><![CDATA[Christmas]]></date>
+        <date year="2017" month="4" date="17" type="HOLIDAY"><![CDATA[Easter Monday]]></date>
+        <date year="2017" month="5" date="22" type="HOLIDAY"><![CDATA[Victoria Day]]></date>
+        <date year="2017" month="7" date="3" type="HOLIDAY"><![CDATA[Canada Day]]></date>
+        <date year="2017" month="9" date="4" type="HOLIDAY"><![CDATA[Labour Day]]></date>
+        <date year="2017" month="10" date="9" type="HOLIDAY"><![CDATA[Thanksgiving]]></date>
+    </calendars>
+    <tasks empty-milestones="true">
+        <taskproperties>
+            <taskproperty id="tpd0" name="type" type="default" valuetype="icon"/>
+            <taskproperty id="tpd1" name="priority" type="default" valuetype="icon"/>
+            <taskproperty id="tpd2" name="info" type="default" valuetype="icon"/>
+            <taskproperty id="tpd3" name="name" type="default" valuetype="text"/>
+            <taskproperty id="tpd4" name="begindate" type="default" valuetype="date"/>
+            <taskproperty id="tpd5" name="enddate" type="default" valuetype="date"/>
+            <taskproperty id="tpd6" name="duration" type="default" valuetype="int"/>
+            <taskproperty id="tpd7" name="completion" type="default" valuetype="int"/>
+            <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
+            <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
+        </taskproperties>
+        <task id="0" name="Préparation des données hydrométriques, piézométriques et climatiques" color="#000000" meeting="false" start="2017-09-18" duration="27" complete="100" expand="true">
+            <task id="103" name="Télécharger les donnnées climatiques avec WHAT" color="#8cb6ce" meeting="false" start="2017-09-18" duration="1" complete="100" expand="true">
+                <notes><![CDATA[Télécharger les données des stations qui ont été ciblées par l'UQAM. 
+
+Pour ce faire, le code de GWHAT sera modifé pour qu'il soit possible de lire une liste de stations météo et de télécharger automatiquement les données via un script python, sans avoir à utiliser l'interface graphique de GWHAT. L'objectif est que la mise à jour des données puisse être faite de façon automatique sur une base biannuelle.]]></notes>
+                <depend id="104" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="104" name="Combler les données climatiques manquantes avec WHAT" color="#8cb6ce" meeting="false" start="2017-09-19" duration="3" complete="100" expand="true">
+                <notes><![CDATA[Utiliser l'API de GWHAT pour combler automatiquement les données manquantes dans les jeux de données météo via un script python.]]></notes>
+            </task>
+            <task id="13" name="Créer une API pour télécharger les données piézo du MDDELCC" color="#8cb6ce" meeting="false" start="2017-09-25" duration="3" complete="100" expand="true">
+                <notes><![CDATA[Créer une API permettant de lire la liste des stations piézométriques existantes sur le site du RSESQ du MDDELCC et de télécharger, formatter et sauvegarder les données dans un format csv.]]></notes>
+                <depend id="54" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="54" name="Télécharger les données piézo du MDDELCC" color="#8cb6ce" meeting="false" start="2017-09-28" duration="2" complete="100" expand="true">
+                <notes><![CDATA[Créer un script Python utilisant l'API ayant été produit à l'étape précédente pour télécharger les données de niveau d'eau automatiquement du site du MDDELCC afin de mettre à jours les données piézométriques du projet sur une base biannuelle.]]></notes>
+            </task>
+            <task id="4" name="Données hydrométriques" color="#999999" meeting="false" start="2017-10-16" duration="6" complete="100" expand="true">
+                <task id="120" name="Tutoriel SQLite pour Python" color="#00ff66" meeting="false" start="2017-10-16" duration="1" complete="100" expand="true">
+                    <notes><![CDATA[L'objectif est d'acquérir les connaissances nécessaires pour mener à bien l'Issue #1.
+
+Documentation de Python:
+- [x] https://docs.python.org/2/library/sqlite3.html
+
+Documentation de SQLite:
+- [x] https://www.tutorialspoint.com/sqlite/sqlite_python.htm
+
+Tutoriel de ZetCode:
+- [x] http://zetcode.com/db/sqlitepythontutorial/
+
+Pandas:
+- [x] http://pandas.pydata.org/pandas-docs/version/0.15.0/generated/pandas.read_sql.html
+- [x] https://www.dataquest.io/blog/python-pandas-databases/]]></notes>
+                    <depend id="25" type="2" difference="0" hardness="Strong"/>
+                </task>
+                <task id="25" name="Créer une API pour lire la base de données hydrométriques HYDAT" color="#8cb6ce" meeting="false" start="2017-10-17" duration="2" complete="100" expand="true">
+                    <notes><![CDATA[Créer une API qui permettra de lire et récupérer les données de la base de données HYDAT dans le but de pouvoir mettre à jour les données hydrométriques utilisées pour le projet sur une base bi-annuelle.]]></notes>
+                </task>
+                <task id="249" name="Créer une API pour télécharger les données hydrométriques du CEHQ" color="#8cb6ce" meeting="false" start="2017-10-19" duration="1" complete="100" expand="true">
+                    <depend id="26" type="2" difference="0" hardness="Strong"/>
+                </task>
+                <task id="26" name="Récupérer les données hydrométriques du CEHQ" color="#8cb6ce" meeting="false" start="2017-10-20" duration="1" complete="100" expand="true">
+                    <notes><![CDATA[Créer un script dans un IPython notebook faisant appel à l'API développée plus tôt pour récupérer automatiquement les données d'intérêts dans la base de données HYDAT.]]></notes>
+                    <depend id="252" type="2" difference="0" hardness="Strong"/>
+                </task>
+                <task id="252" name="Améliorer l'API pour télécharger les données hydrométriques du CEHQ" color="#8cb6ce" meeting="false" start="2017-10-23" duration="1" complete="100" expand="true">
+                    <notes><![CDATA[L'objectif est de faire en sorte que le téléchargement de l'information relative aux stations soit moins long la première fois que l'utilisateur utilise l'API.
+
+https://github.com/jnsebgosselin/inrs-rsesq/issues/15]]></notes>
+                </task>
+            </task>
+            <task id="253" name="Créer une API pour télécharger les données climatiques d'EC" color="#8cb6ce" meeting="false" start="2017-10-23" duration="1" complete="100" expand="true">
+                <notes><![CDATA[L'objectif est de reprendre le travail qui a été fait dans le module météo de WHAT et de réorganiser le tout dans une API qui est similaire à ce qui a été fait pour le CEHQ (MDDELCC_CEHQ_Reader) et le RSESQ du MDDELCC (MDDELCC_RSESQ_Reader).
+
+https://github.com/jnsebgosselin/inrs-rsesq/pull/19]]></notes>
+                <depend id="273" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="273" name="Télécharger les données des stations climatiques actives du QC" color="#8cb6ce" meeting="false" start="2017-10-24" duration="1" complete="100" expand="true">
+                <notes><![CDATA[L'objectif est d'utiliser l'APi pour télécharger de façon automatique les données climatiques journalières de toutes les stations climatiques actives du Québec.]]></notes>
+                <depend id="275" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="275" name="Documenter l'API pour les données climatiques" color="#8cb6ce" meeting="false" start="2017-10-25" duration="1" complete="100" expand="true">
+                <notes><![CDATA[Ajout de la documentatation dans le README.md du répertoire GitHub.]]></notes>
+            </task>
+        </task>
+        <task id="287" name="Affichage GIS des données et évaluation du réseau" color="#000000" meeting="false" start="2017-10-25" duration="8" complete="6" expand="true">
+            <task id="288" name="Graph: nbr. de stations versus le temps" color="#8cb6ce" meeting="false" start="2017-10-25" duration="1" complete="100" expand="true">
+                <notes><![CDATA[Produire un graphique mettant en relation le nombre de stations piézométriques pour lesquelles des données sont disponibles au Québec en fonction du temps. 
+
+https://github.com/jnsebgosselin/inrs-rsesq/issues/6]]></notes>
+            </task>
+            <task id="290" name="Associer des stations météos aux puits" meeting="false" start="2017-10-25" duration="1" complete="0" expand="true"/>
+            <task id="291" name="Production d'une carte avec la localisation des stations" meeting="false" start="2017-10-26" duration="2" complete="0" expand="true"/>
+            <task id="289" name="Déterminer les stations qui sont dans la zone d'étude" meeting="false" start="2017-10-27" duration="3" complete="0" expand="true"/>
+            <task id="292" name="Graph: distance puits vs station climatique active" meeting="false" start="2017-11-01" duration="1" complete="0" expand="true"/>
+            <task id="173" name="Lecture circulaire 1217 de l'USGS" color="#00ff66" meeting="false" start="2017-10-25" duration="8" complete="0" expand="true"/>
+        </task>
+        <task id="293" name="Prédiction hydrométrique à partir des données piézométriques et climatiques" meeting="false" start="2017-10-25" duration="28" complete="0" expand="true">
+            <task id="203" name="Lecture Pal et Prakash (2017)" color="#00ff66" meeting="false" start="2017-10-25" duration="8" complete="0" expand="true"/>
+            <task id="295" name="Preuve de concept pour quelques puits" meeting="false" start="2017-10-25" duration="28" complete="0" expand="true"/>
+        </task>
+        <task id="9" name="Combler les données climatiques manquantes avec du machine learning" color="#000000" meeting="false" start="2017-11-13" duration="11" complete="0" expand="true">
+            <task id="8" name="Combler les données manquantes dans les stations actives" color="#8cb6ce" meeting="false" start="2017-11-13" duration="6" complete="0" expand="true">
+                <depend id="137" type="2" difference="0" hardness="Strong"/>
+            </task>
+            <task id="137" name="Ajouter des stations non actives au besoin" color="#8cb6ce" meeting="false" start="2017-11-21" duration="5" complete="0" expand="true"/>
+        </task>
+        <task id="281" name="Développement de GWHAT" meeting="false" start="2017-11-06" duration="46" complete="0" expand="true">
+            <task id="282" name="Données piézométriques" color="#999999" meeting="false" start="2018-01-04" duration="5" complete="0" expand="true">
+                <task id="283" name="Inclure l'API dans GWHAT" color="#8cb6ce" meeting="false" start="2018-01-04" duration="3" complete="0" expand="true">
+                    <notes><![CDATA[Inclure les fonctionalités de l'API dans l'interface graphique de GWHAT.]]></notes>
+                    <depend id="284" type="2" difference="0" hardness="Strong"/>
+                </task>
+                <task id="284" name="Mettre à jour la doc. de GWHAT" color="#ffff00" meeting="false" start="2018-01-09" duration="2" complete="0" expand="true"/>
+            </task>
+            <task id="12" name="Écrire un article scientifique" color="#ffff00" meeting="false" start="2017-11-06" duration="20" complete="0" expand="true"/>
+            <task id="118" name="Compléter la doc de GWHAT" color="#ffff00" meeting="false" start="2017-11-06" duration="10" complete="0" expand="true">
+                <notes><![CDATA[Générer la documentation en lien avec la collecte et l'estimation des valeurs manquantes dans les séries météo journalières dans GWHAT.
+
+Pour ce faire, il est proposé de rédiger le tout à l'aide de Read the Doc: http://docs.readthedocs.io/en/latest/getting_started.html]]></notes>
+            </task>
+            <task id="244" name="Améliorer l'outil pour télécharger les données météo" color="#8cb6ce" meeting="false" start="2017-11-20" duration="14" complete="0" expand="true">
+                <task id="218" name="Modifier l'outil de recherche des stations dans GWHAT" color="#8cb6ce" meeting="false" start="2017-11-20" duration="2" complete="0" expand="true">
+                    <depend id="111" type="2" difference="0" hardness="Strong"/>
+                </task>
+                <task id="111" name="Compléter la doc de GWHAT" color="#ffff00" meeting="false" start="2017-11-22" duration="2" complete="0" expand="true">
+                    <notes><![CDATA[Générer la documentation en lien avec la collecte et l'estimation des valeurs manquantes dans les séries météo journalières dans GWHAT.
+
+Pour ce faire, il est proposé de rédiger le tout à l'aide de Read the Doc: http://docs.readthedocs.io/en/latest/getting_started.html]]></notes>
+                    <depend id="219" type="2" difference="0" hardness="Strong"/>
+                </task>
+                <task id="219" name="Évaluer les options pour la diffusion des travaux" color="#ffff00" meeting="false" start="2017-11-24" duration="10" complete="0" expand="true"/>
+            </task>
+        </task>
+        <task id="88" name="Caractérisation des puits" color="#000000" meeting="false" start="2017-07-04" duration="112" complete="0" expand="true">
+            <task id="90" name="Fonction de réponse barométrique" color="#8cb6ce" meeting="false" start="2017-12-04" duration="5" complete="0" expand="true">
+                <notes><![CDATA[Utiliser le logiciel KGS-BRF à partir de l'interface de GWHAT pour caractériser la fonction de réponse barométrique des puits à l'aide de données de niveau d'eau acquises aux 15 minutes.
+
+https://github.com/jnsebgosselin/inrs-rsesq/issues/8]]></notes>
+            </task>
+            <task id="144" name="Déf. des conditions autour des puits" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="168" name="Classement des puits et leurs fonctions" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="188" name="Livrable: grille de classement des puits" color="#8cb6ce" meeting="true" start="2017-07-04" duration="0" complete="0" expand="true"/>
+        </task>
+        <task id="145" name="Volet: exploitation" color="#333333" meeting="false" start="2017-08-28" duration="10" complete="0" expand="true">
+            <task id="147" name="Estimation de la recharge" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="152" name="Détection des changements dans les tendances" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="149" name="Prévision des niveau d'eau" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="151" name="Lien avec les cours d'eau" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="158" name="Graph: normales mensuelles" color="#8cb6ce" meeting="false" start="2017-08-28" duration="1" complete="0" expand="true">
+                <notes><![CDATA[L'objectif est de pouvoir comparer visuellement où se situ le niveau actuel de l'eau souterraine par rapport aux années antécédentes. Pour se faire, il est proposé de s'inspirer de ce que produit l'USGS pour l'ensemble des puits de son Climate Response Network (voir image ci-dessous). Ces statistiques et graphiques doivent pouvoir être mis à jour de façon automatique chaque fois que de nouvelles données sont disponibles.
+
+https://github.com/jnsebgosselin/inrs-rsesq/issues/7]]></notes>
+            </task>
+        </task>
+        <task id="175" name="Volet: rationalisation" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true">
+            <task id="180" name="Graph: localisation puits vs météo" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+        </task>
+        <task id="93" name="Volet: diffusion" color="#000000" meeting="false" start="2017-09-11" duration="593" complete="0" expand="true">
+            <task id="171" name="Données traitées en format csv" color="#8cb6ce" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="163" name="Graph: hydrogramme et météo" meeting="false" start="2017-09-11" duration="1" complete="0" expand="true"/>
+            <task id="162" name="Rapport: fin de projet" color="#8cb6ce" meeting="true" start="2019-12-31" duration="0" complete="0" expand="true"/>
+        </task>
+        <task id="17" name="Formation continue" color="#00ff66" meeting="false" start="2017-10-02" duration="19" complete="0" expand="true">
+            <task id="21" name="Lecture Klove et al. (2014)" color="#00ff66" meeting="false" start="2017-10-23" duration="5" complete="0" expand="true"/>
+            <task id="247" name="Lire le contenu du CEHQ" color="#00ff66" meeting="false" start="2017-10-02" duration="1" complete="0" expand="true">
+                <notes><![CDATA[Survoler et lire tout ce qui est disponible sur:
+https://www.cehq.gouv.qc.ca/hydrometrie/]]></notes>
+            </task>
+        </task>
+    </tasks>
+    <resources/>
+    <allocations/>
+    <vacations/>
+    <previous/>
+    <roles roleset-name="Default"/>
+    <roles roleset-name="SoftwareDevelopment"/>
+</project>

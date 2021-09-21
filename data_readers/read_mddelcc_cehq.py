@@ -198,7 +198,6 @@ def scrape_data_from_sid(sid):
 
 
 class MDDELCC_CEHQ_Reader(AbstractReader):
-    DATABASE_FILEPATH = 'mddelcc_cehq_database.npy'
 
     def __init__(self):
         super(MDDELCC_CEHQ_Reader, self).__init__()
@@ -216,6 +215,8 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
 
     def station_ids(self):
         return list(self._db.keys())
+
+    # ---- Load and fetch database
 
     def load_database(self):
         try:
@@ -238,6 +239,12 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             print("\r%d of %d" % (i, len(sids)), end="          ")
         print("\nDatasheet fetched for all stations.")
         np.save(self.DATABASE_FILEPATH, self._db)
+
+    def set_local_database_dir(self, dirname):
+        self.DATABASE_FILEPATH = os.path.join(
+                dirname, 'mddelcc_cehq_database.npy')
+
+    # ---- Fetch data
 
     def fetch_station_dlydata(self, sid):
         """

@@ -20,7 +20,6 @@ class AbstractReader(ABC):
         self.load_database()
 
     # ---- Load and fetch database
-
     @abstractmethod
     def load_database(self):
         pass
@@ -30,7 +29,6 @@ class AbstractReader(ABC):
         pass
 
     # ---- Utility functions
-
     @abstractmethod
     def stations(self):
         pass
