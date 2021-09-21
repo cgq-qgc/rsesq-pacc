@@ -118,28 +118,18 @@ def get_wldata_from_xls(url_or_fpath):
             ws = wb.sheet_by_index(0)
 
     row_idx = ws.col_values(0).index('Date du relevé') + 1
-    time = np.array(ws.col_values(0, start_rowx=row_idx)).astype(float)
-    wlvl = np.array(ws.col_values(1, start_rowx=row_idx)).astype(float)
-    wtemp = np.array(ws.col_values(2, start_rowx=row_idx)).astype(float)
+    stn_data = pd.DataFrame(
+        [],
+        index=[datetime.datetime(*xlrd.xldate_as_tuple(t, 0)) for t in
+               ws.col_values(0, start_rowx=row_idx)])
+    stn_data['Water Level (masl)'] = pd.to_numeric(
+        ws.col_values(1, start_rowx=row_idx), errors='coerce')
+    stn_data['Temperature (degC)'] = pd.to_numeric(
+        ws.col_values(2, start_rowx=row_idx), errors='coerce')
 
-    # Remove duplicates in time series and save in a dataframe
-    indexes = np.digitize(np.unique(time), time, right=True)
+    stn_elevation = find_float_from_str(ws.cell_value(4, 2))
 
-    df = {}
-    df['Elevation'] = find_float_from_str(ws.cell_value(4, 2))
-    df['Time'] = time[indexes]
-    df['Water Level'] = wlvl[indexes]
-    df['Temperature'] = wtemp[indexes]
-
-    # Produce year, month and data time series.
-    df['Year'] = np.zeros(np.shape(df['Time'])).astype(int)
-    df['Month'] = np.zeros(np.shape(df['Time'])).astype(int)
-    df['Day'] = np.zeros(np.shape(df['Time'])).astype(int)
-    for i, t in enumerate(df['Time']):
-        date = xlrd.xldate_as_tuple(t, 0)[:3]
-        df['Year'][i], df['Month'][i], df['Day'][i] = date
-
-    return df
+    return stn_elevation, stn_data
 
 
 class MDDELCC_RSESQ_Reader(AbstractReader):
@@ -164,18 +154,8 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         Return a pandas dataframe with the temperature and water level time
         series corresponding to the specified station indexed by date.
         """
-        data = self.fetch_station_wldata(stn_id)
-        columns = ['Water Level (masl)', 'Temperature (degC)']
-        if 'Water Level' in data:
-            df = pd.DataFrame(
-                np.vstack((data['Water Level'], data['Temperature'])).T,
-                [datetime.datetime(*xlrd.xldate_as_tuple(t, 0)) for
-                 t in data['Time']],
-                columns=columns
-                )
-        else:
-            df = pd.DataFrame(columns=columns)
-        return df
+        stn_elevation, stn_data = self.fetch_station_wldata(stn_id)
+        return stn_data
 
     # ---- Load and fetch data
     def load_database(self):
@@ -201,6 +181,8 @@ class MDDELCC_RSESQ_Reader(AbstractReader):
         url = self._db[sid]['url data']
         if url not in [None, '', b'']:
             return get_wldata_from_xls(url)
+        else:
+            return None, None
 
     # ---- Download files
     def dwnld_raw_xls_datafile(self, station_id, filepath):
