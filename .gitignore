@@ -2,6 +2,7 @@
 patm_narr_data_gtm0.csv
 synthetic_earthtides_1980-2018_1H_UTC.csv
 HydroSensorReader-1.7.5.zip
+rsesq-visu/figures_hydrogrammes/
 */narr_grid_barodata/baro_naar_netcdf
 *.npy
 /data_files
