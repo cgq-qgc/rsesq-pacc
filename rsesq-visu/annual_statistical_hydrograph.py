@@ -6,6 +6,7 @@ Created on Wed Oct 25 20:24:09 2017
 
 # ---- Standard library imports
 import os
+import os.path as osp
 from calendar import monthrange
 import datetime as dt
 
@@ -53,12 +54,11 @@ def compute_monthly_statistics(tseries, q, pool='all'):
     return np.array(percentiles), np.array(nyear)
 
 
-def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
-                                             filename=None, pool='all'):
-    reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
-    reader.load_database()
-    stn_name = reader[sid]['Name']
-    stn_id = reader[sid]['ID']
+def plot_10yrs_annual_statistical_hydrograph(stn_info, stn_data, cur_year,
+                                             last_month=12, filename=None,
+                                             pool='all'):
+    stn_name = stn_info['Name']
+    stn_id = stn_info['ID']
 
     # Organize month order and define first and last datetime value for
     # the current data.
@@ -78,8 +78,7 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
             monthrange(cur_year, mth_idx[-1] + 1)[-1])
 
     # Generate the percentiles.
-    wlevels = (reader['02167001']['Elevation'] -
-               reader.get_station_data('02167001')['Water Level (masl)'])
+    wlevels = stn_data['Water Level (masl)']
     q = [100, 90, 75, 50, 25, 10, 0]
     percentiles, nyear = compute_monthly_statistics(wlevels, q, pool)
 
@@ -118,22 +117,21 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
     ymin = min(np.min(percentiles), np.min(cur_wlevels))
     yrange = ymax - ymin
     yoffset = 0.1 / fh * yrange
-    ax.axis([-0.75, 11.75, ymin-yoffset, ymax+yoffset])
-    ax.invert_yaxis()
+    ax.axis([-0.75, 11.75, ymin - yoffset, ymax + yoffset])
 
     # Set axis labels.
     ax.set_ylabel("Niveau d'eau en m sous la surface", fontsize=16,
                   labelpad=10)
     pad = mpl.transforms.ScaledTranslation(0, 5/72, fig.dpi_scale_trans)
     ax.text(0.5, 0, year_lbl, ha='center', va='bottom', fontsize=16,
-            transform=fig.transFigure+pad)
+            transform=fig.transFigure + pad)
 
     # Set ticks and ticklabels.
     ax.set_xticks(np.arange(-0.5, 11.51))
     ax.set_xticklabels([])
 
     xlabelspos = np.arange(12)
-    y = ymax+yoffset
+    y = ymin - yoffset
     for m, n, x in zip(MONTHS[mth_idx], nyear[mth_idx], xlabelspos):
         offset = transforms.ScaledTranslation(0, -3/72, fig.dpi_scale_trans)
         ax.text(x, y, m, ha='center', va='top', fontsize=12,
@@ -191,26 +189,29 @@ def plot_10yrs_annual_statistical_hydrograph(sid, cur_year, last_month=12,
 
 def plot_and_save_all(year, dirname, pool='all'):
     reader = MDDELCC_RSESQ_Reader()
-    for stn in reader.stations():
-        if 'Year' not in list(stn.keys()):
+    stations = reader.stations()
+    for stn_id, stn_info in stations.iterrows():
+        stn_data = reader.get_station_data(stn_id)
+
+        avail_years = stn_data.index.year.unique()
+        if len(avail_years) < 10:
             continue
 
-        years = np.unique(stn['Year'])
-        if len(years) < 10:
+        year_to_plot = avail_years[-1] if year == 'last' else year
+        if year_to_plot not in avail_years:
             continue
 
-        yr_to_plot = years[-1] if year == 'last' else year
-        if yr_to_plot not in years:
-            continue
-
-        filename = ('%s (%s) - %d.png' % (stn['Name'], stn['ID'], yr_to_plot))
-        if not os.path.exists(dirname):
+        if not osp.exists(dirname):
             os.makedirs(dirname)
-        filename = os.path.join(dirname, filename)
+        filename = osp.join(
+            dirname,
+            '{} - hydrogramme_statistique ({}).png'
+            .format(stn_id, year_to_plot)
+            )
 
-        last_month = stn['Month'][stn['Year'] == yr_to_plot][-1]
+        last_month = 12
         plot_10yrs_annual_statistical_hydrograph(
-            stn['ID'], yr_to_plot, last_month, filename, pool)
+            stn_info, stn_data, year_to_plot, last_month, filename, pool)
         plt.close('all')
 
 
@@ -232,16 +233,7 @@ def plot_all_year_from_sid(sid):
 
 
 if __name__ == "__main__":
-    from matplotlib.backends.backend_pdf import PdfPages
-
-    plt.close('all')
-    pdfpages = PdfPages(
-        '05080001 - hydrogramme_statistique_annnuels_1996-2018.pdf')
-    for year in range(1996, 2019):
-        fig = plot_10yrs_annual_statistical_hydrograph('05080001', year)
-        pdfpages.savefig(fig)
-    pdfpages.close()
-
-    reader = MDDELCC_RSESQ_Reader(workdir="D:/Data")
-    reader.load_database()
-    stn_data = reader.get_station_data('05080001')
+    stn_data = plot_and_save_all(
+        year=2020,
+        dirname=osp.join(osp.dirname(__file__), 'figures_hydrogrammes'),
+        pool='min_max_median')
