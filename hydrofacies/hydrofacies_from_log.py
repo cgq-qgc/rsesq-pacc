@@ -6,7 +6,6 @@ le niveau de confinement à partir des séquences d'hydrofaciès.
 """
 from math import ceil
 import numpy as np
-import numpy as np
 import os.path as osp
 import pandas as pd
 from copy import copy
