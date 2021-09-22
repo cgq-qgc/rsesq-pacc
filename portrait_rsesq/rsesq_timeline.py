@@ -3,21 +3,66 @@
 Created on Wed Oct 25 08:59:57 2017
 @author: jsgosselin
 """
-
+import pandas as pd
+import os.path as osp
 import numpy as np
 import matplotlib.pyplot as plt
-from data_readers import MDDELCC_RSESQ_Reader
+from datetime import datetime
+import xlrd
+
+
+workdir = "D:/Projets/pacc-inrs/portrait_rsesq"
+
+
+def read_rsesq_data():
+
+    rsesq_data_raw = np.load(
+        osp.join(workdir, 'mddelcc_rsesq_database.npy'),
+        allow_pickle=True).item()
+
+    rsesq_data = {}
+    for stn_id, stn_data in rsesq_data_raw.items():
+        stn_readings = pd.DataFrame(
+            [],
+            columns=['Water Level (masl)', 'Temperature (degC)']
+            )
+        if 'Time' not in stn_data:
+            rsesq_data[stn_id] = stn_readings
+            continue
+
+        stn_readings['Water Level (masl)'] = pd.to_numeric(
+            stn_data['Water Level'], errors='coerce')
+        stn_readings['Temperature (degC)'] = pd.to_numeric(
+            stn_data['Temperature'], errors='coerce')
+        stn_readings.index = [
+            datetime(*xlrd.xldate_as_tuple(t, 0)) for t in stn_data['Time']]
+
+        rsesq_data[stn_id] = stn_readings
+
+    # We need to add the data from Sainte-Martine manually because they
+    # were not available at the time on the RSESQ website.
+    stn_data = pd.read_csv(
+        osp.join(workdir, 'Sainte-Martine (03097082).csv'),
+        skiprows=10)
+
+    stn_readings = stn_data[
+        ['Time', 'Water level (masl)', 'Water temperature (degC)']].copy()
+    stn_readings.index = [
+        datetime(*xlrd.xldate_as_tuple(t, 0)) for t in stn_data['Time']]
+    stn_readings = stn_readings.drop('Time', axis=1)
+
+    return rsesq_data
 
 
 # ---- Compute bins
-def compute_nbr_stn_bins(bstep, reader):
+def compute_nbr_stn_bins(bstep, rsesq_data):
     """Compute the number of active stations for periods of bstep years."""
     bins = {}
-    for stn in reader.stations():
-        if 'Year' not in list(stn.keys()):
+    for stn_id, stn_readings in rsesq_data.items():
+        if stn_readings.empty:
             continue
 
-        dec = np.unique(stn['Year'] // bstep) * bstep
+        dec = stn_readings.index.year.unique() // bstep * bstep
         for d in dec.astype(str):
             if d not in list(bins.keys()):
                 bins[d] = 0
@@ -36,14 +81,14 @@ def compute_nbr_stn_bins(bstep, reader):
     return years, values
 
 
-def compute_nbr_year_bins(bins, reader):
+def compute_nbr_year_bins(bins, rsesq_data):
     "Compute the number of stations with data for at "
     values = [0] * len(bins)
-    for stn in reader.stations():
-        if 'Year' not in list(stn.keys()):
+    for stn_id, stn_readings in rsesq_data.items():
+        if stn_readings.empty:
             nyear = 0
         else:
-            nyear = len(np.unique(stn['Year']))
+            nyear = len(stn_readings.index.year.unique())
 
         for i, b in enumerate(bins):
             if nyear >= b:
@@ -53,9 +98,7 @@ def compute_nbr_year_bins(bins, reader):
 
 
 # ---- Produce the plot
-
-
-def plot_nbr_stn_bins(bstep=5):
+def plot_nbr_stn_bins(rsesq_data, bstep=5):
     # Produce the figure.
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.set_facecolor('0.85')
@@ -66,7 +109,7 @@ def plot_nbr_stn_bins(bstep=5):
     ax.tick_params(axis='both', which='both', length=0)
 
     # Produce the barplot.
-    years, values = compute_nbr_stn_bins(bstep, MDDELCC_RSESQ_Reader())
+    years, values = compute_nbr_stn_bins(bstep, rsesq_data)
     ax.bar(years[:-1]+2.5, values, 4)
     ax.set_ylabel('Nombre de stations actives', fontsize=16, labelpad=10)
     ax.set_xlabel('Années', fontsize=16, labelpad=10)
@@ -77,16 +120,17 @@ def plot_nbr_stn_bins(bstep=5):
         ax.text(year+2.5, value+1, str(value), ha='center', va='bottom')
 
     # Plot a continous line.
-    years, values = compute_nbr_stn_bins(1, MDDELCC_RSESQ_Reader())
+    years, values = compute_nbr_stn_bins(1, rsesq_data)
     ax.plot(years[:-1], values, ls='--', lw=1.5, color='red',
             dashes=[5, 2], alpha=0.75)
 
     plt.tight_layout()
     plt.show(block=False)
-    fig.savefig('nbr_stns_actives_vs_temps.pdf')
+    fig.savefig(osp.join(workdir, 'nbr_stns_actives_vs_temps.pdf'))
 
 
-def plot_nbr_year_bins(bins=[0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40]):
+def plot_nbr_year_bins(rsesq_data,
+                       bins=[0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40]):
     # Produce the figure.
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.set_facecolor('0.85')
@@ -97,7 +141,7 @@ def plot_nbr_year_bins(bins=[0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40]):
     ax.tick_params(axis='both', which='both', length=0)
 
     # Produce the barplot.
-    values = compute_nbr_year_bins(bins, MDDELCC_RSESQ_Reader())
+    values = compute_nbr_year_bins(bins, rsesq_data)
     xpos = range(len(bins))
     ax.bar(xpos, values, 0.75)
     ax.set_ylabel('Nombre de stations', fontsize=16, labelpad=10)
@@ -112,17 +156,11 @@ def plot_nbr_year_bins(bins=[0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40]):
 
     plt.tight_layout()
     plt.show(block=False)
-    fig.savefig('stns_nbr_vs_year_nbr.pdf')
+    fig.savefig(osp.join(workdir, 'stns_nbr_vs_year_nbr.pdf'))
 
 
 if __name__ == "__main__":
-    filename = "D:/Projets/pacc-inrs/data_files/mddelcc_cehq_database.npy"
-    data = np.load(filename, allow_pickle=True).item()
-    
-    data['062002']
-    
-    # data_readers = MDDELCC_RSESQ_Reader()
-    # print(data_readers.stations())
-    # plt.close('all')
-    # plot_nbr_stn_bins()
-    # plot_nbr_year_bins()
+    rsesq_data = read_rsesq_data()
+    plt.close('all')
+    plot_nbr_stn_bins(rsesq_data)
+    plot_nbr_year_bins(rsesq_data)
