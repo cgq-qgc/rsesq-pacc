@@ -5,26 +5,21 @@ Created on Tue Jun 13 14:29:29 2017
 """
 
 # ---- Imports: standard library
-
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 import numpy as np
 import os
 
 # ---- Imports: third parties
-
 from bs4 import BeautifulSoup
 from xlrd.xldate import xldate_from_date_tuple
 
 # ---- Imports: local
-
 from .base import AbstractReader
 from .utils import find_unique, dms2decdeg, save_content_to_csv
 
 
 # ---- Base functions
-
-
 def read_html_from_url(url):
     """"Get, read and decode html data from a url in the the CEHQ domain."""
     try:
@@ -204,7 +199,6 @@ def scrape_data_from_sid(sid):
 
 
 class MDDELCC_CEHQ_Reader(AbstractReader):
-    DATABASE_FILEPATH = 'mddelcc_cehq_database.npy'
 
     def __init__(self):
         super(MDDELCC_CEHQ_Reader, self).__init__()
@@ -222,6 +216,8 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
 
     def station_ids(self):
         return list(self._db.keys())
+
+    # ---- Load and fetch database
 
     def load_database(self):
         try:
@@ -244,6 +240,12 @@ class MDDELCC_CEHQ_Reader(AbstractReader):
             print("\r%d of %d" % (i, len(sids)), end="          ")
         print("\nDatasheet fetched for all stations.")
         np.save(self.DATABASE_FILEPATH, self._db)
+
+    def set_local_database_dir(self, dirname):
+        self.DATABASE_FILEPATH = os.path.join(
+                dirname, 'mddelcc_cehq_database.npy')
+
+    # ---- Fetch data
 
     def fetch_station_dlydata(self, sid):
         """
