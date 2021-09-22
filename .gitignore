@@ -6,6 +6,7 @@ rsesq-visu/figures_hydrogrammes/
 */narr_grid_barodata/baro_naar_netcdf
 *.npy
 /data_files
+*/puits_mddelcc_shp/*
 Hydat.sqlite3
 demande_UQAM_meteo_debit.xlsx
 backup/
