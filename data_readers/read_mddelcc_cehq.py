@@ -19,6 +19,7 @@ from .base import AbstractReader
 from .utils import find_unique, dms2decdeg, save_content_to_csv
 
 
+# ---- Base functions
 def read_html_from_url(url):
     """"Get, read and decode html data from a url in the the CEHQ domain."""
     try:
