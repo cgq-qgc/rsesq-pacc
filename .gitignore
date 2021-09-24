@@ -15,6 +15,7 @@ raw_baro_and_level_data/
 formatted_baro_and_level_data/
 brf_1hour_results/
 brf_1hour_input_data/
+corrected_water_levels/
 corrected_water_levels_hors_zone/
 corrected_water_levels_zone_pacc/
 not_corrected_water_levels/
