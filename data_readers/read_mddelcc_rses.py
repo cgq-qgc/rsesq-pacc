@@ -25,7 +25,6 @@ from data_readers.utils import (
 
 
 # ---- Base functions
-
 def get_xml_url():
     """
     Get the url of the last xml data table.

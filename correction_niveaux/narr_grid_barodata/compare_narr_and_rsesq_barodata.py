@@ -7,6 +7,8 @@
 # -----------------------------------------------------------------------------
 
 """
+Un script pour comparer les données barométriques mesurées aux puits du
+RSESQ avec les données de la grille NARR.
 """
 
 # ---- Standard party imports
