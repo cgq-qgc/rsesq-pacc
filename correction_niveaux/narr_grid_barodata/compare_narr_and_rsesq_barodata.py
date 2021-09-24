@@ -24,6 +24,9 @@ import matplotlib
 from matplotlib.transforms import ScaledTranslation
 from matplotlib.backends.backend_pdf import PdfPages
 
+# ---- Local imports
+from data_readers import MDDELCC_RSESQ_Reader
+
 matplotlib.rcParams['axes.unicode_minus'] = False
 plt.close('all')
 
@@ -101,31 +104,62 @@ def plot_cross_correllation(x1, x2, station='', dist=0):
 
     return fig
 
-# plot_cross_correllation(
-#     baro_naar.values, baro_sta['BP(m)'].values,
-#     station=station, dist=dist[rowmin, colmin])
-
 
 # %% Read barometric data from the NARR grid
 
-# This file is produced with the script 'format_narr_data.py'.
-narr_datafile = osp.join(osp.dirname(__file__), 'patm_narr_data.csv')
-pres_grid = pd.read_csv(narr_datafile, header=[0, 1, 2], index_col=0)
-pres_grid.index = pd.to_datetime(pres_grid.index)
+patm_narr_fname = osp.join(osp.dirname(__file__), "patm_narr_data_gtm0.csv")
 
-lat_grid = pres_grid.columns.get_level_values(0)
-#         [dt0 + timedelta(hours=(i * 3)) for i in range(len(t))])
+# Get the barometric data.
+narr_baro = pd.read_csv(patm_narr_fname, header=[0, 1, 2])
 
-# pres_grid = np.vstack(pres_stack)
-# lat_grid = np.array(dset['lat'])
-# lon_grid = np.array(dset['lon'])
+narr_baro = narr_baro.set_index(
+    [('Latitude (dd)', 'Longitude (dd)', 'Station')], drop=True)
+narr_baro.index = pd.to_datetime(narr_baro.index, format="%Y-%m-%d %H:%M:%S")
+narr_baro.index = narr_baro.index.rename('datetime')
 
-# %% Read measured baro
+# !!! It is important to shift the data by 5 hours to match the
+#     local time of the data from the RSESQ.
+narr_baro.index = narr_baro.index - pd.Timedelta(hours=5)
+
+# Extract latitude and longitude data from the columns multi-index and drop
+# these from the columns.
+narr_coord = pd.DataFrame([], index=narr_baro.columns.get_level_values(2))
+narr_coord['lat_dd'] = narr_baro.columns.get_level_values(0).astype('float')
+narr_coord['lon_dd'] = narr_baro.columns.get_level_values(1).astype('float')
+
+narr_baro.columns = narr_baro.columns.droplevel(level=[0, 1])
+
+# %% Read measured baro from RSESQ
+
+dirname = osp.join(
+    osp.dirname(osp.dirname(__file__)),
+    'rsesq_data_15min_2017',
+    'formatted_baro_and_level_data')
+files = ['formatted_barodata_capitale-nationale_15min_LOCALTIME.csv',
+         'formatted_barodata_centre-quebec_15min_LOCALTIME.csv',
+         'formatted_barodata_chaudiere-appalaches_15min_LOCALTIME.csv',
+         'formatted_barodata_monteregie_15min_LOCALTIME.csv',
+         'formatted_barodata_montreal_15min_LOCALTIME.csv']
+
+for i, file in enumerate(files):
+    if i == 0:
+        rsesq_baro = pd.read_csv(
+            osp.join(dirname, files[0]), header=0, index_col='Date')
+    else:
+        rsesq_baro = rsesq_baro.append(pd.read_csv(
+            osp.join(dirname, file), header=0, index_col='Date'))
+
+# %%
+plt.close('all')
+
+rsesq_reader = MDDELCC_RSESQ_Reader()
+rsesq_stations = rsesq_reader.stations()
 
 fig, axes = plt.subplots(2, 5)
-axes = axes.flatten()
 fig.set_size_inches(w=11, h=6)
-for i, ax in enumerate(axes):
+axes = axes.flatten()
+
+for i, ax in enumerate(axes.flatten()):
     ax.set_aspect('equal')
     ax.set_axisbelow(True)
     ax.set_xticks([-30, 0, 30])
@@ -143,85 +177,64 @@ for i, ax in enumerate(axes):
     else:
         ax.set_xlabel('Baro NARR (cm)', labelpad=10, fontsize=14)
 
-baroname = ("D:/OneDrive/INRS/2017 - Projet INRS PACC/Correction Baro RSESQ/"
-            "rsesq_barodata.hdf5")
-hdf5baro = h5py.File(baroname, 'r')
-stations = list(hdf5baro.keys())
-
 crosscorr_figs = []
-# stations = ['03020001']
-for i, station in enumerate(stations):
+for i, station in enumerate(rsesq_baro.columns[:10]):
+    if i == 10:
+        break
 
-    # Get data from the RSESQ measurements
-    data_sta = hdf5baro[station]
-    baro_sta = pd.Series(
-        data_sta['baro_m'][:],
-        pd.to_datetime(data_sta['date'], format="%Y-%m-%d %H:%M:%S"))
+    rsesq_baro_sta = rsesq_baro[station]
+    rsesq_baro_sta.name = 'RSESQ'
+
+    narr_baro_sta = narr_baro[station]
+    narr_baro_sta.name = 'NARR'
 
     # Get the baro data from the nearest node in the NARR grid.
-    lat_sta = data_sta.attrs['latitude']
-    lon_sta = data_sta.attrs['longitude']
-    dist = calc_dist_from_coord(lat_grid, lon_grid, lat_sta, lon_sta)
-    rowmin = np.argmin(np.min(dist, axis=1))
-    colmin = np.argmin(dist[rowmin, :])
-
-    baro_naar = pd.Series(
-        np.copy(pres_grid[:, rowmin, colmin]), dtime_grid)
-    baro_naar = baro_naar * 0.00010197  # Pa -> m
-    baro_naar.index = baro_naar.index - pd.Timedelta(hours=5)
+    dist = calc_dist_from_coord(
+        narr_coord.loc[station]['lat_dd'],
+        narr_coord.loc[station]['lon_dd'],
+        rsesq_stations.loc[station]['Lat_ddeg'],
+        rsesq_stations.loc[station]['Lon_ddeg'])
 
     # Keep only the values that are synchronized.
-    baro_naar.dropna(inplace=True)
-    baro_sta = baro_sta[baro_naar.index]
-    baro_sta.dropna(inplace=True)
-    baro_naar = baro_naar[baro_sta.index]
+    baro_stack = rsesq_baro_sta.to_frame().join(
+        narr_baro_sta, how='outer').dropna()
 
     # Normalize the data.
-    baro_sta = baro_sta - np.nanmean(baro_sta)
-    baro_naar = baro_naar - np.nanmean(baro_naar)
+    baro_stack['RSESQ'] = baro_stack['RSESQ'] - baro_stack['RSESQ'].mean()
+    baro_stack['NARR'] = baro_stack['NARR'] - baro_stack['NARR'].mean()
 
     # Plot the data.
-    l1, = axes[i].plot(baro_naar * 100, baro_sta * 100, '.',
-                       ms=3, alpha=0.5, mfc='k', mec='k', clip_on=True, mew=0)
+    ax = axes[i]
+    l1, = ax.plot(
+        baro_stack['NARR'] * 100, baro_stack['RSESQ'] * 100,
+        '.', ms=3, alpha=0.5, mfc='k', mec='k', clip_on=True, mew=0)
     l1.set_rasterized(True)
-    axes[i].plot((-30, 30), (-30, 30), '--', lw=1, color='red')
-    axes[i].set_title('#' + str(station), fontsize=14)
-    axes[i].axis(ymin=-30, ymax=30, xmin=-30, xmax=30)
+    ax.plot((-30, 30), (-30, 30), '--', lw=1, color='red')
+    ax.set_title('#' + str(station), fontsize=14)
+    ax.axis(ymin=-30, ymax=30, xmin=-30, xmax=30)
 
-    # PLot the coefficient of regression.
-    r = np.corrcoef(baro_naar.values, baro_sta.values)[1, 0]
-    axes[i].text(
+    # Plot the coefficient of regression.
+    r = np.corrcoef(baro_stack['NARR'], baro_stack['RSESQ'])[1, 0]
+    ax.text(
         0, 1, 'r = %0.3f' % (r), ha='left', va='top', fontsize=11,
-        transform=(axes[i].transAxes +
+        transform=(ax.transAxes +
                    ScaledTranslation(5/72, -20/72, fig.dpi_scale_trans)))
 
     # Plot the RMSE.
-    rmse = np.nanmean((baro_naar.values - baro_sta.values)**2)**0.5
+    rmse = np.nanmean((baro_stack['NARR'] - baro_stack['RSESQ'])**2)**0.5
     rmse = rmse * 100  # m -> cm
-    axes[i].text(
+    ax.text(
         0, 1, 'RMSE = %0.1f cm' % (rmse), ha='left', va='top', fontsize=11,
-        transform=(axes[i].transAxes +
+        transform=(ax.transAxes +
                    ScaledTranslation(5/72, -5/72, fig.dpi_scale_trans)))
-
-    # crosscorr_figs.append(plot_cross_correllation(
-    #     baro_naar.values, baro_sta['BP(m)'].values,
-    #     station=station, dist=dist[rowmin, colmin])
-    # )
 
 suptitle = (
     "Comparaison des données barométriques normalisées du RSESQ \n"
     " avec la grille NARR pout la période du {} au {}"
-    ).format(baro_sta.index[0].strftime("%Y-%m-%d"),
-             baro_sta.index[-1].strftime("%Y-%m-%d"))
+    ).format(baro_stack.index[0].strftime("%Y-%m-%d"),
+             baro_stack.index[-1].strftime("%Y-%m-%d"))
 
 fig.suptitle(suptitle, fontsize=15)
 fig.tight_layout()
 fig.subplots_adjust(wspace=0.3, hspace=0.3, top=0.85)
-# fig.savefig("baro_rsesq_vs_narr.pdf", dpi=600)
-
-# pdfpages = PdfPages('cross_correllation_RSESQ_NARR.pdf')
-# for crosscorr_fig in crosscorr_figs:
-#     pdfpages.savefig(crosscorr_fig)
-# pdfpages.close()
-
-hdf5baro.close()
+fig.savefig("baro_rsesq_vs_narr.pdf", dpi=600)
